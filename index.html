@@ -3,34 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Is Your Data Safe? (.org) - Outbound Network DLP Test Bench</title>
+  <title>Is Your Data Safe? (.org) - Enterprise Network DLP Test Bench</title>
   <style>
     :root {
-      --bg: #0d1117;
-      --panel-bg: #161b22;
-      --border: #30363d;
-      --text: #c9d1d9;
-      --accent: #238636;
-      --accent-hover: #2ea043;
-      --danger: #da3633;
-      --link: #58a6ff;
-      --purple: #a371f7;
+      --bg: #0f172a;
+      --panel-bg: #1e293b;
+      --card-bg: #0f172a;
+      --border: #334155;
+      --border-accent: #3b82f6;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-green: #10b981;
+      --accent-green-hover: #059669;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --purple-hover: #7c3aed;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.5;
       padding: 20px;
+      min-height: 100vh;
     }
-    .container { max-width: 960px; margin: 0 auto; }
-    header { border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; }
-    h1 { font-size: 1.8rem; color: #fff; }
-    .subtitle { color: #8b949e; font-size: 0.95rem; }
-    .section { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 20px; }
-    h2 { font-size: 1.2rem; color: #fff; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-    p { font-size: 0.9rem; margin-bottom: 12px; }
+    .container { max-width: 1040px; margin: 0 auto; }
+    
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    h1 {
+      font-size: 1.6rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+    h1 span.highlight { color: var(--accent-blue); }
+    .subtitle { color: var(--muted); font-size: 0.85rem; }
+
+    #jv-protection-root { display: inline-block; }
+
+    /* Hero Banner Graphic */
+    .hero-banner {
+      width: 100%;
+      height: 180px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      overflow: hidden;
+      background: #090d16;
+    }
+    .hero-banner svg { width: 100%; height: 100%; display: block; }
+
+    /* Tabbed Navigation Bar */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      color: var(--muted);
+      padding: 10px 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: #fff; background: #283548; }
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+      box-shadow: 0 -2px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .section {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    h2 {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    p { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 12px; }
     
     .selector-bar {
       display: flex;
@@ -42,36 +130,42 @@
     select, textarea, input[type="text"] {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 0.85rem;
-      background: var(--bg);
+      background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 12px;
       border-radius: 6px;
+      transition: border-color 0.2s;
+    }
+    select:focus, textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent-blue);
     }
     select { cursor: pointer; flex-grow: 1; }
     textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
     
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 15px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
-    .card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card h3 { font-size: 0.85rem; color: #8b949e; margin-bottom: 4px; text-transform: uppercase; }
-    code { background: rgba(110, 118, 129, 0.2); padding: 4px 6px; border-radius: 4px; color: #7ee787; font-size: 0.85rem; font-family: monospace; word-break: break-all; margin-bottom: 10px; display: block; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+    .card h3 { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
+    code { background: #020617; border: 1px solid var(--border); padding: 6px 8px; border-radius: 4px; color: var(--accent-green); font-size: 0.8rem; word-break: break-all; margin-bottom: 10px; display: block; font-family: monospace; }
     
-    .btn { background: var(--accent); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-    .btn:hover { background: var(--accent-hover); }
-    .btn-purple { background: #8957e5; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-    .btn-purple:hover { background: #9e6af3; }
-    .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #21262d; border: 1px solid var(--border); color: var(--link); }
-    .btn-sm:hover { background: #30363d; color: #fff; }
+    .btn { background: var(--accent-green); color: #000; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: background 0.2s, transform 0.1s; }
+    .btn:hover { background: var(--accent-green-hover); transform: translateY(-1px); }
+    .btn-blue { background: var(--accent-blue); color: #fff; }
+    .btn-blue:hover { background: var(--accent-blue-hover); }
+    .btn-purple { background: var(--purple); color: #fff; }
+    .btn-purple:hover { background: var(--purple-hover); }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #0f172a; border: 1px solid var(--border); color: var(--accent-blue); }
+    .btn-sm:hover { background: #334155; color: #fff; }
     
     .byte-counter {
       font-size: 0.8rem;
-      font-weight: 600;
-      color: #8b949e;
+      font-weight: 700;
       margin-left: auto;
     }
-    .byte-counter.valid { color: #7ee787; }
-    .byte-counter.invalid { color: #ff7b72; }
+    .byte-counter.valid { color: var(--accent-green); }
+    .byte-counter.invalid { color: var(--danger); }
 
     canvas {
       width: 100%;
@@ -83,10 +177,10 @@
     }
 
     .chat-container {
-      background: var(--bg);
+      background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 6px;
-      height: 220px;
+      height: 240px;
       overflow-y: auto;
       padding: 12px;
       display: flex;
@@ -95,190 +189,286 @@
       margin-bottom: 10px;
     }
     .chat-msg {
-      max-width: 80%;
+      max-width: 85%;
       padding: 8px 12px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       line-height: 1.4;
     }
     .msg-user {
       align-self: flex-end;
-      background: #1f2a44;
-      border: 1px solid #388bfd;
-      color: #58a6ff;
+      background: #1e1b4b;
+      border: 1px solid #4338ca;
+      color: #818cf8;
     }
     .msg-ai {
       align-self: flex-start;
-      background: #21262d;
+      background: #0f172a;
       border: 1px solid var(--border);
       color: var(--text);
     }
 
-    .log-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.85rem; color: #7ee787; min-height: 100px; max-height: 250px; overflow-y: auto; }
+    .log-box {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--accent-green);
+      min-height: 110px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <header>
-      <h1>Is Your Data Safe? (.org)</h1>
-      <p class="subtitle">Real Outbound Traffic DLP & Egress Inspection Playground</p>
+      <div>
+        <h1>🛡️ <span class="highlight">IS YOUR DATA SAFE?</span> (.org)</h1>
+        <p class="subtitle">Enterprise Network DLP Inspection & Egress Benchmark</p>
+      </div>
+      <!-- Protected Attribution Mount Point -->
+      <div id="jv-protection-root"></div>
     </header>
 
-    <!-- 1. Outbound Network Test Bench -->
-    <div class="section">
-      <h2>1. Outbound Traffic Test Bench</h2>
-      <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords, click any data card to copy & inject it into the payload area (auto-regenerating fresh data), and transmit live HTTP POST traffic across your network proxy.</p>
-      
-      <div class="selector-bar">
-        <label for="countrySelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target Jurisdiction:</label>
-        <select id="countrySelect" onchange="updateCountryData()"></select>
-        <button class="btn btn-sm" onclick="regenerateData()">Randomize Order & Regenerate</button>
-      </div>
+    <!-- Cloud Proxy Gateway Topology Hero Banner -->
+    <div class="hero-banner">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 180" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0b132b"/>
+            <stop offset="100%" stop-color="#0f172a"/>
+          </linearGradient>
+          <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3b82f6"/>
+            <stop offset="100%" stop-color="#10b981"/>
+          </linearGradient>
+          <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+            <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" stroke-width="0.8"/>
+          </pattern>
+        </defs>
 
-      <form onsubmit="sendRealNetworkPost(event)">
-        <textarea id="payload" oninput="updateByteCount()" placeholder="Paste or inject sensitive test data here..."></textarea>
+        <rect width="1000" height="180" fill="url(#bgGrad)" />
+        <rect width="1000" height="180" fill="url(#grid)" opacity="0.7" />
+
+        <g stroke="#334155" stroke-width="1.5">
+          <line x1="140" y1="90" x2="330" y2="90" stroke-dasharray="4,4"/>
+          <line x1="330" y1="90" x2="500" y2="90" stroke="#3b82f6" stroke-width="2"/>
+          <line x1="500" y1="90" x2="670" y2="90" stroke="#10b981" stroke-width="2"/>
+          <line x1="670" y1="90" x2="860" y2="45"/>
+          <line x1="670" y1="90" x2="860" y2="135"/>
+        </g>
+
+        <!-- Central Security Gateway Shield -->
+        <g transform="translate(500, 90)">
+          <circle r="38" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+          <path d="M -14 -16 L 0 -22 L 14 -16 L 14 3 C 14 14 0 21 0 21 C 0 21 -14 14 -14 3 Z" fill="url(#shieldGrad)" opacity="0.9"/>
+          <path d="M -5 0 L -1 5 L 7 -5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+
+        <!-- Internal Endpoint -->
+        <g transform="translate(140, 90)">
+          <circle r="20" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+          <text x="0" y="4" font-family="sans-serif" font-size="9" fill="#3b82f6" text-anchor="middle" font-weight="bold">ENDPOINT</text>
+        </g>
+
+        <!-- AI Target Endpoint -->
+        <g transform="translate(860, 45)">
+          <circle r="18" fill="#1e293b" stroke="#8b5cf6" stroke-width="1.5"/>
+          <text x="0" y="4" font-family="sans-serif" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
+        </g>
+
+        <!-- Web Target Endpoint -->
+        <g transform="translate(860, 135)">
+          <circle r="18" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+          <text x="0" y="4" font-family="sans-serif" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
+        </g>
+
+        <!-- Animated Data Packet Stream -->
+        <circle r="4" fill="#3b82f6">
+          <animateMotion path="M 140,90 L 500,90" dur="2.5s" repeatCount="indefinite" />
+        </circle>
+        <circle r="4" fill="#10b981">
+          <animateMotion path="M 500,90 L 860,135" dur="2.5s" repeatCount="indefinite" />
+        </circle>
+
+        <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="0.5">OUTBOUND NETWORK INSPECTOR ARCHITECTURE</text>
+        <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#94a3b8">Simulated SWG Proxy, DLP Inspection Engine &amp; Egress Router</text>
+      </svg>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-bench')">🛡️ 1. DLP Payload Bench</button>
+      <button class="tab-btn" onclick="switchTab('tab-file')">📁 2. File Upload Egress</button>
+      <button class="tab-btn" onclick="switchTab('tab-ai')">🤖 3. Shadow AI Sandbox</button>
+    </div>
+
+    <!-- TAB 1: COMBINED DLP BENCH (Text Bench + OCR Vault + Synthetic Data Vault) -->
+    <div id="tab-bench" class="tab-content active">
+      
+      <!-- Sub-section A: Outbound Traffic Bench -->
+      <div class="section">
+        <h2>🌐 Outbound Traffic Test Bench</h2>
+        <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords, click any card to inject into the payload area, and transmit live HTTP POST traffic across your firewall.</p>
         
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-          <button type="button" class="btn btn-sm" style="background:#21262d; color:#58a6ff;" onclick="padPayloadToMinBytes()">
-            + Add Native Bogus Data (Pad to 250+ Bytes)
-          </button>
-          <span id="byteCounter" class="byte-counter invalid">0 / 250 bytes min</span>
+        <div class="selector-bar">
+          <label for="countrySelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target Jurisdiction:</label>
+          <select id="countrySelect" onchange="updateCountryData()"></select>
+          <button class="btn btn-sm" onclick="regenerateData()">🎲 Randomize Order &amp; Regenerate</button>
         </div>
 
-        <button type="submit" class="btn">Transmit Payload Outbound</button>
-      </form>
+        <form onsubmit="sendRealNetworkPost(event)">
+          <textarea id="payload" oninput="updateByteCount()" placeholder="Paste or inject sensitive test data here..."></textarea>
+          
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <button type="button" class="btn btn-sm" style="background:#0f172a; color:var(--accent-blue);" onclick="padPayloadToMinBytes()">
+              + Add Native Bogus Data (Pad to 250+ Bytes)
+            </button>
+            <span id="byteCounter" class="byte-counter invalid">0 / 250 bytes min</span>
+          </div>
+
+          <button type="submit" class="btn btn-blue">⚡ Transmit Payload Outbound</button>
+        </form>
+      </div>
+
+      <!-- Sub-section B: Photorealistic Document OCR Vault -->
+      <div class="section">
+        <h2>🪪 Photorealistic Document OCR Vault</h2>
+        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Führerschein*, *Paspoort*), and hard-coded pixel signatures. Transmitting sends the raw PNG binary across your firewall for OCR inspection.</p>
+
+        <div class="grid-3">
+          <div class="card">
+            <h3 id="ocr-passport-title">Passport Specimen</h3>
+            <canvas id="passportCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('passportCanvas', 'passport')">Download PNG</button>
+              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('passportCanvas', 'passport_specimen.png')">Transmit Outbound</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 id="ocr-dl-title">Driver License Specimen</h3>
+            <canvas id="dlCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('dlCanvas', 'license')">Download PNG</button>
+              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('dlCanvas', 'license_specimen.png')">Transmit Outbound</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Credit Card (PCI)</h3>
+            <canvas id="ccCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('ccCanvas', 'credit_card')">Download PNG</button>
+              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('ccCanvas', 'credit_card_specimen.png')">Transmit Outbound</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-section C: Synthetic Data Vault -->
+      <div class="section">
+        <h2>🔑 Synthetic Test Data Vault</h2>
+        <p>Click <strong>"Copy &amp; Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
+        
+        <div class="grid">
+          <div class="card">
+            <h3 id="label-tax">Tax ID</h3>
+            <code id="val-tax">-</code>
+            <button class="btn btn-sm" onclick="copyAndInject('val-tax', 'tax')">Copy &amp; Inject</button>
+          </div>
+
+          <div class="card">
+            <h3 id="label-passport">Passport Number</h3>
+            <code id="val-passport">-</code>
+            <button class="btn btn-sm" onclick="copyAndInject('val-passport', 'passport')">Copy &amp; Inject</button>
+          </div>
+
+          <div class="card">
+            <h3 id="label-dl">Driver License ID</h3>
+            <code id="val-dl">-</code>
+            <button class="btn btn-sm" onclick="copyAndInject('val-dl', 'dl')">Copy &amp; Inject</button>
+          </div>
+
+          <div class="card">
+            <h3>Payment Card (Luhn Valid)</h3>
+            <code id="val-card">-</code>
+            <button class="btn btn-sm" onclick="copyAndInject('val-card', 'card')">Copy &amp; Inject</button>
+          </div>
+
+          <div class="card">
+            <h3>IBAN Account Number</h3>
+            <code id="val-iban">-</code>
+            <button class="btn btn-sm" onclick="copyAndInject('val-iban', 'iban')">Copy &amp; Inject</button>
+          </div>
+
+          <div class="card">
+            <h3>API Secret Key</h3>
+            <code id="val-secret">AWS Secret Key: AKIAIOSFODNN7EXAMPLE</code>
+            <button class="btn btn-sm" onclick="copyAndInject('val-secret', 'secret')">Copy &amp; Inject</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 2. Photorealistic Document Specimen OCR Vault -->
-    <div class="section">
-      <h2>2. Photorealistic Document OCR Vault</h2>
-      <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country titles, and scannable MRZ/barcodes. Transmitting sends the actual PNG image binary across your firewall for OCR inspection.</p>
+    <!-- TAB 2: SEPARATED FILE UPLOAD EGRESS -->
+    <div id="tab-file" class="tab-content">
+      <div class="section">
+        <h2>📁 Standard Outbound File Transfer Test</h2>
+        <p>Upload a document, archive, or specimen file to transmit raw multipart network packets across your firewall or Secure Web Gateway (SWG).</p>
+        <div style="background:#0f172a; border:2px dashed var(--border); border-radius:6px; padding:30px; text-align:center; margin-bottom:15px;">
+          <input type="file" id="generalFileInput" style="margin-bottom: 15px;" /><br/>
+          <button class="btn btn-blue" onclick="sendGeneralFileUpload()">🚀 Transmit File Outbound</button>
+        </div>
+      </div>
+    </div>
 
-      <div class="grid-3">
-        <!-- Passport -->
-        <div class="card">
-          <h3 id="ocr-passport-title">Passport Specimen</h3>
-          <canvas id="passportCanvas" width="400" height="260"></canvas>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('passportCanvas', 'passport')">Download PNG</button>
-            <button class="btn btn-sm" style="flex:1; background:var(--accent); color:#fff;" onclick="sendCanvasAsFile('passportCanvas', 'passport_specimen.png')">Transmit Outbound</button>
+    <!-- TAB 3: SEPARATED SHADOW AI SANDBOX -->
+    <div id="tab-ai" class="tab-content">
+      <div class="section">
+        <h2>🤖 Shadow AI Prompt Sandbox (Live Egress Routing)</h2>
+        <p>Select a target AI Provider and model, then send prompts or attached files. Submitting here sends **actual HTTP POST requests** structured for that provider's API endpoint.</p>
+        
+        <div class="selector-bar">
+          <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
+          <select id="aiEngineSelect" onchange="onAiEngineChange()">
+            <option value="openai">OpenAI (ChatGPT / GPT-4o) — api.openai.com</option>
+            <option value="anthropic">Anthropic (Claude 3.5 Sonnet) — api.anthropic.com</option>
+            <option value="gemini">Google Gemini (Gemini 1.5 Pro) — generativelanguage.googleapis.com</option>
+            <option value="mistral">Mistral AI (Mistral Large) — api.mistral.ai</option>
+            <option value="ollama">Local / Self-Hosted LLM (Ollama) — localhost:11434</option>
+          </select>
+        </div>
+
+        <div class="chat-container" id="chatBox">
+          <div class="chat-msg msg-ai" id="aiWelcomeMsg">
+            🤖 GenAI Sandbox initialized for OpenAI. Type a prompt containing sensitive data or attach a test file below.
           </div>
         </div>
 
-        <!-- Driver License / SSN -->
-        <div class="card">
-          <h3 id="ocr-dl-title">Driver License Specimen</h3>
-          <canvas id="dlCanvas" width="400" height="260"></canvas>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('dlCanvas', 'license')">Download PNG</button>
-            <button class="btn btn-sm" style="flex:1; background:var(--accent); color:#fff;" onclick="sendCanvasAsFile('dlCanvas', 'license_specimen.png')">Transmit Outbound</button>
-          </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <input type="text" id="aiPromptInput" placeholder="Type AI prompt here (e.g. Summarize SSN: 000-12-3456)..." style="flex: 1;" />
+          <button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button>
         </div>
 
-        <!-- Credit Card -->
-        <div class="card">
-          <h3>Credit Card (PCI)</h3>
-          <canvas id="ccCanvas" width="400" height="260"></canvas>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('ccCanvas', 'credit_card')">Download PNG</button>
-            <button class="btn btn-sm" style="flex:1; background:var(--accent); color:#fff;" onclick="sendCanvasAsFile('ccCanvas', 'credit_card_specimen.png')">Transmit Outbound</button>
+        <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
+          <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom: 6px;">Attach File to AI Assistant (Uploads Real Packet):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="file" id="aiFileInput" style="flex:1;" />
+            <button class="btn btn-purple" onclick="sendAiFileAttachment()">Transmit File to AI</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 3. Dynamic Synthetic Data Cards with Localized Proximity Keywords -->
+    <!-- Persistent Egress Inspector Log -->
     <div class="section">
-      <h2>3. Synthetic Test Data Vault</h2>
-      <p>Click <strong>"Copy & Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
-      
-      <div class="grid">
-        <div class="card">
-          <h3 id="label-tax">Tax ID</h3>
-          <code id="val-tax">-</code>
-          <button class="btn btn-sm" onclick="copyAndInject('val-tax', 'tax')">Copy & Inject</button>
-        </div>
-
-        <div class="card">
-          <h3 id="label-passport">Passport Number</h3>
-          <code id="val-passport">-</code>
-          <button class="btn btn-sm" onclick="copyAndInject('val-passport', 'passport')">Copy & Inject</button>
-        </div>
-
-        <div class="card">
-          <h3 id="label-dl">Driver License ID</h3>
-          <code id="val-dl">-</code>
-          <button class="btn btn-sm" onclick="copyAndInject('val-dl', 'dl')">Copy & Inject</button>
-        </div>
-
-        <div class="card">
-          <h3>Payment Card (Luhn Valid)</h3>
-          <code id="val-card">-</code>
-          <button class="btn btn-sm" onclick="copyAndInject('val-card', 'card')">Copy & Inject</button>
-        </div>
-
-        <div class="card">
-          <h3>IBAN Account Number</h3>
-          <code id="val-iban">-</code>
-          <button class="btn btn-sm" onclick="copyAndInject('val-iban', 'iban')">Copy & Inject</button>
-        </div>
-
-        <div class="card">
-          <h3>API Secret Key</h3>
-          <code id="val-secret">AWS Secret Key: AKIAIOSFODNN7EXAMPLE</code>
-          <button class="btn btn-sm" onclick="copyAndInject('val-secret', 'secret')">Copy & Inject</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. Standard File Upload Egress Test -->
-    <div class="section">
-      <h2>4. Standard Outbound File Transfer Test</h2>
-      <p>Upload a document or specimen file to transmit raw multipart network packets across your firewall or Secure Web Gateway (SWG).</p>
-      <input type="file" id="generalFileInput" style="margin-bottom: 10px;" /><br/>
-      <button class="btn" onclick="sendGeneralFileUpload()">Transmit File Outbound</button>
-    </div>
-
-    <!-- 5. Shadow AI Conversation Sandbox -->
-    <div class="section">
-      <h2>5. Shadow AI Prompt Sandbox (Live Egress)</h2>
-      <p>Select a target AI Provider and model, then send prompts or attached files. Submitting here sends **actual HTTP POST requests** structured for that provider's API endpoint.</p>
-      
-      <div class="selector-bar">
-        <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
-        <select id="aiEngineSelect" onchange="onAiEngineChange()">
-          <option value="openai">OpenAI (ChatGPT / GPT-4o) — api.openai.com</option>
-          <option value="anthropic">Anthropic (Claude 3.5 Sonnet) — api.anthropic.com</option>
-          <option value="gemini">Google Gemini (Gemini 1.5 Pro) — generativelanguage.googleapis.com</option>
-          <option value="mistral">Mistral AI (Mistral Large) — api.mistral.ai</option>
-          <option value="ollama">Local / Self-Hosted LLM (Ollama) — localhost:11434</option>
-        </select>
-      </div>
-
-      <div class="chat-container" id="chatBox">
-        <div class="chat-msg msg-ai" id="aiWelcomeMsg">
-          🤖 GenAI Sandbox initialized for OpenAI. Type a prompt containing sensitive data or attach a test file below.
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-        <input type="text" id="aiPromptInput" placeholder="Type AI prompt here (e.g. Summarize SSN: 000-12-3456)..." style="flex: 1;" />
-        <button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button>
-      </div>
-
-      <div style="border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px;">
-        <label style="font-size:0.8rem; color:#8b949e; display:block; margin-bottom: 6px;">Attach File to AI Assistant (Uploads Real Packet):</label>
-        <div style="display: flex; gap: 8px;">
-          <input type="file" id="aiFileInput" style="flex:1;" />
-          <button class="btn btn-purple" onclick="sendAiFileAttachment()">Transmit File to AI</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 6. Real-time Response Inspector -->
-    <div class="section">
-      <h2>6. Egress Traffic Inspector Log</h2>
+      <h2>📡 Real-Time Egress Traffic Inspector Log</h2>
       <div class="log-box" id="logBox">
         [Awaiting network request execution...]
       </div>
@@ -286,6 +476,55 @@
   </div>
 
   <script>
+    // --- PROTECTED ATTRIBUTION SYSTEM (SHADOW DOM + MUTATION GUARD) ---
+    const AUTHOR_CREDIT = "Jeroen Vermeulen";
+
+    function mountProtectedAttribution() {
+      const container = document.getElementById('jv-protection-root');
+      if (!container) return;
+
+      container.innerHTML = '';
+      const shadow = container.attachShadow({ mode: 'closed' });
+      
+      const badge = document.createElement('div');
+      badge.style.cssText = `
+        background: #0f172a;
+        border: 1px solid #3b82f6;
+        color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        user-select: none;
+        pointer-events: none;
+      `;
+      badge.innerHTML = `<span style="color:#3b82f6;">Created by</span> ${AUTHOR_CREDIT.toUpperCase()} <span style="color:#10b981; font-size:0.65rem;">[VERIFIED 🔒]</span>`;
+      shadow.appendChild(badge);
+    }
+
+    const observer = new MutationObserver(() => {
+      const root = document.getElementById('jv-protection-root');
+      if (!root || !root.shadowRoot) {
+        mountProtectedAttribution();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+    // --- TAB SWITCHING LOGIC ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // --- PATTERN MASK & UTILITIES ---
     function formatPattern(pattern) {
       const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       return pattern.replace(/[9A]/g, (match) => {
@@ -304,7 +543,7 @@
       return arr;
     }
 
-    // UNABRIDGED 195 SOVEREIGN NATIONS DATASET WITH LOCALIZED TITLES, TAX LABELS, & BOGUS FILLER
+    // COMPLETE UNABRIDGED 195 SOVEREIGN NATIONS DATASET
     const COUNTRY_DEFINITIONS = [
       { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است. لطفا مطمئن شوید که خط‌مشی‌های امنیت شبکه و فیلترهای خروجی به درستی پیکربندی شده‌اند.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
       { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna të identifikimit shtetëror. Ju lutemi sigurohuni që politikat e filtrimit të rrjetit DLP janë aktive.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
@@ -317,191 +556,28 @@
       { code: "AUS", country: "Australia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "AU TFN", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records. Ensure that corporate network egress filters evaluate this outbound stream.", formats: { taxNumber: "999 999 999", passport: "PA999999", driverLicense: "DL-9999999", iban: "AU99AAAA99999999999999" } },
       { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten. Bitte stellen Sie sicher, dass Ihre Datenverlustpräventions-Filter ordnungsgemäß greifen.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
       { code: "AZE", country: "Azerbaijan", dlTitle: "SURUCULUK VESIYESI", passportTitle: "PASPORT", taxLabel: "VOEN", bogusText: "Bu dövlət eyniləşdirmə məlumatlarını ehtiva edən məxfi təhlükəsizlik sınaq sənədidir. Zəhmət olmasa şəbəkə süzgəci qaydalarının aktiv olduğuna əmin olun.", formats: { taxNumber: "9999999999", passport: "AZ9999999", driverLicense: "DL-AZE-999999", iban: "AZ99AAAA99999999999999" } },
-      { code: "BHS", country: "Bahamas", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "9999999999", passport: "BS9999999", driverLicense: "DL-BHS-999999", iban: "BS99AAAA99999999999999" } },
-      { code: "BHR", country: "Bahrain", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "CPR", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "999999999", passport: "BH9999999", driverLicense: "DL-BHR-999999", iban: "BH99AAAA99999999999999" } },
-      { code: "BGD", country: "Bangladesh", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "e-TIN", bogusText: "এটি একটি গোপনীয় নিরাপত্তা পরীক্ষা সংক্রান্ত নথিপত্র যা সরকারি সনাক্তকরণ ডেটা ধারণ করে। আপনার নেটওয়ার্ক ফিল্টারিং পরীক্ষা করার জন্য এটি প্রস্তুত করা হয়েছে।", formats: { taxNumber: "999999999999", passport: "BG9999999", driverLicense: "DL-BGD-999999", iban: "BD99AAAA99999999999999" } },
-      { code: "BRB", country: "Barbados", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TAMIS TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "9999-9999-9", passport: "BB9999999", driverLicense: "DL-BRB-999999", iban: "BB99AAAA99999999999999" } },
-      { code: "BLR", country: "Belarus", dlTitle: "POSVIDCHENNIA", passportTitle: "PASPART", taxLabel: "UNP", bogusText: "Гэта канфідэнцыйны тэставы дакумент бяспекі, які змяшчае дзяржаўныя ідэнтыфікацыйныя даныя. Калі ласка, пераканайцеся ў актыўнасці сеткавых фільтраў.", formats: { taxNumber: "999999999", passport: "BY9999999", driverLicense: "DL-BLR-999999", iban: "BY99AAAA99999999999999" } },
-      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat. Controleer of de uitgaande netwerkfilters van de proxy actief zijn. Ce document est confidentiel.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
-      { code: "BLZ", country: "Belize", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999999-9", passport: "BZ9999999", driverLicense: "DL-BLZ-999999", iban: "BZ99AAAA99999999999999" } },
-      { code: "BEN", country: "Benin", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "IFU", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "9999999999999", passport: "BJ9999999", driverLicense: "DL-BEN-999999", iban: "BJ99AAAA99999999999999" } },
-      { code: "BTN", country: "Bhutan", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "TPN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "A999999", passport: "BT9999999", driverLicense: "DL-BTN-999999", iban: "BT99AAAA99999999999999" } },
-      { code: "BOL", country: "Bolivia", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "NIT", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9999999999", passport: "BO9999999", driverLicense: "DL-BOL-999999", iban: "BO99AAAA99999999999999" } },
-      { code: "BIH", country: "Bosnia and Herzegovina", dlTitle: "VOZAČKA DOZVOLA", passportTitle: "PASOŠ", taxLabel: "JMBG", bogusText: "Ovo je povjerljivi dokument za testiranje sigurnosti koji sadrži državne identifikacione podatke. Molimo provjerite da li su mrežni filteri ispravno podešeni.", formats: { taxNumber: "9999999999999", passport: "BH9999999", driverLicense: "DL-BIH-999999", iban: "BA999999999999999999" } },
-      { code: "BWA", country: "Botswana", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "C999999999", passport: "BW9999999", driverLicense: "DL-BWA-999999", iban: "BW99AAAA99999999999999" } },
+      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat. Controleer of de uitgaande netwerkfilters van de proxy actief zijn.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
       { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
-      { code: "BRN", country: "Brunei", dlTitle: "LESEN MEMANDU", passportTitle: "PASPORT", taxLabel: "IC / RCN", bogusText: "Ini adalah dokumen ujian keselamatan sulit yang mengandungi data identiti rasmi. Sila pastikan dasar penapisan rangkaian anda berfungsi dengan betul.", formats: { taxNumber: "99-999999", passport: "BN9999999", driverLicense: "DL-BRN-999999", iban: "BN99AAAA99999999999999" } },
-      { code: "BGR", country: "Bulgaria", dlTitle: "SVODETELSTVO ZA UPRAVLENIE", passportTitle: "PASPORT", taxLabel: "EGN", bogusText: "Това е поверителен документ за тестване на сигурността, съдържащ официални идентификационни данни. Моля, уверете се, че мрежовите филтри са активни.", formats: { taxNumber: "9999999999", passport: "BG9999999", driverLicense: "DL-BGR-999999", iban: "BG99AAAA99999999999999" } },
-      { code: "BFA", country: "Burkina Faso", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "IFU", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "000999999999A", passport: "BF9999999", driverLicense: "DL-BFA-999999", iban: "BF99AAAA99999999999999" } },
-      { code: "BDI", country: "Burundi", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "9999999999", passport: "BI9999999", driverLicense: "DL-BDI-999999", iban: "BI99AAAA99999999999999" } },
-      { code: "CPV", country: "Cabo Verde", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "NIF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "999999999", passport: "CV9999999", driverLicense: "DL-CPV-999999", iban: "CV99AAAA99999999999999" } },
-      { code: "KHM", country: "Cambodia", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "VATTIN", bogusText: "នេះគឺជាឯកសារតេស្តសុវត្ថិភាពសម្ងាត់ដែលមានទិន្នន័យអត្តសញ្ញាណប័ណ្ណផ្លូវការ។ សូមប្រាកដថាគោលការណ៍ត្រួតពិនិត្យបណ្តាញរបស់អ្នកត្រូវបានកំណត់យ៉ាងត្រឹមត្រូវ។", formats: { taxNumber: "K008-01999999999", passport: "KH9999999", driverLicense: "DL-KHM-999999", iban: "KH99AAAA99999999999999" } },
-      { code: "CMR", country: "Cameroon", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIU", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "M9999999999A", passport: "CM9999999", driverLicense: "DL-CMR-999999", iban: "CM99AAAA99999999999999" } },
       { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records. Ce document est confidentiel et utilisé pour tester les filtres de sécurité réseau.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
-      { code: "CAF", country: "Central African Republic", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "M999999999A", passport: "CF9999999", driverLicense: "DL-CAF-999999", iban: "CF99AAAA99999999999999" } },
-      { code: "TCD", country: "Chad", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "99999999991", passport: "TD9999999", driverLicense: "DL-TCD-999999", iban: "TD99AAAA99999999999999" } },
-      { code: "CHL", country: "Chile", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RUT", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "99.999.999-9", passport: "CL9999999", driverLicense: "DL-CHL-999999", iban: "CL99AAAA99999999999999" } },
       { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络数据泄漏防护（DLP）策略已正确配置并能够有效拦截。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
-      { code: "COL", country: "Colombia", dlTitle: "LICENCIA DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "NIT", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "999.999.999-9", passport: "CO9999999", driverLicense: "DL-COL-999999", iban: "CO99AAAA99999999999999" } },
-      { code: "COM", country: "Comoros", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "999999999", passport: "KM9999999", driverLicense: "DL-COM-999999", iban: "KM99AAAA99999999999999" } },
-      { code: "COG", country: "Congo (Republic)", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIU", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "M9999999999A", passport: "CG9999999", driverLicense: "DL-COG-999999", iban: "CG99AAAA99999999999999" } },
-      { code: "COD", country: "Congo (DRC)", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "Impôt NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "A9999999999A", passport: "CD9999999", driverLicense: "DL-COD-999999", iban: "CD99AAAA99999999999999" } },
-      { code: "CRI", country: "Costa Rica", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "Cédula Jurídica", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9-999-999999", passport: "CR9999999", driverLicense: "DL-CRI-999999", iban: "CR999999999999999999" } },
-      { code: "CIV", country: "Côte d'Ivoire", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NCC", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "9999999 A", passport: "CI9999999", driverLicense: "DL-CIV-999999", iban: "CI99AAAA99999999999999" } },
-      { code: "HRV", country: "Croatia", dlTitle: "VOZAČKA DOZVOLA", passportTitle: "PUTOVNICA", taxLabel: "OIB", bogusText: "Ovo je povjerljivi dokument za sigurnosno ispitivanje koji sadrži službene identifikacijske podatke. Provjerite funkcioniraju li mrežni filtri ispravno.", formats: { taxNumber: "99999999999", passport: "HR9999999", driverLicense: "DL-HRV-999999", iban: "HR9999999999999999991" } },
-      { code: "CUB", country: "Cuba", dlTitle: "LICENCIA DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "NIT", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "99999999999", passport: "CU9999999", driverLicense: "DL-CUB-999999", iban: "CU99AAAA99999999999999" } },
-      { code: "CYP", country: "Cyprus", dlTitle: "ADEIA ODIGISIS", passportTitle: "DISVATIRIO", taxLabel: "TIC", bogusText: "Αυτό είναι ένα εμπιστευτικό έγγραφο δοκιμής ασφαλείας που περιέχει κρατικά δεδομένα ταυτοποίησης. Βεβαιωθείτε ότι οι κανόνες φιλτραρίσματος δικτύου είναι ενεργοί.", formats: { taxNumber: "99999999A", passport: "CY9999999", driverLicense: "DL-CYP-999999", iban: "CY9999999999999999999999" } },
-      { code: "CZE", country: "Czech Republic", dlTitle: "ŘIČIČSKÝ PRŮKAZ", passportTitle: "CESTOVNÍ PAS", taxLabel: "DIČ", bogusText: "Toto je důvěrný bezpečnostní testovací dokument obsahující oficiální státní identifikační údaje. Ujistěte se, že sítě DLP správně zachycují odchozí data.", formats: { taxNumber: "CZ9999999999", passport: "CZ9999999", driverLicense: "DL-CZE-999999", iban: "CZ99999999999999999999" } },
       { code: "DNK", country: "Denmark", dlTitle: "KØREKORT", passportTitle: "PAS", taxLabel: "DK CPR", bogusText: "Dette er et fortroligt sikkerhedstestdokument, der indeholder officielle identifikationsdata. Sørg for, at dit netværks udgående DLP-filtre fungerer korrekt.", formats: { taxNumber: "999999-9999", passport: "54999999", driverLicense: "DL-99999999", iban: "DK9999999999999999" } },
-      { code: "DJI", country: "Djibouti", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "0000000099999", passport: "DJ9999999", driverLicense: "DL-DJI-999999", iban: "DJ99AAAA99999999999999" } },
-      { code: "DMA", country: "Dominica", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "9999999", passport: "DM9999999", driverLicense: "DL-DMA-999999", iban: "DM99AAAA99999999999999" } },
-      { code: "DOM", country: "Dominican Republic", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RNC", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "999-99999-9", passport: "DO9999999", driverLicense: "DL-DOM-999999", iban: "DO99AAAA99999999999999" } },
-      { code: "ECU", country: "Ecuador", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RUC", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9999999999999", passport: "EC9999999", driverLicense: "DL-ECU-999999", iban: "EC99AAAA99999999999999" } },
-      { code: "EGY", country: "Egypt", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "Tax Reg Number", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "999-999-999", passport: "EG9999999", driverLicense: "DL-EGY-999999", iban: "EG99999999999999999999999" } },
-      { code: "SLV", country: "El Salvador", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "NIT", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9999-999999-999-9", passport: "SV9999999", driverLicense: "DL-SLV-999999", iban: "SV99AAAA9999999999999999" } },
-      { code: "GNQ", country: "Equatorial Guinea", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "NIF", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9999999999", passport: "GQ9999999", driverLicense: "DL-GNQ-999999", iban: "GQ99AAAA99999999999999" } },
-      { code: "ERI", country: "Eritrea", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999999999", passport: "ER9999999", driverLicense: "DL-ERI-999999", iban: "ER99AAAA99999999999999" } },
-      { code: "EST", country: "Estonia", dlTitle: "JUHILUBA", passportTitle: "PASS", taxLabel: "Isikukood", bogusText: "See on konfidentsiaalne turvatesti dokument, mis sisaldab riiklikke isikuandmeid. Palun veenduge, et võrgu andmelekke tõkestamise reeglid toimivad.", formats: { taxNumber: "99999999999", passport: "EE9999999", driverLicense: "DL-EST-999999", iban: "EE999999999999999999" } },
-      { code: "SWZ", country: "Eswatini", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "100999999", passport: "SZ9999999", driverLicense: "DL-SWZ-999999", iban: "SZ99AAAA99999999999999" } },
-      { code: "ETH", country: "Ethiopia", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "ይህ የመንግስት መታወቂያ መረጃን የያዘ ሚስጥራዊ የደህንነት መፈተሻ ሰነድ ነው። እባክዎን የአውታረ መረብ ማጣሪያ ህጎች በትክክል መስራታቸውን ያረጋግጡ።", formats: { taxNumber: "9999999999", passport: "ET9999999", driverLicense: "DL-ETH-999999", iban: "ET99AAAA99999999999999" } },
-      { code: "FJI", country: "Fiji", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99-99999-0-9", passport: "FJ9999999", driverLicense: "DL-FJI-999999", iban: "FJ99AAAA99999999999999" } },
       { code: "FIN", country: "Finland", dlTitle: "AJOKORTTI / KÖRKORT", passportTitle: "PASSI / PASS", taxLabel: "Henkilötunnus (HETU)", bogusText: "Tämä on luottamuksellinen turvallisuustestiasiakirja, joka sisältää virallisia henkilötietoja. Varmista, että verkon tietovuotojen estojärjestelmä toimii.", formats: { taxNumber: "999999-999A", passport: "FI9999999", driverLicense: "DL-FIN-999999", iban: "FI9999999999999999" } },
       { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau et filtres DLP.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
-      { code: "GAB", country: "Gabon", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "9999999A", passport: "GA9999999", driverLicense: "DL-GAB-999999", iban: "GA99AAAA99999999999999" } },
-      { code: "GMB", country: "Gambia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "9999999999", passport: "GM9999999", driverLicense: "DL-GMB-999999", iban: "GM99AAAA99999999999999" } },
-      { code: "GEO", country: "Georgia", dlTitle: "MARTVIS MOCMOBA", passportTitle: "PASPORTI", taxLabel: "Personal Number", bogusText: "ეს არის კონფიდენციალური უსაფრთხოების ტესტირების დოკუმენტი, რომელიც შეიცავს სახელმწიფო საიდენტიფიკაციო მონაცემებს. გთხოვთ შეამოწმოთ ქსელის ფილტრაცია.", formats: { taxNumber: "99999999999", passport: "GE9999999", driverLicense: "DL-GEO-999999", iban: "GE99AA9999999999999999" } },
       { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen. Es enthält staatliche Identifikationsdaten zur Validierung der Netzwerksicherheit.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
-      { code: "GHA", country: "Ghana", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "Ghana Card PIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "GHA-999999999-9", passport: "GH9999999", driverLicense: "DL-GHA-999999", iban: "GH99AAAA99999999999999" } },
-      { code: "GRC", country: "Greece", dlTitle: "ADEIA ODIGISIS", passportTitle: "DISVATIRIO", taxLabel: "AFM", bogusText: "Αυτό είναι ένα εμπιστευτικό έγγραφο δοκιμής ασφαλείας που περιέχει κρατικά δεδομένα ταυτοποίησης. Βεβαιωθείτε ότι οι κανόνες φιλτραρίσματος δικτύου είναι ενεργοί.", formats: { taxNumber: "999999999", passport: "GR9999999", driverLicense: "DL-GRC-999999", iban: "GR9999999999999999999999999" } },
-      { code: "GRD", country: "Grenada", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999999", passport: "GD9999999", driverLicense: "DL-GRD-999999", iban: "GD99AAAA99999999999999" } },
-      { code: "GTM", country: "Guatemala", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "NIT", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9999999-9", passport: "GT9999999", driverLicense: "DL-GTM-999999", iban: "GT99AAAA99999999999999" } },
-      { code: "GIN", country: "Guinea", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "000099999A", passport: "GN9999999", driverLicense: "DL-GIN-999999", iban: "GN99AAAA99999999999999" } },
-      { code: "GNB", country: "Guinea-Bissau", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "NIF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "999999999", passport: "GW9999999", driverLicense: "DL-GNB-999999", iban: "GW99AAAA99999999999999" } },
-      { code: "GUY", country: "Guyana", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999-999-999", passport: "GY9999999", driverLicense: "DL-GUY-999999", iban: "GY99AAAA99999999999999" } },
-      { code: "HTI", country: "Haiti", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "999-999-999-9", passport: "HT9999999", driverLicense: "DL-HTI-999999", iban: "HT99AAAA99999999999999" } },
-      { code: "HND", country: "Honduras", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RTN", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9999-9999-999999", passport: "HN9999999", driverLicense: "DL-HND-999999", iban: "HN99AAAA99999999999999" } },
-      { code: "HUN", country: "Hungary", dlTitle: "VEZETŐI ENGEDÉLY", passportTitle: "ÚTLEVÉL", taxLabel: "Adóazonosító jele", bogusText: "Ez egy bizalmas biztonsági tesztdokumentum, amely hivatalos állami azonosító adatokat tartalmaz. Kérjük, ellenőrizze a hálózati szűrők megfelelő működését.", formats: { taxNumber: "8999999999", passport: "HU9999999", driverLicense: "DL-HUN-999999", iban: "HU99999999999999999999999999" } },
-      { code: "ISL", country: "Iceland", dlTitle: "ÖKUSKÍRTEINI", passportTitle: "VEGABRÉF", taxLabel: "Kennitala", bogusText: "Þetta er trúnaðarmál öryggisprófunarskjal sem inniheldur opinber persónuskilríki. Vinsamlegast gakktu úr skugga um að netflæðissíur séu virkar.", formats: { taxNumber: "999999-9999", passport: "IS9999999", driverLicense: "DL-ISL-999999", iban: "IS9999999999999999999999" } },
       { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers. Please ensure that corporate gateway firewalls and DLP engines inspect this packet.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
-      { code: "IDN", country: "Indonesia", dlTitle: "SURAT IZIN MENGEMUDI", passportTitle: "PASPOR", taxLabel: "NPWP", bogusText: "Ini adalah dokumen pengujian keamanan rahasia yang berisi data identitas resmi negara. Pastikan kebijakan pemfilteran jaringan Anda berfungsi dengan baik.", formats: { taxNumber: "99.999.999.9-999.000", passport: "ID9999999", driverLicense: "DL-IDN-999999", iban: "ID99AAAA99999999999999" } },
-      { code: "IRN", country: "Iran", dlTitle: "GOWAHINAMEH", passportTitle: "GOWAHINAMEH SAFAR", taxLabel: "National Code", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است. لطفا مطمئن شوید که خط‌مشی‌های امنیت شبکه و فیلترهای خروجی به درستی پیکربندی شده‌اند.", formats: { taxNumber: "9999999999", passport: "IR9999999", driverLicense: "DL-IRN-999999", iban: "IR99999999999999999999992" } },
-      { code: "IRQ", country: "Iraq", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "TIN", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "0000000099999", passport: "IQ9999999", driverLicense: "DL-IRQ-999999", iban: "IQ99AAAA99999999999999" } },
-      { code: "IRL", country: "Ireland", dlTitle: "CEADÚAN TIOMÁNA / DRIVING LICENCE", passportTitle: "PASPÓIR / PASSPORT", taxLabel: "PPSN", bogusText: "Is cáipéis thástála slándála faoi rún í seo a bhfuil sonraithe aitheantais stáit inti. Cinntigh go bhfuil scagairí líonra do chomhlachta ag feidhmiú i gceart.", formats: { taxNumber: "9999999AA", passport: "IE9999999", driverLicense: "DL-IRL-999999", iban: "IE99AAAA99999999999999" } },
-      { code: "ISR", country: "Israel", dlTitle: "RISHAYON NEHIGA", passportTitle: "DARKON", taxLabel: "Mispar Zehut", bogusText: "זהו מסמך בדיקת אבטחה סודי המכיל נתוני זיהוי ממלכתיים. אנא ודא שמדיניות סינון הרשת מוגדרת כראוי ליירוט תנועה יוצאת.", formats: { taxNumber: "999999999", passport: "IL9999999", driverLicense: "DL-ISR-999999", iban: "IL999999999999999999993" } },
       { code: "ITA", country: "Italy", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "IT Codice Fiscale", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali. Si prega di verificare che i filtri di prevenzione della fuga di dati siano attivi.", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999", iban: "IT99A9999999999999999999999" } },
-      { code: "JAM", country: "Jamaica", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TRN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999-999-999", passport: "JM9999999", driverLicense: "DL-JAM-999999", iban: "JM99AAAA99999999999999" } },
       { code: "JPN", country: "Japan", dlTitle: "UNTEN MENKYO SHO", passportTitle: "RYOKAN", taxLabel: "JP My Number", bogusText: "これは国家識別データを含む機密のセキュリティテスト用テキストです。ネットワークの送信データ漏洩防止（DLP）ルールが正常に動作しているか確認してください。", formats: { taxNumber: "9999 9999 9999", passport: "TR999999", driverLicense: "DL-99999999", iban: "JP99AAAA99999999999999" } },
-      { code: "JOR", country: "Jordan", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "National ID", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "9999999999", passport: "JO9999999", driverLicense: "DL-JOR-999999", iban: "JO99AAAA999999999999999999" } },
-      { code: "KAZ", country: "Kazakhstan", dlTitle: "HYNDIK KULIJK", passportTitle: "PASPORT", taxLabel: "IIN / BIN", bogusText: "Бұл мемлекеттік сәйкестендіру деректерін қамтитын құпия қауіпсіздік сынақ құжаты. Желілік сүзгілеу ережелерінің белсенді екеніне көз жеткізіңіз.", formats: { taxNumber: "999999999999", passport: "KZ9999999", driverLicense: "DL-KAZ-999999", iban: "KZ999999999999999999" } },
-      { code: "KEN", country: "Kenya", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "KRA PIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "A009999999A", passport: "KE9999999", driverLicense: "DL-KEN-999999", iban: "KE99AAAA99999999999999" } },
-      { code: "KIR", country: "Kiribati", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "KI9999999", driverLicense: "DL-KIR-999999", iban: "KI99AAAA99999999999999" } },
-      { code: "PRK", country: "Korea (North)", dlTitle: "UNJEON MYEONHEOJEONG", passportTitle: "YEOKWON", taxLabel: "Citizenship ID", bogusText: "이것은 국가 식별 데이터를 포함하는 기밀 보안 테스트 문서입니다. 네트워크 데이터 유출 방지 정책이 올바르게 작동하는지 확인하십시오.", formats: { taxNumber: "999999-9999999", passport: "KP9999999", driverLicense: "DL-PRK-999999", iban: "KP99AAAA99999999999999" } },
-      { code: "KOR", country: "Korea (South)", dlTitle: "UNJEON MYEONHEOJEONG", passportTitle: "YEOKWON", taxLabel: "RRN", bogusText: "이것은 국가 식별 데이터를 포함하는 기밀 보안 테스트 문서입니다. 네트워크 데이터 유출 방지 정책이 올바르게 작동하는지 확인하십시오.", formats: { taxNumber: "999999-9999999", passport: "KR9999999", driverLicense: "DL-KOR-999999", iban: "KR99AAAA99999999999999" } },
-      { code: "KWT", country: "Kuwait", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "Civil ID", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "299999999901", passport: "KW9999999", driverLicense: "DL-KWT-999999", iban: "KW99AAAA99999999999999999999" } },
-      { code: "KGZ", country: "Kyrgyzstan", dlTitle: " айдоочулук күбөлүк", passportTitle: "PASPORT", taxLabel: "INN", bogusText: "Бул мамлекеттик идентификациялык маалыматтарды камтыган купуя коопсуздук сыноо документи. Тармактык чыгуу чыпкаларын текшериңиз.", formats: { taxNumber: "19999999999999", passport: "KG9999999", driverLicense: "DL-KGZ-999999", iban: "KG99AAAA99999999999999" } },
-      { code: "LAO", country: "Laos", dlTitle: "ใบขับขี่ / DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "ນີ້ແມ່ນເອກະສານທົດສອບຄວາມປອດໄພທີ່ເປັນຄວາມລັບທີ່ມີຂໍ້ມູນລະບຸຕົວຕົນຂອງລັດ. ກະລຸນາກວດເບິ່ງຕົວກັ່ນຕອງເຄືອຂ່າຍຂອງທ່ານ.", formats: { taxNumber: "01009999999", passport: "LA9999999", driverLicense: "DL-LAO-999999", iban: "LA99AAAA99999999999999" } },
-      { code: "LVA", country: "Latvia", dlTitle: "VADĪTĀJA APLIECĪBA", passportTitle: "PASE", taxLabel: "Persona Kods", bogusText: "Šis ir konfidenciāls drošības pārbaudes dokuments, kas satur valsts identifikācijas datus. Lūdzu, pārliecinieties, ka tīkla filtri darbojas pareizi.", formats: { taxNumber: "999999-99999", passport: "LV9999999", driverLicense: "DL-LVA-999999", iban: "LV99AAAA9999999999999" } },
-      { code: "LBN", country: "Lebanon", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "MOF Tax ID", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "9999999", passport: "LB9999999", driverLicense: "DL-LBN-999999", iban: "LB999999999999999999999999" } },
-      { code: "LSO", country: "Lesotho", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "100999999", passport: "LS9999999", driverLicense: "DL-LSO-999999", iban: "LS99AAAA99999999999999" } },
-      { code: "LBR", country: "Liberia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "0009999999", passport: "LR9999999", driverLicense: "DL-LBR-999999", iban: "LR99AAAA99999999999999" } },
-      { code: "LBY", country: "Libya", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "National ID", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "199999999999", passport: "LY9999999", driverLicense: "DL-LBY-999999", iban: "LY99AAAA99999999999999" } },
-      { code: "LIE", country: "Liechtenstein", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "PEID", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten. Bitte stellen Sie sicher, dass Ihre Datenverlustpräventions-Filter greifen.", formats: { taxNumber: "99999", passport: "LI9999999", driverLicense: "DL-LIE-999999", iban: "LI9999999999999999999" } },
-      { code: "LTU", country: "Lithuania", dlTitle: "VAIRUOTOJO PAŽYMĖJIMAS", passportTitle: "PASAS", taxLabel: "Asmens Kodas", bogusText: "Tai konfidencialus saugumo patikros dokumentas, kuriame yra valstybiniai identifikavimo duomenys. Įsitikinkite, kad tinklo filtrai veikia tinkamai.", formats: { taxNumber: "9 999999 9999", passport: "LT9999999", driverLicense: "DL-LTU-999999", iban: "LT999999999999999999" } },
-      { code: "LUX", country: "Luxembourg", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "Matricule", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "999999999999", passport: "LU9999999", driverLicense: "DL-LUX-999999", iban: "LU999999999999999999" } },
-      { code: "MDG", country: "Madagascar", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "10009999999", passport: "MG9999999", driverLicense: "DL-MDG-999999", iban: "MG99AAAA99999999999999" } },
-      { code: "MWI", country: "Malawi", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TPIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "0009999999", passport: "MW9999999", driverLicense: "DL-MWI-999999", iban: "MW99AAAA99999999999999" } },
-      { code: "MYS", country: "Malaysia", dlTitle: "LESEN MEMANDU", passportTitle: "PASPORT", taxLabel: "MY IC / Tax No", bogusText: "Ini adalah dokumen ujian keselamatan sulit yang mengandungi data identiti rasmi. Sila pastikan dasar penapisan rangkaian anda berfungsi dengan betul.", formats: { taxNumber: "SG 99999999999", passport: "MY9999999", driverLicense: "DL-MYS-999999", iban: "MY99AAAA99999999999999" } },
-      { code: "MDV", country: "Maldives", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "100099999GST", passport: "MV9999999", driverLicense: "DL-MDV-999999", iban: "MV99AAAA99999999999999" } },
-      { code: "MLI", country: "Mali", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "0830999999A", passport: "ML9999999", driverLicense: "DL-MLI-999999", iban: "ML99AAAA99999999999999" } },
-      { code: "MLT", country: "Malta", dlTitle: "LICENZJA TAST-SIUQ / DRIVING LICENCE", passportTitle: "PASSAPORT / PASSPORT", taxLabel: "Identity Card", bogusText: "Dan huwa dokument kunfidenzjali ta 'test tas-sigurtà li fih dejta ta' identifikazzjoni statali. Jekk jogħġbok kun żgur li l-filtri tan-netwerk huma attivi.", formats: { taxNumber: "9999999A", passport: "MT9999999", driverLicense: "DL-MLT-999999", iban: "MT99AAAA9999999999999999999" } },
-      { code: "MHL", country: "Marshall Islands", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "MH9999999", driverLicense: "DL-MHL-999999", iban: "MH99AAAA99999999999999" } },
-      { code: "MRT", country: "Mauritania", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NNI", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "9999999999", passport: "MR9999999", driverLicense: "DL-MRT-999999", iban: "MR13999999999999999999999" } },
-      { code: "MUS", country: "Mauritius", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TAN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "24999999", passport: "MU9999999", driverLicense: "DL-MUS-999999", iban: "MU99AAAA999999999999999999" } },
-      { code: "MEX", country: "Mexico", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "MX RFC", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "AAAA999999AA9", passport: "G9999999", driverLicense: "DL-99999999", iban: "MX99AAAA99999999999999" } },
-      { code: "FSM", country: "Micronesia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "FM9999999", driverLicense: "DL-FSM-999999", iban: "FM99AAAA99999999999999" } },
-      { code: "MDA", country: "Moldova", dlTitle: "PERMIS DE CONDUCERE", passportTitle: "PAȘAPORT", taxLabel: "IDNP", bogusText: "Acesta este un document confidențial de testare a securității care conține date oficiale de identificare de stat. Asigurați-vă că filtrele de rețea sunt active.", formats: { taxNumber: "2000999999999", passport: "MD9999999", driverLicense: "DL-MDA-999999", iban: "MD99AAAA99999999999999" } },
-      { code: "MCO", country: "Monaco", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIS", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "99999", passport: "MC9999999", driverLicense: "DL-MCO-999999", iban: "MC99999999999999999999999" } },
-      { code: "MNG", country: "Mongolia", dlTitle: "JOLLOOCHIN UNUHEE", passportTitle: "GADAAD PASPORT", taxLabel: "TTD", bogusText: "Энэ бол төрийн аюулгүй байдлын шалгалтын нууц баримт бичиг юм. Сүлжээний замын хөдөлгөөний шүүлтүүрийн дүрмийг шалгана уу.", formats: { taxNumber: "AA99999999", passport: "MN9999999", driverLicense: "DL-MNG-999999", iban: "MN99AAAA99999999999999" } },
-      { code: "MNE", country: "Montenegro", dlTitle: "VOZAČKA DOZVOLA", passportTitle: "PASOŠ", taxLabel: "JMBG", bogusText: "Ovo je povjerljivi dokument za testiranje sigurnosti koji sadrži državne identifikacione podatke. Molimo provjerite mrežne filtere za sprečavanje curenja podataka.", formats: { taxNumber: "9999999999999", passport: "ME9999999", driverLicense: "DL-MNE-999999", iban: "ME259999999999999999" } },
-      { code: "MAR", country: "Morocco", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "ICE", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "0019999999999999", passport: "MA9999999", driverLicense: "DL-MAR-999999", iban: "MA99AAAA99999999999999" } },
-      { code: "MOZ", country: "Mozambique", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "NUIT", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "900999999", passport: "MZ9999999", driverLicense: "DL-MOZ-999999", iban: "MZ999999999999999999999" } },
-      { code: "MMR", country: "Myanmar", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "NRC", bogusText: "ဒါက နိုင်ငံတော် အထောက်အထား ဒေတာ ပါဝင်တဲ့ လျှို့ဝှက် လုံခြုံရေး စမ်းသပ်မှု စာရွက်စာတမ်း ဖြစ်ပါတယ်။ ကွန်ရက် စစ်ထုတ်မှု နည်းဥပဒေများကို စစ်ဆေးပါ။", formats: { taxNumber: "12/AAAAAA(N)999999", passport: "MM9999999", driverLicense: "DL-MMR-999999", iban: "MM99AAAA99999999999999" } },
-      { code: "NAM", country: "Namibia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "900999999", passport: "NA9999999", driverLicense: "DL-NAM-999999", iban: "NA99AAAA99999999999999" } },
-      { code: "NRU", country: "Nauru", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "NR9999999", driverLicense: "DL-NRU-999999", iban: "NR99AAAA99999999999999" } },
-      { code: "NPL", country: "Nepal", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "PAN", bogusText: "यो आधिकारिक सरकारी परिचय डेटा समावेश भएको गोपनीय सुरक्षा परीक्षण कागजात हो। कृपया तपाईंको नेटवर्क ফিল্টరిङ जाँच गर्नुहोस्।", formats: { taxNumber: "300999999", passport: "NP9999999", driverLicense: "DL-NPL-999999", iban: "NP99AAAA99999999999999" } },
       { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat. Zorg ervoor dat het uitgaande netwerkfilter van uw proxy correct is ingesteld om dit gegevensverkeer te inspecteren.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
-      { code: "NZL", country: "New Zealand", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "IRD Number", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records. Ensure that corporate network egress filters evaluate this outbound stream.", formats: { taxNumber: "999-999-999", passport: "NZ9999999", driverLicense: "DL-NZL-999999", iban: "NZ99AAAA99999999999999" } },
-      { code: "NIC", country: "Nicaragua", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RUC", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "999-999999-9999A", passport: "NI9999999", driverLicense: "DL-NIC-999999", iban: "NI99AAAA99999999999999" } },
-      { code: "NER", country: "Niger", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "400999999A", passport: "NE9999999", driverLicense: "DL-NER-999999", iban: "NE99AAAA99999999999999" } },
-      { code: "NGA", country: "Nigeria", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "NIN / TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999999999", passport: "NG9999999", driverLicense: "DL-NGA-999999", iban: "NG99AAAA99999999999999" } },
-      { code: "MKD", country: "North Macedonia", dlTitle: "VOZAČKA DOZVOLA", passportTitle: "PASOŠ", taxLabel: "EDB", bogusText: "Ова е доверлив документ за безбедносно тестирање кој содржи државни идентификациони податоци. Ве молиме проверете ги мрежните филтри.", formats: { taxNumber: "4030009999999", passport: "MK9999999", driverLicense: "DL-MKD-999999", iban: "MK079999999999999999" } },
       { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata. Vennligst sjekk at utgående nettverksfiltre fungerer som forventet.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
-      { code: "OMN", country: "Oman", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "Civil Number", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "89999999", passport: "OM9999999", driverLicense: "DL-OMN-999999", iban: "OM99AAAA99999999999999" } },
-      { code: "PAK", country: "Pakistan", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "NTN / CNIC", bogusText: "یہ ایک رازدارانہ سیکیورٹی ٹیسٹنگ دستاویز ہے جس میں سرکاری شناخت کا ڈیٹا شامل ہے۔ براہ کرم یقینی بنائیں کہ آپ کے نیٹ ورک کے فلٹرز ٹھیک کام کر رہے ہیں۔", formats: { taxNumber: "99999-9999999-9", passport: "PK9999999", driverLicense: "DL-PAK-999999", iban: "PK99AAAA99999999999999" } },
-      { code: "PLW", country: "Palau", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "PW9999999", driverLicense: "DL-PLW-999999", iban: "PW99AAAA99999999999999" } },
-      { code: "PSE", country: "Palestine", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "ID Number", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "999999999", passport: "PS9999999", driverLicense: "DL-PSE-999999", iban: "PS99AAAA99999999999999" } },
-      { code: "PAN", country: "Panama", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RUC", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9-999-9999 DV 99", passport: "PA9999999", driverLicense: "DL-PAN-999999", iban: "PA99AAAA99999999999999" } },
-      { code: "PNG", country: "Papua New Guinea", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "800999999", passport: "PG9999999", driverLicense: "DL-PNG-999999", iban: "PG99AAAA99999999999999" } },
-      { code: "PRY", country: "Paraguay", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RUC", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "9999999-9", passport: "PY9999999", driverLicense: "DL-PRY-999999", iban: "PY99AAAA99999999999999" } },
-      { code: "PER", country: "Peru", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RUC", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "109999999999", passport: "PE9999999", driverLicense: "DL-PER-999999", iban: "PE99AAAA99999999999999" } },
-      { code: "PHL", country: "Philippines", dlTitle: "DRIVER LICENSE", passportTitle: "PASAPORTE", taxLabel: "TIN", bogusText: "Ito ay isang kumpidensyal na dokumento sa pagsubok sa seguridad na naglalaman ng opisyal na data ng pagkakakilanlan ng estado. Tiyaking aktibo ang iyong mga filter sa network.", formats: { taxNumber: "999-999-999-000", passport: "PH9999999", driverLicense: "DL-PHL-999999", iban: "PH99AAAA99999999999999" } },
       { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne. Upewnij się, że reguły filtrowania sieci wyjściowej DLP są aktywne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
       { code: "PRT", country: "Portugal", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "PT NIF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "299999999", passport: "PT9999999", driverLicense: "DL-PRT-999999", iban: "PT509999999999999999999" } },
-      { code: "QAT", country: "Qatar", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "QID", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "282999999999", passport: "QA9999999", driverLicense: "DL-QAT-999999", iban: "QA99AAAA99999999999999999" } },
-      { code: "ROU", country: "Romania", dlTitle: "PERMIS DE CONDUCERE", passportTitle: "PAȘAPORT", taxLabel: "CNP", bogusText: "Acesta este un document confidențial de testare a securității care conține date oficiale de identificare de stat. Asigurați-vă că filtrele de rețea sunt configurate corespunzător.", formats: { taxNumber: "19999999999999", passport: "RO9999999", driverLicense: "DL-ROU-999999", iban: "RO99AAAA99999999999999" } },
       { code: "RUS", country: "Russia", dlTitle: "VODITELSKOYE UDOSTOVERENIYE", passportTitle: "PASPORT", taxLabel: "INN", bogusText: "Это конфиденциальный тестовый документ безопасности, содержащий государственные идентификационные данные. Убедитесь, что правила сетевой фильтрации DLP функционируют.", formats: { taxNumber: "779999999999", passport: "RU9999999", driverLicense: "DL-RUS-999999", iban: "RU99AAAA99999999999999" } },
-      { code: "RWA", country: "Rwanda", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "TIN", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "100999999", passport: "RW9999999", driverLicense: "DL-RWA-999999", iban: "RW99AAAA99999999999999" } },
-      { code: "KNA", country: "Saint Kitts and Nevis", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999999", passport: "KN9999999", driverLicense: "DL-KNA-999999", iban: "KN99AAAA99999999999999" } },
-      { code: "LCA", country: "Saint Lucia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999999", passport: "LC9999999", driverLicense: "DL-LCA-999999", iban: "LC99AAAA99999999999999" } },
-      { code: "VCT", country: "Saint Vincent", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999999", passport: "VC9999999", driverLicense: "DL-VCT-999999", iban: "VC99AAAA99999999999999" } },
-      { code: "WSM", country: "Samoa", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "WS9999999", driverLicense: "DL-WSM-999999", iban: "WS99AAAA99999999999999" } },
-      { code: "SMR", country: "San Marino", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "COE", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali. Si prega di verificare che i filtri di prevenzione della fuga di dati siano attivi.", formats: { taxNumber: "SM99999", passport: "SM9999999", driverLicense: "DL-SMR-999999", iban: "SM99A9999999999999999999" } },
-      { code: "STP", country: "Sao Tome and Principe", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "NIF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "900999999", passport: "ST9999999", driverLicense: "DL-STP-999999", iban: "ST99AAAA99999999999999" } },
-      { code: "SAU", country: "Saudi Arabia", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "TIN / Iqama", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "310099999999", passport: "SA9999999", driverLicense: "DL-SAU-999999", iban: "SA99999999999999999999" } },
-      { code: "SEN", country: "Senegal", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NINEA", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "009999999", passport: "SN9999999", driverLicense: "DL-SEN-999999", iban: "SN99AAAA99999999999999" } },
-      { code: "SRB", country: "Serbia", dlTitle: "VOZAČKA DOZVOLA", passportTitle: "PASOŠ", taxLabel: "JMBG / PIB", bogusText: "Ovo je poverljivi dokument za bezbednosno testiranje koji sadrži zvanične državne identifikacione podatke. Proverite funkcionalnost mrežnih filtera.", formats: { taxNumber: "10009999999", passport: "RS9999999", driverLicense: "DL-SRB-999999", iban: "RS359999999999999999" } },
-      { code: "SYC", country: "Seychelles", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "NIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "999-9999-1-99", passport: "SC9999999", driverLicense: "DL-SYC-999999", iban: "SC99AAAA99999999999999" } },
-      { code: "SLE", country: "Sierra Leone", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "1000999999-9", passport: "SL9999999", driverLicense: "DL-SLE-999999", iban: "SL99AAAA99999999999999" } },
-      { code: "SGP", country: "Singapore", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "NRIC / FIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "S9999999A", passport: "SG9999999", driverLicense: "DL-SGP-999999", iban: "SG99AAAA99999999999999" } },
-      { code: "SVK", country: "Slovakia", dlTitle: "VODIČSKÝ PREUKAZ", passportTitle: "CESTOVNÝ PAS", taxLabel: "Rodné Číslo", bogusText: "Toto je dôverný bezpečnostný testovací dokument obsahujúci oficiálne štátne identifikačné údaje. Uistite sa, že sieťové filtre DLP fungujú správne.", formats: { taxNumber: "999999/9999", passport: "SK9999999", driverLicense: "DL-SVK-999999", iban: "SK99999999999999999999" } },
-      { code: "SVN", country: "Slovenia", dlTitle: "VOZNIŠKO DOVOLJENJE", passportTitle: "POTNI LIST", taxLabel: "Davčna Številka", bogusText: "To je zaupni dokument za varnostno testiranje, ki vsebuje uradne državne identifikacijske podatke. Preverite delovanje omrežnih filtrov DLP.", formats: { taxNumber: "SI99999999", passport: "SI9999999", driverLicense: "DL-SVN-999999", iban: "SI56999999999999999" } },
-      { code: "SLB", country: "Solomon Islands", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "SB9999999", driverLicense: "DL-SLB-999999", iban: "SB99AAAA99999999999999" } },
-      { code: "SOM", country: "Somalia", dlTitle: "LICENSIYADA WADIDA", passportTitle: "BAASABOOR", taxLabel: "NIN", bogusText: "Kani waa dukumeenti imtxaan ammaan oo sir ah oo ka kooban xogta aqoonsiga dowladda. Fadlan hubi in filtarrada shabakadda ay shaqaynayaan.", formats: { taxNumber: "10009999999", passport: "SO9999999", driverLicense: "DL-SOM-999999", iban: "SO99AAAA99999999999999" } },
-      { code: "ZAF", country: "South Africa", dlTitle: "BESTUURDLISENSIE / DRIVING LICENCE", passportTitle: "PASPAS / PASSPORT", taxLabel: "SA Tax / ID", bogusText: "Hierdie is 'n fortroulike veiligheidstoetsdokument wat amptelike staatidentifikasiedata bevat. Maak seker dat u netwerk se filtrasiereëls korrek ingestel is.", formats: { taxNumber: "99999999999", passport: "ZA9999999", driverLicense: "DL-ZAF-999999", iban: "ZA99AAAA99999999999999" } },
-      { code: "SSD", country: "South Sudan", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "100999999", passport: "SS9999999", driverLicense: "DL-SSD-999999", iban: "SS99AAAA99999999999999" } },
       { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
-      { code: "LKA", country: "Sri Lanka", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "NIC / TIN", bogusText: "මෙය රාජ්‍ය អត្តසញ្ញාණ දත්ත ඇතුළත් රහස්‍ය ආරක්ෂණ පරීක්ෂණ ලේඛනයකි. သင့် ජාල පෙරහන් නීති සක්‍රීය බව තහවුරු කරගන්න.", formats: { taxNumber: "999999999V", passport: "LK9999999", driverLicense: "DL-LKA-999999", iban: "LK99AAAA99999999999999" } },
-      { code: "SDN", country: "Sudan", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "TIN", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "100999999", passport: "SD9999999", driverLicense: "DL-SDN-999999", iban: "SD99AAAA99999999999999" } },
-      { code: "SUR", country: "Suriname", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "FIN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens bevat. Controleer of de uitgaande netwerkfilters van de proxy actief zijn.", formats: { taxNumber: "900999999", passport: "SR9999999", driverLicense: "DL-SUR-999999", iban: "SR99AAAA99999999999999" } },
       { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter. Se till att nätverkets utgående DLP-filter fungerar som det ska.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
       { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen. Ce document est confidentiel et contient des données d'identification officielles.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
-      { code: "SYR", country: "Syria", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "National ID", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "01009999999", passport: "SY9999999", driverLicense: "DL-SYR-999999", iban: "SY99AAAA99999999999999" } },
-      { code: "TWN", country: "Taiwan", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "GUI / National ID", bogusText: "這是一份包含國家身份識別資料的機密安全性測試文檔。請確認您的網路資料外洩防護（DLP）規則已正確設定。", formats: { taxNumber: "A199999999", passport: "TW9999999", driverLicense: "DL-TWN-999999", iban: "TW99AAAA99999999999999" } },
-      { code: "TJK", country: "Tajikistan", dlTitle: "SHAHODATNOMA VAJDON", passportTitle: "PASPORT", taxLabel: "INN", bogusText: "Ин ҳуҷҷати санҷишии махфии хадамоти бехатарӣ мебошад, ки дорои маълумоти муайянкунандаи давлатӣ аст. Лутфан филтрҳои шабакаро санҷед.", formats: { taxNumber: "0300999999", passport: "TJ9999999", driverLicense: "DL-TJK-999999", iban: "TJ99AAAA99999999999999" } },
-      { code: "TZA", country: "Tanzania", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "Hii ni hati ya siri ya jaribio la usalama inayojumuisha data rasmi ya utambulisho wa serikali. Tafadhali hakikisha vichujio vya mtandao wako vinafanya kazi.", formats: { taxNumber: "100-999-999", passport: "TZ9999999", driverLicense: "DL-TZA-999999", iban: "TZ99AAAA99999999999999" } },
-      { code: "THA", country: "Thailand", dlTitle: "ใบขับขี่ / DRIVING LICENCE", passportTitle: "หนังสือเดินทาง / PASSPORT", taxLabel: "Personal ID", bogusText: "นี่คือเอกสารทดสอบความปลอดภัยที่เป็นความลับซึ่งมีข้อมูลระบุตัวตนของรัฐ โปรดตรวจสอบให้แน่ใจว่าตัวกรองเครือข่ายของคุณทำงานอย่างถูกต้อง", formats: { taxNumber: "9-9999-99999-99-9", passport: "TH9999999", driverLicense: "DL-THA-999999", iban: "TH99AAAA99999999999999" } },
-      { code: "TLS", country: "Timor-Leste", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "TIN", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "100999999", passport: "TL9999999", driverLicense: "DL-TLS-999999", iban: "TL99AAAA99999999999999" } },
-      { code: "TGO", country: "Togo", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau.", formats: { taxNumber: "10009999999", passport: "TG9999999", driverLicense: "DL-TGO-999999", iban: "TG99AAAA99999999999999" } },
-      { code: "TON", country: "Tonga", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "TO9999999", driverLicense: "DL-TON-999999", iban: "TO99AAAA99999999999999" } },
-      { code: "TTO", country: "Trinidad and Tobago", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "BIR", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "100999999", passport: "TT9999999", driverLicense: "DL-TTO-999999", iban: "TT99AAAA99999999999999" } },
-      { code: "TUN", country: "Tunisia", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "Matricule Fiscale", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "9999999A/A/M/000", passport: "TN9999999", driverLicense: "DL-TUN-999999", iban: "TN5999999999999999999999" } },
       { code: "TUR", country: "Turkey", dlTitle: "SÜRÜCÜ BELGESİ", passportTitle: "PASAPORT", taxLabel: "VKN / T.C. Kimlik", bogusText: "Bu, resmi devlet kimlik verilerini içeren gizli bir güvenlik testi belgesidir. Lütfen ağ veri sızıntısı önleme (DLP) filtrelerinizin aktif olduğundan emin olun.", formats: { taxNumber: "9999999999", passport: "TR9999999", driverLicense: "DL-TUR-999999", iban: "TR999999999999999999999999" } },
-      { code: "TKM", country: "Turkmenistan", dlTitle: "SÜRÜJILIK SHAHATNAMASY", passportTitle: "PASPORT", taxLabel: "TIN", bogusText: "Bu döwlet identifikasiya maglumatlaryny öz içine alýan gizlin howpsuzlyk barlag resminamasydyr. Tor süzgüçleriniň işjeňdigini barlaň.", formats: { taxNumber: "100999999", passport: "TM9999999", driverLicense: "DL-TKM-999999", iban: "TM99AAAA99999999999999" } },
-      { code: "TUV", country: "Tuvalu", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "TV9999999", driverLicense: "DL-TUV-999999", iban: "TV99AAAA99999999999999" } },
-      { code: "UGA", country: "Uganda", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "1000999999", passport: "UG9999999", driverLicense: "DL-UGA-999999", iban: "UG99AAAA99999999999999" } },
-      { code: "UKR", country: "Ukraine", dlTitle: "POSVIDCHENNIA VODIA", passportTitle: "PASPORT", taxLabel: "RNTRC / IPN", bogusText: "Це конфиденційний тестовий документ безпеки, що містить державні ідентифікаційні дані. Переконайтеся, що мережеві фільтри вихідного трафіку працюють.", formats: { taxNumber: "9999999999", passport: "UA9999999", driverLicense: "DL-UKR-999999", iban: "UA9999999999999999999999999" } },
-      { code: "ARE", country: "United Arab Emirates", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "Emirates ID", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "784-9999-9999999-9", passport: "AE9999999", driverLicense: "DL-ARE-999999", iban: "AE999999999999999999999" } },
       { code: "GBR", country: "United Kingdom", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "UK NINO", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records. Ensure that corporate network egress filters evaluate this outbound stream.", formats: { taxNumber: "AA 99 99 99 A", passport: "999999999", driverLicense: "AAAAA999999AA9AA", iban: "GB99AAAA99999999999999" } },
-      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers. Please ensure corporate DLP rules intercept this payload stream.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } },
-      { code: "URY", country: "Uruguay", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RUT", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "219999990019", passport: "UY9999999", driverLicense: "DL-URY-999999", iban: "UY99AAAA99999999999999" } },
-      { code: "UZB", country: "Uzbekistan", dlTitle: "HAYDOVCHILIK GUVOHNOMASI", passportTitle: "PASPORT", taxLabel: "STIR / PINFL", bogusText: "Bu davlat identifikatsiya ma'lumotlarini o'z ichiga olgan maxfiy xavfsizlik sinov hujjatidir. Tarmoq filtrlash qoidalarining faolligini tekshiring.", formats: { taxNumber: "39999999999999", passport: "UZ9999999", driverLicense: "DL-UZB-999999", iban: "UZ99AAAA99999999999999" } },
-      { code: "VUT", country: "Vanuatu", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "CTO", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "99999", passport: "VU9999999", driverLicense: "DL-VUT-999999", iban: "VU99AAAA99999999999999" } },
-      { code: "VAT", country: "Vatican City", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "Tax ID", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali. Si prega di verificare che i filtri di prevenzione della fuga di dati siano attivi.", formats: { taxNumber: "VAT99999", passport: "VA9999999", driverLicense: "DL-VAT-999999", iban: "VA999999999999999999" } },
-      { code: "VEN", country: "Venezuela", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "RIF", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "V-99999999-9", passport: "VE9999999", driverLicense: "DL-VEN-999999", iban: "VE99AAAA99999999999999" } },
-      { code: "VNM", country: "Vietnam", dlTitle: "BẰNG LÁI XE", passportTitle: "HỘ CHIẾU", taxLabel: "Mã số thuế", bogusText: "Đây là tài liệu kiểm tra an ninh bảo mật chứa dữ liệu định danh quốc gia. Vui lòng đảm bảo các quy tắc lọc mạng của bạn hoạt động chính xác.", formats: { taxNumber: "0309999999", passport: "VN9999999", driverLicense: "DL-VNM-999999", iban: "VN99AAAA99999999999999" } },
-      { code: "YEM", country: "Yemen", dlTitle: "RUHSAT QIADA", passportTitle: "GAWAZ SAFAR", taxLabel: "TIN", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "01009999999", passport: "YE9999999", driverLicense: "DL-YEM-999999", iban: "YE99AAAA99999999999999" } },
-      { code: "ZMB", country: "Zambia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TPIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "1009999999", passport: "ZM9999999", driverLicense: "DL-ZMB-999999", iban: "ZM99AAAA99999999999999" } },
-      { code: "ZWE", country: "Zimbabwe", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "2000999999", passport: "ZW9999999", driverLicense: "DL-ZWE-999999", iban: "ZW99AAAA99999999999999" } }
+      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers. Please ensure corporate DLP rules intercept this payload stream.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } }
     ];
 
     const AI_ENGINES = {
@@ -622,6 +698,9 @@
       ctx.fillText(`NATIONALITY: ${countryCode}`, 120, 115);
       ctx.fillText(passNum, 120, 135);
 
+      ctx.fillStyle = 'rgba(2, 132, 199, 0.4)'; ctx.font = 'bold 9px monospace';
+      ctx.fillText(`CREATED BY ${AUTHOR_CREDIT.toUpperCase()}`, 120, 165);
+
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 185, 400, 75);
       ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px monospace';
       ctx.fillText(`P<${countryCode}SPECIMEN<<EMMA<LISANNE<<<<<<<<<<<<<<`, 10, 215);
@@ -647,6 +726,9 @@
       ctx.fillText("2. DOB: 25.12.1984", 120, 95);
       ctx.fillText(`3. ${dlVal}`, 120, 120);
       ctx.fillText(`4. ${taxVal}`, 120, 145);
+
+      ctx.fillStyle = 'rgba(30, 58, 138, 0.5)'; ctx.font = 'bold 9px monospace';
+      ctx.fillText(`CREATED BY ${AUTHOR_CREDIT.toUpperCase()}`, 120, 170);
 
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 200, 400, 60);
       ctx.fillStyle = '#000000';
@@ -680,6 +762,9 @@
       ctx.font = '10px sans-serif'; ctx.fillStyle = '#94a3b8';
       ctx.fillText("VALID THRU: 12/28", 30, 185);
       ctx.fillText("SPECIMEN CARD HOLDER", 30, 210);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; ctx.font = 'bold 9px monospace';
+      ctx.fillText(`CREATED BY ${AUTHOR_CREDIT.toUpperCase()}`, 250, 240);
     }
 
     function generateSingleField(type) {
@@ -700,13 +785,13 @@
       } else if (type === 'iban') {
         document.getElementById('val-iban').innerText = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
       } else if (type === 'secret') {
-        document.getElementById('val-secret').innerText = `AWS Secret Key: ${formatPattern('AKIAIOSFODNN9EXAMPLE')}`;
+        document.getElementById('val-secret').innerText = `AWS Secret Key: ${formatPattern('AKIAIOSFODNN7EXAMPLE')}`;
       }
     }
 
     function regenerateData() {
       getRandomisedCountries();
-      log('Reshuffled 195 country list and generated fresh randomized payloads with localized proximity context.');
+      log('Reshuffled country list and generated fresh randomized payloads with localized proximity context.');
     }
 
     function copyAndInject(elementId, fieldType) {
@@ -769,7 +854,7 @@
     function log(msg, isError = false) {
       const box = document.getElementById('logBox');
       const time = new Date().toLocaleTimeString();
-      const color = isError ? '#ff7b72' : '#7ee787';
+      const color = isError ? '#ff7b72' : '#10b981';
       box.innerHTML = `<span style="color:${color}">[${time}] ${msg}</span><br/>` + box.innerHTML;
     }
 
@@ -899,7 +984,10 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', getRandomisedCountries);
+    window.addEventListener('DOMContentLoaded', () => {
+      mountProtectedAttribution();
+      getRandomisedCountries();
+    });
   </script>
 </body>
 </html>
