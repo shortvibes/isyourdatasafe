@@ -56,109 +56,52 @@
       letter-spacing: -0.02em;
       font-weight: 700;
     }
-    h1 span.highlight {
-      color: var(--accent-cyan);
-      text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-    }
+    h1 span.highlight { color: var(--accent-cyan); text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
     .subtitle { color: var(--muted); font-size: 0.85rem; }
 
     #jv-protection-root { display: inline-block; }
 
     .hero-banner {
-      width: 100%;
-      height: 180px;
-      border-radius: 8px;
-      border: 1px solid var(--border-cyan);
-      margin-bottom: 20px;
-      overflow: hidden;
-      background: #020617;
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
-      position: relative;
+      width: 100%; height: 180px; border-radius: 8px;
+      border: 1px solid var(--border-cyan); margin-bottom: 20px;
+      overflow: hidden; background: #020617;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); position: relative;
     }
     .hero-banner svg { width: 100%; height: 100%; display: block; }
 
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+    .nav-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
     .tab-btn {
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--border);
-      border-bottom: none;
-      color: var(--muted);
-      padding: 10px 18px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); border-bottom: none;
+      color: var(--muted); padding: 10px 18px; font-size: 0.85rem; font-weight: 700;
+      border-top-left-radius: 6px; border-top-right-radius: 6px; cursor: pointer; transition: all 0.2s;
     }
     .tab-btn:hover { color: #fff; border-color: var(--accent-cyan); }
     .tab-btn.active {
-      background: #0f172a;
-      color: var(--accent-cyan);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
-      text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+      background: #0f172a; color: var(--accent-cyan); border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3); text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
     }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
     .section {
-      background: var(--panel-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      position: relative;
+      background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px); position: relative;
     }
     .section::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 1px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
     }
-    h2 {
-      font-size: 1.1rem;
-      color: #fff;
-      margin-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    h2 { font-size: 1.1rem; color: #fff; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     p { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 12px; }
     
-    .selector-bar {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
+    .selector-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
     select, textarea, input[type="text"] {
-      font-family: inherit;
-      font-size: 0.85rem;
-      background: #020617;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 6px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit; font-size: 0.85rem; background: #020617; border: 1px solid var(--border);
+      color: var(--text); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, box-shadow 0.2s;
     }
-    select:focus, textarea:focus, input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
-    }
+    select:focus, textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
     select { cursor: pointer; flex-grow: 1; }
     textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
     
@@ -183,33 +126,12 @@
 
     canvas { width: 100%; height: auto; border-radius: 6px; background: #000; border: 1px solid var(--border); margin-bottom: 10px; }
 
-    .chat-container {
-      background: #020617;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      height: 240px;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
     .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; }
     .msg-user { align-self: flex-end; background: #1e1b4b; border: 1px solid #4338ca; color: #818cf8; }
     .msg-ai { align-self: flex-start; background: #0f172a; border: 1px solid var(--border); color: var(--text); }
 
-    .log-box {
-      background: #020617;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      font-size: 0.8rem;
-      color: var(--accent-green);
-      min-height: 110px;
-      max-height: 250px;
-      overflow-y: auto;
-    }
+    .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
   </style>
 </head>
 <body>
@@ -332,7 +254,7 @@
       </div>
 
       <div class="section">
-        <h2>🔑 Synthetic Test Data Vault</h2>
+        <h2>🔑 Synthetic Test Data Vault (195 Sovereign Nations)</h2>
         <p>Click <strong>"Copy &amp; Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
         <div class="grid">
           <div class="card"><h3 id="label-tax">Tax ID</h3><code id="val-tax">-</code><button class="btn btn-sm" onclick="copyAndInject('val-tax', 'tax')">Copy &amp; Inject</button></div>
@@ -360,8 +282,8 @@
     <!-- TAB 3: SHADOW AI SANDBOX -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
-        <h2>🤖 Shadow AI Prompt Sandbox (Live Egress Routing)</h2>
-        <p>Select a target AI Engine and choose your **Egress Routing Mode**. Direct Web App mode transmits HTTP POST requests directly to real application hosts (e.g. `chatgpt.com`, `chat.claude.ai`) from your browser to trigger inline SWG / proxy interception rules.</p>
+        <h2>🤖 Shadow AI Prompt Sandbox (Live Direct Egress)</h2>
+        <p>Select a target AI Engine and choose your **Egress Routing Mode**. Direct Web App mode transmits HTTP POST requests directly to real application hosts (`chatgpt.com/uc`, `claude.ai/chat`, `perplexity.ai/search`) from your browser to trigger inline SWG / proxy interception rules.</p>
         <div class="selector-bar">
           <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
           <select id="aiEngineSelect" onchange="onAiEngineChange()"></select>
@@ -369,8 +291,8 @@
         <div class="selector-bar" style="margin-bottom:15px;">
           <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label>
           <select id="aiTrafficTypeSelect" onchange="onAiEngineChange()">
-            <option value="direct_web">🌐 Direct Web App Target (Browser UI POST to Target Domain)</option>
-            <option value="direct_api">⚡ Direct Developer API Target (Script POST to Target Domain)</option>
+            <option value="direct_web">🌐 Direct Web App Target (Browser UI POST to Real End-User Target Domain)</option>
+            <option value="direct_api">⚡ Direct Developer API Target (Script POST to API Host Domain)</option>
             <option value="mirror">🔁 Proxy Mirror / Echo Route (httpbin.org with Target Headers)</option>
           </select>
         </div>
@@ -458,19 +380,16 @@
       return arr;
     }
 
-    // 195 UN SOVEREIGN NATIONS GENERATOR DATASET
+    // 195 UN SOVEREIGN NATIONS DATASET HELPERS
     const UN_COUNTRIES_SEED = [
       { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
       { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
       { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
-      { code: "AND", country: "Andorra", dlTitle: "PERMÍS DE CONDUIR", passportTitle: "PASSAPORT", taxLabel: "NIA", bogusText: "Aquest és un document confidencial de prova de seguretat que conté dades.", formats: { taxNumber: "A-999999-A", passport: "AD9999999", driverLicense: "DL-AND-999999", iban: "AD9999999999999999999999" } },
-      { code: "AGO", country: "Angola", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "NIF", bogusText: "Este é um documento confidencial de teste de segurança que contém dados.", formats: { taxNumber: "9999999999LA999", passport: "AO9999999", driverLicense: "DL-AGO-999999", iban: "AO9999999999999999999999" } },
       { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
       { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
       { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
       { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
       { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
-      { code: "DNK", country: "Denmark", dlTitle: "KØREKORT", passportTitle: "PAS", taxLabel: "DK CPR", bogusText: "Dette er et fortroligt sikkerhedstestdokument, der indeholder officielle identifikationsdata.", formats: { taxNumber: "999999-9999", passport: "54999999", driverLicense: "DL-99999999", iban: "DK9999999999999999" } },
       { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
       { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
       { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
@@ -479,7 +398,6 @@
       { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
       { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
       { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
-      { code: "PRT", country: "Portugal", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "PT NIF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional.", formats: { taxNumber: "299999999", passport: "PT9999999", driverLicense: "DL-PRT-999999", iban: "PT509999999999999999999" } },
       { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
       { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
       { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
@@ -489,7 +407,6 @@
 
     const ALL_195_ISO_CODES = ["AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE","BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH","BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF","TCD","CHL","CHN","COL","COM","COG","COD","CRI","CIV","HRV","CUB","CYP","CZE","DNK","DJI","DMA","DOM","ECU","EGY","SLV","GNQ","ERI","EST","SWZ","ETH","FJI","FIN","FRA","GAB","GMB","GEO","DEU","GHA","GRC","GRD","GTM","GIN","GNB","GUY","HTI","HND","HUN","ISL","IND","IDN","IRN","IRQ","IRL","ISR","ITA","JAM","JPN","JOR","KAZ","KEN","KIR","PRK","KOR","KWT","KGZ","LAO","LVA","LBN","LSO","LBR","LBY","LIE","LTU","LUX","MDG","MWI","MYS","MDV","MLI","MLT","MHL","MRT","MUS","MEX","FSM","MDA","MCO","MNG","MNE","MAR","MOZ","MMR","NAM","NRU","NPL","NLD","NZL","NIC","NER","NGA","MKD","NOR","OMN","PAK","PLW","PSE","PAN","PNG","PRY","PER","PHL","POL","PRT","QAT","ROU","RUS","RWA","KNA","LCA","VCT","WSM","SMR","STP","SAU","SEN","SRB","SYC","SLE","SGP","SVK","SVN","SLB","SOM","ZAF","SSD","ESP","LKA","SDN","SUR","SWE","CHE","SYR","TWN","TJK","TZA","THA","TLS","TGO","TON","TTO","TUN","TUR","TKM","TUV","UGA","UKR","ARE","GBR","USA","URY","UZB","VUT","VAT","VEN","VNM","YEM","ZMB","ZWE"];
 
-    // Expand seed to full 195 ISO list dynamically
     const COUNTRY_DEFINITIONS = ALL_195_ISO_CODES.map(code => {
       const found = UN_COUNTRIES_SEED.find(item => item.code === code);
       if (found) return found;
@@ -500,18 +417,15 @@
         passportTitle: "PASSPORT",
         taxLabel: `${code} Tax ID`,
         bogusText: `This is a confidential security benchmark test payload containing official state identification records for jurisdiction ${code}.`,
-        formats: {
-          taxNumber: `${code}-99999999`,
-          passport: `${code.substring(0,2)}9999999`,
-          driverLicense: `DL-${code}-999999`,
-          iban: `${code.substring(0,2)}99AAAA999999999999`
-        }
+        formats: { taxNumber: `${code}-99999999`, passport: `${code.substring(0,2)}9999999`, driverLicense: `DL-${code}-999999`, iban: `${code.substring(0,2)}99AAAA999999999999` }
       };
     });
 
+    // SHADOW AI ENGINES WITH YOUR SPECIFIC ENDPOINTS INCLUDED
     const AI_ENGINES = {
-      openai: { name: "OpenAI ChatGPT", webEndpoint: "https://chatgpt.com/backend-api/conversation", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
-      anthropic: { name: "Anthropic Claude", webEndpoint: "https://chat.claude.ai/api/organizations/chat_conversations", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet-20240620" },
+      openai: { name: "OpenAI ChatGPT", webEndpoint: "https://chatgpt.com/uc", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
+      anthropic: { name: "Anthropic Claude", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet-20240620" },
+      perplexity: { name: "Perplexity AI", webEndpoint: "https://www.perplexity.ai/search", apiEndpoint: "https://api.perplexity.ai/search", model: "sonar-reasoning" },
       gemini: { name: "Google Gemini", webEndpoint: "https://gemini.google.com/_/BardChatUi/data/batchexecute", apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", model: "gemini-1.5-pro" },
       copilot: { name: "Microsoft Copilot", webEndpoint: "https://copilot.microsoft.com/sydney/ChatHub", apiEndpoint: "https://sydney.bing.com/sydney/ChatHub", model: "copilot-enterprise" },
       mistral: { name: "Mistral AI", webEndpoint: "https://chat.mistral.ai/api/chat", apiEndpoint: "https://api.mistral.ai/v1/chat/completions", model: "mistral-large-latest" },
@@ -534,11 +448,9 @@
       const engineKey = document.getElementById('aiEngineSelect').value;
       const trafficType = document.getElementById('aiTrafficTypeSelect').value;
       const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai;
-      
       let targetUrl = "https://httpbin.org/post";
       if (trafficType === 'direct_web') targetUrl = engine.webEndpoint;
       else if (trafficType === 'direct_api') targetUrl = engine.apiEndpoint;
-
       return { engine, trafficType, targetUrl };
     }
 
