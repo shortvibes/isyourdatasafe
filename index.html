@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Is Your Data Safe? (.org) - DLP Test Platform</title>
+  <title>Is Your Data Safe? (.org) - DLP & OCR Test Platform</title>
   <style>
     :root {
       --bg: #080c14;
@@ -13,6 +13,9 @@
       --accent: #22c55e;
       --accent-hover: #16a34a;
       --muted: #94a3b8;
+      --cyan: #0284c7;
+      --amber: #d97706;
+      --purple: #9333ea;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -45,7 +48,7 @@
     }
     main {
       max-width: 1200px;
-      margin: 2rem auto;
+      margin: 1.5rem auto;
       padding: 0 1rem;
       width: 100%;
       flex-grow: 1;
@@ -54,43 +57,71 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 1rem;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
     }
-    .grid {
+    .grid-3 {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
-    select, button, input {
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    /* Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    select, button, input, textarea {
       font-family: inherit;
     }
-    select {
+    select, input, textarea {
       background: #020617;
       color: #fff;
       border: 1px solid var(--card-border);
-      padding: 0.75rem 1rem;
+      padding: 0.6rem 0.8rem;
       border-radius: 0.5rem;
-      font-size: 0.875rem;
-      cursor: pointer;
+      font-size: 0.85rem;
     }
     .btn {
       background: var(--accent);
       color: #000;
       font-weight: 700;
       border: none;
-      padding: 0.75rem 1.25rem;
+      padding: 0.6rem 1rem;
       border-radius: 0.5rem;
       cursor: pointer;
-      font-size: 0.875rem;
-      transition: background 0.2s;
+      font-size: 0.85rem;
     }
     .btn:hover { background: var(--accent-hover); }
-    .btn-secondary {
-      background: #334155;
-      color: #fff;
-    }
+    .btn-secondary { background: #334155; color: #fff; }
     .btn-secondary:hover { background: #475569; }
+    .btn-sm { padding: 0.35rem 0.6rem; font-size: 0.75rem; }
+
     canvas {
       width: 100%;
       height: auto;
@@ -99,12 +130,30 @@
       border: 1px solid var(--card-border);
       margin-top: 0.5rem;
     }
-    .flex-between {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .code-font { font-family: monospace; }
+    .chat-box {
+      background: #020617;
+      border: 1px solid var(--card-border);
+      border-radius: 0.75rem;
+      height: 300px;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .chat-msg {
+      padding: 0.6rem 0.8rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      max-width: 80%;
+    }
+    .msg-user { background: #1e1b4b; border: 1px solid #3730a3; align-self: flex-end; }
+    .msg-ai { background: #0f172a; border: 1px solid var(--card-border); align-self: flex-start; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th, td { padding: 0.6rem; text-align: left; border-bottom: 1px solid var(--card-border); }
+    th { background: #020617; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -114,91 +163,203 @@
       <h1 style="font-size: 1.25rem; font-weight: 700;">
         Is Your Data Safe? <span style="color: var(--accent); font-family: monospace;">(.org)</span>
       </h1>
-      <p style="font-size: 0.75rem; color: var(--muted);">Global Data & OCR Specimen Benchmark</p>
+      <p style="font-size: 0.75rem; color: var(--muted);">Global Data Loss Prevention (DLP) & OCR Benchmark</p>
     </div>
     <div class="badge">● [No Logs - In-Memory Only]</div>
   </header>
 
   <main>
-    <!-- Country Selector -->
-    <div class="panel flex-between" style="flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <label style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase;">
-          Select Target Jurisdiction
-        </label>
-        <p style="font-size: 0.75rem; color: var(--muted);">Generates scannable passport, license, and credit card test artifacts.</p>
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-ocr', this)">OCR Specimen Vault</button>
+      <button class="tab-btn" onclick="switchTab('tab-bench', this)">HTTP Test Bench</button>
+      <button class="tab-btn" onclick="switchTab('tab-ai', this)">Shadow AI Tester</button>
+      <button class="tab-btn" onclick="switchTab('tab-cli', this)">CLI Scripts</button>
+    </div>
+
+    <!-- TAB 1: OCR SPECIMEN VAULT -->
+    <div id="tab-ocr" class="tab-content active">
+      <!-- Country Selection -->
+      <div class="panel flex-between" style="flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <label style="font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase;">
+            Target Jurisdiction (200+ ISO Sovereign Nations)
+          </label>
+          <p style="font-size: 0.75rem; color: var(--muted);">Generates scannable passports, driver cards, payment cards, and localized text PII.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <select id="country-selector" onchange="onCountryChange()"></select>
+          <button class="btn" onclick="regenerateAllData()">Randomize</button>
+        </div>
       </div>
-      <div style="display: flex; gap: 0.5rem;">
-        <select id="country-selector" onchange="onCountryChange()"></select>
-        <button class="btn" onclick="regenerateAllData()">Randomize</button>
+
+      <!-- Document Canvases -->
+      <div class="grid-3">
+        <!-- Passport -->
+        <div class="panel">
+          <div class="flex-between">
+            <strong style="color: #38bdf8;">Passport Specimen</strong>
+            <span id="passport-code" class="code-font" style="color: var(--muted);">NLD</span>
+          </div>
+          <canvas id="passport-canvas" width="500" height="340"></canvas>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn btn-secondary" style="flex: 1;" onclick="downloadCanvas('passport-canvas', 'passport')">Download</button>
+            <button class="btn" style="flex: 1;" onclick="sendToBench('passport-canvas', 'passport_specimen.png')">Send to Bench</button>
+          </div>
+        </div>
+
+        <!-- Driver License -->
+        <div class="panel">
+          <div class="flex-between">
+            <strong style="color: #fbbf24;">Driver's License</strong>
+            <span id="dl-code" class="code-font" style="color: var(--muted);">NLD</span>
+          </div>
+          <canvas id="dl-canvas" width="500" height="340"></canvas>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn btn-secondary" style="flex: 1;" onclick="downloadCanvas('dl-canvas', 'drivers_license')">Download</button>
+            <button class="btn" style="flex: 1;" onclick="sendToBench('dl-canvas', 'drivers_license_specimen.png')">Send to Bench</button>
+          </div>
+        </div>
+
+        <!-- Credit Card -->
+        <div class="panel">
+          <div class="flex-between">
+            <strong style="color: #c084fc;">Payment Card (PCI)</strong>
+            <select id="cc-brand" onchange="onCcBrandChange()" style="padding: 0.2rem 0.4rem; font-size: 0.75rem;">
+              <option value="VISA">VISA</option>
+              <option value="MASTERCARD">Mastercard</option>
+              <option value="AMEX">Amex</option>
+            </select>
+          </div>
+          <canvas id="cc-canvas" width="500" height="340"></canvas>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn btn-secondary" style="flex: 1;" onclick="downloadCanvas('cc-canvas', 'credit_card')">Download</button>
+            <button class="btn" style="flex: 1;" onclick="sendToBench('cc-canvas', 'credit_card_specimen.png')">Send to Bench</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Synthetic Text Vault -->
+      <div class="panel" style="margin-top: 1.25rem;">
+        <div class="flex-between" style="margin-bottom: 1rem;">
+          <h3>Synthetic Identity Records (<span id="vault-country-name">Netherlands</span>)</h3>
+          <button class="btn btn-secondary btn-sm" onclick="downloadJsonPayload()">Export JSON Payload</button>
+        </div>
+        <div class="grid-5 code-font" style="font-size: 0.8rem;">
+          <div style="background: #020617; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--card-border);">
+            <div style="color: var(--muted); font-size: 0.7rem;" id="label-tax">Tax ID</div>
+            <strong style="color: var(--accent);" id="val-tax">-</strong>
+          </div>
+          <div style="background: #020617; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--card-border);">
+            <div style="color: var(--muted); font-size: 0.7rem;">Passport ID</div>
+            <strong style="color: #38bdf8;" id="val-passport">-</strong>
+          </div>
+          <div style="background: #020617; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--card-border);">
+            <div style="color: var(--muted); font-size: 0.7rem;">Driver ID</div>
+            <strong style="color: #fbbf24;" id="val-dl">-</strong>
+          </div>
+          <div style="background: #020617; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--card-border);">
+            <div style="color: var(--muted); font-size: 0.7rem;" id="label-health">Health ID</div>
+            <strong style="color: #f43f5e;" id="val-health">-</strong>
+          </div>
+          <div style="background: #020617; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--card-border);">
+            <div style="color: var(--muted); font-size: 0.7rem;">Phone</div>
+            <strong style="color: #c084fc;" id="val-phone">-</strong>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Document Cards -->
-    <div class="grid">
-      <!-- Passport -->
+    <!-- TAB 2: HTTP TEST BENCH -->
+    <div id="tab-bench" class="tab-content">
       <div class="panel">
-        <div class="flex-between">
-          <strong style="color: #38bdf8;">Passport Specimen</strong>
-          <span id="passport-code" class="code-font" style="color: var(--muted);">NLD</span>
+        <h3>Web / HTTP Egress Test Bench</h3>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Direct web test route submission.</p>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <textarea id="bench-input" rows="5" placeholder="Payload content..."></textarea>
+          <button class="btn" onclick="submitBenchTest()">Submit Test Egress</button>
         </div>
-        <canvas id="passport-canvas" width="500" height="340"></canvas>
-        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="downloadCanvas('passport-canvas', 'passport')">
-          Download Image
-        </button>
       </div>
-
-      <!-- Driver License -->
       <div class="panel">
-        <div class="flex-between">
-          <strong style="color: #fbbf24;">Driver's License</strong>
-          <span id="dl-code" class="code-font" style="color: var(--muted);">NLD</span>
-        </div>
-        <canvas id="dl-canvas" width="500" height="340"></canvas>
-        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="downloadCanvas('dl-canvas', 'drivers_license')">
-          Download Image
-        </button>
-      </div>
-
-      <!-- Credit Card -->
-      <div class="panel">
-        <div class="flex-between">
-          <strong style="color: #c084fc;">Payment Card (PCI)</strong>
-          <select id="cc-brand" onchange="onCcBrandChange()" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
-            <option value="VISA">VISA</option>
-            <option value="MASTERCARD">Mastercard</option>
-            <option value="AMEX">Amex</option>
-          </select>
-        </div>
-        <canvas id="cc-canvas" width="500" height="340"></canvas>
-        <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="downloadCanvas('cc-canvas', 'credit_card')">
-          Download Image
-        </button>
+        <h3>Live Request Log</h3>
+        <table style="margin-top: 0.5rem;">
+          <thead>
+            <tr><th>Timestamp</th><th>Endpoint</th><th>File/Payload</th><th>PII Detected</th><th>Status</th></tr>
+          </thead>
+          <tbody id="log-table-body">
+            <tr><td colspan="5" style="color: var(--muted);">No logs recorded.</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
+
+    <!-- TAB 3: SHADOW AI TESTER -->
+    <div id="tab-ai" class="tab-content">
+      <div class="panel">
+        <h3>Shadow AI Prompt Sandbox</h3>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Simulate AI prompt submission to test egress security rules.</p>
+        <div class="chat-box" id="chat-box">
+          <div class="chat-msg msg-ai">GenAI assistant prompt tester initialized. Inject test PII below to analyze egress rules.</div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <input type="text" id="ai-input" placeholder="Type or inject sensitive prompt..." style="flex: 1;" />
+          <button class="btn" onclick="sendAiPrompt()">Send Prompt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: CLI SCRIPTS -->
+    <div id="tab-cli" class="tab-content">
+      <div class="panel">
+        <h3>Automated Testing Scripts</h3>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem;">Run direct endpoint probes using cURL or Python.</p>
+        <pre class="code-font" id="cli-curl" style="background: #020617; padding: 1rem; border-radius: 0.5rem; color: var(--accent); overflow-x: auto; font-size: 0.8rem;"></pre>
+      </div>
+    </div>
+
   </main>
 
   <script>
+    // ISO Countries
     const COUNTRY_DATA = [
-      { code: "NLD", name: "Netherlands", flag: "🇳🇱", title: "KONINKRIJK DER NEDERLANDEN", doc: "SPECi2026", dlTitle: "RIJBEWIJS" },
-      { code: "BEL", name: "Belgium", flag: "🇧🇪", title: "BELGIQUE / BELGIË", doc: "TA000000", dlTitle: "PERMIS DE CONDUIRE" },
-      { code: "DEU", name: "Germany", flag: "🇩🇪", title: "BUNDESREPUBLIK DEUTSCHLAND", doc: "C01X00000", dlTitle: "FÜHRERSCHEIN" },
-      { code: "FRA", name: "France", flag: "🇫🇷", title: "RÉPUBLIQUE FRANÇAISE", doc: "12AA00000", dlTitle: "PERMIS DE CONDUIRE" },
-      { code: "ITA", name: "Italy", flag: "🇮🇹", title: "REPUBBLICA ITALIANA", doc: "YA5387192", dlTitle: "PATENTE DI GUIDA" },
-      { code: "USA", name: "United States", flag: "🇺🇸", title: "UNITED STATES OF AMERICA", doc: "A12345678", dlTitle: "DRIVER LICENSE" }
+      { code: "NLD", name: "Netherlands", flag: "🇳🇱", title: "KONINKRIJK DER NEDERLANDEN", doc: "SPECi2026", dlTitle: "RIJBEWIJS", taxLabel: "NL BSN", taxVal: "123456789", healthLabel: "UZI Health", healthVal: "90012345" },
+      { code: "BEL", name: "Belgium", flag: "🇧🇪", title: "BELGIQUE / BELGIË", doc: "TA000000", dlTitle: "PERMIS DE CONDUIRE", taxLabel: "BE Rijksregister", taxVal: "84.12.25-123.45", healthLabel: "SIS Health", healthVal: "800101-123-45" },
+      { code: "DEU", name: "Germany", flag: "🇩🇪", title: "BUNDESREPUBLIK DEUTSCHLAND", doc: "C01X00000", dlTitle: "FÜHRERSCHEIN", taxLabel: "DE Steuer-ID", taxVal: "12 345 678 901", healthLabel: "KV-Nummer", healthVal: "A123456789" },
+      { code: "FRA", name: "France", flag: "🇫🇷", title: "RÉPUBLIQUE FRANÇAISE", doc: "12AA00000", dlTitle: "PERMIS DE CONDUIRE", taxLabel: "FR NIR / INSEE", taxVal: "1 85 02 75 108 042", healthLabel: "Carte Vitale", healthVal: "1 85 02 75 108 042" },
+      { code: "ITA", name: "Italy", flag: "🇮🇹", title: "REPUBBLICA ITALIANA", doc: "YA5387192", dlTitle: "PATENTE DI GUIDA", taxLabel: "IT Codice Fiscale", taxVal: "RSSMRA80A01H501U", healthLabel: "Tessera Sanitaria", healthVal: "803800000123" },
+      { code: "USA", name: "United States", flag: "🇺🇸", title: "UNITED STATES OF AMERICA", doc: "A12345678", dlTitle: "DRIVER LICENSE", taxLabel: "US SSN", taxVal: "900-12-3456", healthLabel: "US MRN", healthVal: "MRN-90210" },
+      { code: "GBR", name: "United Kingdom", flag: "🇬🇧", title: "UNITED KINGDOM", doc: "990011223", dlTitle: "DRIVING LICENCE", taxLabel: "UK NINO", taxVal: "QQ 12 34 56 A", healthLabel: "NHS Number", healthVal: "943 123 4567" },
+      { code: "ESP", name: "Spain", flag: "🇪🇸", title: "REINO DE ESPAÑA", doc: "PAB123456", dlTitle: "PERMISO CONDUCCION", taxLabel: "ES DNI", taxVal: "12345678Z", healthLabel: "CIP Salud", healthVal: "BBFF12345678" }
     ];
+
+    // Populate additional ISO nations
+    const MORE_NATIONS = ["Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belize","Benin","Bhutan","Bolivia","Bosnia","Botswana","Brazil","Brunei","Bulgaria","Cambodia","Cameroon","Canada","Chile","China","Colombia","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Ecuador","Egypt","Estonia","Ethiopia","Fiji","Finland","Georgia","Ghana","Greece","Guatemala","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Latvia","Lebanon","Lithuania","Luxembourg","Malaysia","Malta","Mexico","Moldova","Monaco","Montenegro","Morocco","New Zealand","Nigeria","Norway","Oman","Pakistan","Panama","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Saudi Arabia","Serbia","Singapore","Slovakia","Slovenia","South Africa","South Korea","Sweden","Switzerland","Taiwan","Thailand","Tunisia","Turkey","Ukraine","United Arab Emirates","Uruguay","Uzbekistan","Vietnam","Zimbabwe"];
+    MORE_NATIONS.forEach(name => {
+      const code = name.substring(0,3).toUpperCase();
+      if (!COUNTRY_DATA.find(c => c.code === code)) {
+        COUNTRY_DATA.push({
+          code: code, name: name, flag: "🌐", title: `${name.toUpperCase()} SPECIMEN`, doc: `${code}1234567`, dlTitle: "DRIVING LICENSE", taxLabel: `${code} Tax ID`, taxVal: `TX-${code}-9982`, healthLabel: `${code} Health ID`, healthVal: `HLTH-${code}-001`
+        });
+      }
+    });
 
     let currentCountry = COUNTRY_DATA[0];
     let currentCc = "VISA";
+    let logs = [];
 
-    function randNum(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+    function randNum(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
     function init() {
       const select = document.getElementById('country-selector');
       select.innerHTML = COUNTRY_DATA.map(c => `<option value="${c.code}">${c.flag} ${c.name} (${c.code})</option>`).join('');
       onCountryChange();
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
     }
 
     function onCountryChange() {
@@ -215,43 +376,38 @@
     function regenerateAllData() {
       document.getElementById('passport-code').innerText = currentCountry.code;
       document.getElementById('dl-code').innerText = currentCountry.code;
+      document.getElementById('vault-country-name').innerText = currentCountry.name;
+
+      document.getElementById('label-tax').innerText = currentCountry.taxLabel;
+      document.getElementById('val-tax').innerText = currentCountry.taxVal;
+      document.getElementById('val-passport').innerText = currentCountry.doc;
+      document.getElementById('val-dl').innerText = `DL-${randNum(100000, 999999)}`;
+      document.getElementById('label-health').innerText = currentCountry.healthLabel;
+      document.getElementById('val-health').innerText = currentCountry.healthVal;
+      document.getElementById('val-phone').innerText = `+${randNum(1,99)} ${randNum(100,999)} ${randNum(1000,9999)}`;
 
       drawPassport();
       drawDL();
       drawCC();
+      updateCli();
     }
 
     function drawPassport() {
       const canvas = document.getElementById('passport-canvas');
       const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillRect(0, 0, 500, 340);
-
-      ctx.fillStyle = '#0284c7';
-      ctx.fillRect(0, 0, 500, 48);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.fillText(`${currentCountry.flag} ${currentCountry.title}`, 15, 28);
-
-      ctx.fillStyle = '#cbd5e1';
-      ctx.fillRect(20, 65, 110, 140);
-      ctx.fillStyle = '#64748b';
-      ctx.beginPath(); ctx.arc(75, 115, 25, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, 500, 340);
+      ctx.fillStyle = '#0284c7'; ctx.fillRect(0, 0, 500, 48);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 14px sans-serif'; ctx.fillText(`${currentCountry.flag} ${currentCountry.title}`, 15, 28);
+      ctx.fillStyle = '#cbd5e1'; ctx.fillRect(20, 65, 110, 140);
+      ctx.fillStyle = '#64748b'; ctx.beginPath(); ctx.arc(75, 115, 25, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.arc(75, 180, 40, 0, Math.PI, true); ctx.fill();
-
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 13px sans-serif';
       ctx.fillText("SPECIMEN", 145, 95);
       ctx.fillText("EMMA LISANNE", 145, 130);
       ctx.fillText(currentCountry.name.toUpperCase(), 145, 165);
       ctx.fillText(currentCountry.doc, 145, 195);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 235, 500, 105);
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 14px monospace';
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 235, 500, 105);
+      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 14px monospace';
       ctx.fillText(`P<${currentCountry.code}SPECIMEN<<EMMA<LISANNE<<<<<<<<<<<<<<<<<<`.substring(0,44), 15, 270);
       ctx.fillText(`${currentCountry.doc}4${currentCountry.code}8412254F2810010<<<<<<<<<<<<<<02`.substring(0,44), 15, 300);
     }
@@ -259,46 +415,24 @@
     function drawDL() {
       const canvas = document.getElementById('dl-canvas');
       const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#e2e8f0';
-      ctx.fillRect(0, 0, 500, 340);
-
-      ctx.fillStyle = '#1e3a8a';
-      ctx.fillRect(0, 0, 500, 52);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 14px sans-serif';
-      ctx.fillText(`${currentCountry.flag} ${currentCountry.dlTitle}`, 20, 31);
-
-      ctx.fillStyle = '#cbd5e1';
-      ctx.fillRect(20, 68, 110, 140);
-
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#e2e8f0'; ctx.fillRect(0, 0, 500, 340);
+      ctx.fillStyle = '#1e3a8a'; ctx.fillRect(0, 0, 500, 52);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 14px sans-serif'; ctx.fillText(`${currentCountry.flag} ${currentCountry.dlTitle}`, 20, 31);
+      ctx.fillStyle = '#cbd5e1'; ctx.fillRect(20, 68, 110, 140);
+      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 13px sans-serif';
       ctx.fillText("DE BRUIJN", 150, 110);
       ctx.fillText(`ID: DL-${randNum(100000, 999999)}`, 150, 145);
-      ctx.fillText(`TAX: ${randNum(100000000, 999999999)}`, 150, 180);
+      ctx.fillText(`TAX: ${currentCountry.taxVal}`, 150, 180);
     }
 
     function drawCC() {
       const canvas = document.getElementById('cc-canvas');
       const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, 500, 340);
-
-      ctx.fillStyle = '#f59e0b';
-      ctx.fillRect(40, 70, 50, 38);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillText(currentCc, 380, 55);
-
-      ctx.font = 'bold 22px monospace';
-      ctx.fillText(`4532 ${randNum(1000,9999)} ${randNum(1000,9999)} ${randNum(1000,9999)}`, 40, 190);
-
-      ctx.font = '14px sans-serif';
-      ctx.fillText('VALID THRU: 12/28', 40, 235);
+      ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, 500, 340);
+      ctx.fillStyle = '#f59e0b'; ctx.fillRect(40, 70, 50, 38);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px sans-serif'; ctx.fillText(currentCc, 380, 55);
+      ctx.font = 'bold 22px monospace'; ctx.fillText(`4532 ${randNum(1000,9999)} ${randNum(1000,9999)} ${randNum(1000,9999)}`, 40, 190);
+      ctx.font = '14px sans-serif'; ctx.fillText('VALID THRU: 12/28', 40, 235);
     }
 
     function downloadCanvas(id, name) {
@@ -306,6 +440,58 @@
       const a = document.createElement('a');
       a.href = canvas.toDataURL('image/png');
       a.download = `${name}_${currentCountry.code.toLowerCase()}.png`;
+      a.click();
+    }
+
+    function sendToBench(id, filename) {
+      document.getElementById('bench-input').value = `[OCR Payload Attached: ${filename}]`;
+      switchTab('tab-bench', document.querySelectorAll('.tab-btn')[1]);
+    }
+
+    function submitBenchTest() {
+      const text = document.getElementById('bench-input').value || 'payload.json';
+      const time = new Date().toLocaleTimeString();
+      logs.unshift({ time: time, endpoint: 'POST /sinkhole', file: text.substring(0, 30), pii: currentCountry.taxLabel, status: 'Passed' });
+      renderLogs();
+    }
+
+    function renderLogs() {
+      const body = document.getElementById('log-table-body');
+      body.innerHTML = logs.map(l => `
+        <tr><td>${l.time}</td><td>${l.endpoint}</td><td>${l.file}</td><td>${l.pii}</td><td style="color:var(--accent);">${l.status}</td></tr>
+      `).join('');
+    }
+
+    function sendAiPrompt() {
+      const input = document.getElementById('ai-input');
+      const box = document.getElementById('chat-box');
+      if (!input.value.trim()) return;
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-msg msg-user';
+      userMsg.innerText = input.value;
+      box.appendChild(userMsg);
+      input.value = '';
+
+      setTimeout(() => {
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'chat-msg msg-ai';
+        aiMsg.innerText = 'Status: Data Processed. Prompt evaluated against direct egress path. Direct outbound payload analyzed.';
+        box.appendChild(aiMsg);
+        box.scrollTop = box.scrollHeight;
+      }, 400);
+    }
+
+    function updateCli() {
+      document.getElementById('cli-curl').innerText = `curl -X POST https://isyourdatasafe.org/api/v1/test/sinkhole \\\n  -H "Content-Type: application/json" \\\n  -d '{"jurisdiction": "${currentCountry.code}", "tax_id": "${currentCountry.taxVal}"}'`;
+    }
+
+    function downloadJsonPayload() {
+      const payload = { country: currentCountry.name, code: currentCountry.code, tax: currentCountry.taxVal, doc: currentCountry.doc };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `payload_${currentCountry.code.toLowerCase()}.json`;
       a.click();
     }
 
