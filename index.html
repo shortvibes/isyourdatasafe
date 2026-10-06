@@ -56,111 +56,52 @@
       letter-spacing: -0.02em;
       font-weight: 700;
     }
-    h1 span.highlight {
-      color: var(--accent-cyan);
-      text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
-    }
+    h1 span.highlight { color: var(--accent-cyan); text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
     .subtitle { color: var(--muted); font-size: 0.85rem; }
 
     #jv-protection-root { display: inline-block; }
 
-    /* Hero Banner Graphic */
     .hero-banner {
-      width: 100%;
-      height: 180px;
-      border-radius: 8px;
-      border: 1px solid var(--border-cyan);
-      margin-bottom: 20px;
-      overflow: hidden;
-      background: #020617;
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
-      position: relative;
+      width: 100%; height: 180px; border-radius: 8px;
+      border: 1px solid var(--border-cyan); margin-bottom: 20px;
+      overflow: hidden; background: #020617;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); position: relative;
     }
     .hero-banner svg { width: 100%; height: 100%; display: block; }
 
-    /* Tabbed Navigation Bar */
-    .nav-tabs {
-      display: flex;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+    .nav-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
     .tab-btn {
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--border);
-      border-bottom: none;
-      color: var(--muted);
-      padding: 10px 18px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); border-bottom: none;
+      color: var(--muted); padding: 10px 18px; font-size: 0.85rem; font-weight: 700;
+      border-top-left-radius: 6px; border-top-right-radius: 6px; cursor: pointer; transition: all 0.2s;
     }
     .tab-btn:hover { color: #fff; border-color: var(--accent-cyan); }
     .tab-btn.active {
-      background: #0f172a;
-      color: var(--accent-cyan);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
-      text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+      background: #0f172a; color: var(--accent-cyan); border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3); text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
     }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
     .section {
-      background: var(--panel-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      position: relative;
+      background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px); position: relative;
     }
     .section::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 1px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
     }
-    h2 {
-      font-size: 1.1rem;
-      color: #fff;
-      margin-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    h2 { font-size: 1.1rem; color: #fff; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     p { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 12px; }
     
-    .selector-bar {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
+    .selector-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
     select, textarea, input[type="text"] {
-      font-family: inherit;
-      font-size: 0.85rem;
-      background: #020617;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 6px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit; font-size: 0.85rem; background: #020617; border: 1px solid var(--border);
+      color: var(--text); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, box-shadow 0.2s;
     }
-    select:focus, textarea:focus, input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
-    }
+    select:focus, textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
     select { cursor: pointer; flex-grow: 1; }
     textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
     
@@ -179,66 +120,18 @@
     .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #1e293b; border: 1px solid var(--border); color: var(--accent-cyan); }
     .btn-sm:hover { background: #334155; color: #fff; }
     
-    .byte-counter {
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-left: auto;
-    }
+    .byte-counter { font-size: 0.8rem; font-weight: 700; margin-left: auto; }
     .byte-counter.valid { color: var(--accent-green); }
     .byte-counter.invalid { color: var(--danger); }
 
-    canvas {
-      width: 100%;
-      height: auto;
-      border-radius: 6px;
-      background: #000;
-      border: 1px solid var(--border);
-      margin-bottom: 10px;
-    }
+    canvas { width: 100%; height: auto; border-radius: 6px; background: #000; border: 1px solid var(--border); margin-bottom: 10px; }
 
-    .chat-container {
-      background: #020617;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      height: 240px;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .chat-msg {
-      max-width: 85%;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      line-height: 1.4;
-    }
-    .msg-user {
-      align-self: flex-end;
-      background: #1e1b4b;
-      border: 1px solid #4338ca;
-      color: #818cf8;
-    }
-    .msg-ai {
-      align-self: flex-start;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
+    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; }
+    .msg-user { align-self: flex-end; background: #1e1b4b; border: 1px solid #4338ca; color: #818cf8; }
+    .msg-ai { align-self: flex-start; background: #0f172a; border: 1px solid var(--border); color: var(--text); }
 
-    .log-box {
-      background: #020617;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      font-size: 0.8rem;
-      color: var(--accent-green);
-      min-height: 110px;
-      max-height: 250px;
-      overflow-y: auto;
-    }
+    .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
   </style>
 </head>
 <body>
@@ -252,7 +145,6 @@
       <div id="jv-protection-root"></div>
     </header>
 
-    <!-- Animated Egress Radar Hero Graphic -->
     <div class="hero-banner">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 180" preserveAspectRatio="xMidYMid slice">
         <defs>
@@ -268,10 +160,8 @@
             <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" stroke-width="0.8"/>
           </pattern>
         </defs>
-
         <rect width="1000" height="180" fill="url(#bgGrad)" />
         <rect width="1000" height="180" fill="url(#cyberGrid)" opacity="0.6" />
-
         <g stroke="#1e293b" stroke-width="1.5">
           <line x1="140" y1="90" x2="330" y2="90" stroke-dasharray="4,4"/>
           <line x1="330" y1="90" x2="500" y2="90" stroke="#06b6d4" stroke-width="2"/>
@@ -279,43 +169,31 @@
           <line x1="670" y1="90" x2="860" y2="45"/>
           <line x1="670" y1="90" x2="860" y2="135"/>
         </g>
-
-        <!-- Central Security Gateway Shield -->
         <g transform="translate(500, 90)">
           <circle r="38" fill="#0b132b" stroke="#06b6d4" stroke-width="2"/>
           <path d="M -14 -16 L 0 -22 L 14 -16 L 14 3 C 14 14 0 21 0 21 C 0 21 -14 14 -14 3 Z" fill="url(#shieldGrad)" opacity="0.9"/>
           <path d="M -5 0 L -1 5 L 7 -5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
-
-        <!-- Internal Endpoint -->
         <g transform="translate(140, 90)">
           <circle r="20" fill="#0b132b" stroke="#06b6d4" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="9" fill="#06b6d4" text-anchor="middle" font-weight="bold">ENDPOINT</text>
         </g>
-
-        <!-- AI Target Endpoint -->
         <g transform="translate(860, 45)">
           <circle r="18" fill="#0b132b" stroke="#8b5cf6" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
         </g>
-
-        <!-- Web Target Endpoint -->
         <g transform="translate(860, 135)">
           <circle r="18" fill="#0b132b" stroke="#10b981" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
         </g>
-
-        <!-- Animated Radar Scan Line -->
         <line x1="0" y1="0" x2="0" y2="180" stroke="rgba(6, 182, 212, 0.35)" stroke-width="3">
           <animateTransform attributeName="transform" type="translate" from="0 0" to="1000 0" dur="4s" repeatCount="indefinite"/>
         </line>
-
         <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">NETWORK DLP INSPECTION PLATFORM</text>
         <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#64748b">Outbound Traffic Bench &amp; Photorealistic Document Vault</text>
       </svg>
     </div>
 
-    <!-- Navigation Bar -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab(event, 'tab-bench')">🛡️ 1. DLP Payload Bench</button>
       <button class="tab-btn" onclick="switchTab(event, 'tab-file')">📁 2. File Upload Egress</button>
@@ -443,11 +321,11 @@
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX WITH DIRECT WEB EGRESS ROUTING -->
+    <!-- TAB 3: SHADOW AI SANDBOX -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
-        <h2>🤖 Shadow AI Prompt Sandbox (Live Egress Routing)</h2>
-        <p>Select a target AI Engine and choose your **Egress Routing Mode**. Direct Web App mode dispatches raw opaque HTTP POST requests directly to real application hosts (`chatgpt.com/unauth-mweb/...`, `claude.ai/chat`, `perplexity.ai/search`, `gemini.google.com/_/BardChatUi/data/...`) using `no-cors` mode to bypass browser CORS blocking while transmitting the full payload across your network adapter for proxy inspection.</p>
+        <h2>🤖 Shadow AI Prompt Sandbox</h2>
+        <p>Select a target AI Engine and choose your **Egress Routing Mode** (Web-Endpoint vs API-Endpoint). Web-Endpoint transmits direct HTTP POST stream requests to real application endpoints (`chatgpt.com/unauth-mweb/...`, `claude.ai/chat`, `perplexity.ai/search`, `gemini.google.com/_/BardChatUi/data/...`) using `no-cors` mode to bypass browser CORS blocking while sending full payloads across your network interface for SWG inspection.</p>
         
         <div class="selector-bar">
           <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
@@ -457,9 +335,8 @@
         <div class="selector-bar" style="margin-bottom:15px;">
           <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label>
           <select id="aiTrafficTypeSelect" onchange="onAiEngineChange()">
-            <option value="direct_web">🌐 Direct Web App Target (Opaque no-cors Packet to Real AI Host)</option>
-            <option value="direct_api">⚡ Direct Developer API Target (Script POST to API Host Domain)</option>
-            <option value="mirror">🔁 Proxy Mirror / Echo Route (httpbin.org with Target Headers)</option>
+            <option value="web_endpoint">🌐 Web-Endpoint (Direct Browser UI Target POST via no-cors)</option>
+            <option value="api_endpoint">⚡ API-Endpoint (Direct Developer API POST to Target Domain)</option>
           </select>
         </div>
 
@@ -607,52 +484,46 @@
       };
     });
 
-    // SHADOW AI ENGINES WITH REAL ENDPOINTS
+    // SINGLE AI ENGINE SELECTION WITH DUAL ROUTING MAPS
     const AI_ENGINES = {
-      openai_unauth: { 
-        name: "OpenAI ChatGPT (Logged-Out / Unauth Web)", 
-        webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", 
-        apiEndpoint: "https://api.openai.com/v1/chat/completions", 
-        model: "gpt-4o-mini (unauth)" 
-      },
       openai: { 
-        name: "OpenAI ChatGPT (Web Application)", 
-        webEndpoint: "https://chatgpt.com/backend-api/conversation", 
+        name: "OpenAI ChatGPT (GPT-4o)", 
+        webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", 
         apiEndpoint: "https://api.openai.com/v1/chat/completions", 
         model: "gpt-4o" 
       },
       anthropic: { 
-        name: "Anthropic Claude (Web Application)", 
+        name: "Anthropic Claude (Claude 3.5 Sonnet)", 
         webEndpoint: "https://claude.ai/chat", 
         apiEndpoint: "https://api.anthropic.com/v1/messages", 
-        model: "claude-3-5-sonnet-20240620" 
+        model: "claude-3-5-sonnet" 
       },
       perplexity: { 
-        name: "Perplexity AI (Search Web App)", 
+        name: "Perplexity AI (Sonar Reasoning)", 
         webEndpoint: "https://www.perplexity.ai/search", 
         apiEndpoint: "https://api.perplexity.ai/search", 
         model: "sonar-reasoning" 
       },
-      gemini_stream: { 
-        name: "Google Gemini (StreamGenerate)", 
+      gemini: { 
+        name: "Google Gemini (Gemini 1.5 Pro)", 
         webEndpoint: "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?hl=nl&rt=c", 
         apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", 
         model: "gemini-1.5-pro" 
       },
       copilot: { 
-        name: "Microsoft Copilot", 
+        name: "Microsoft Copilot (Enterprise)", 
         webEndpoint: "https://copilot.microsoft.com/sydney/ChatHub", 
         apiEndpoint: "https://sydney.bing.com/sydney/ChatHub", 
         model: "copilot-enterprise" 
       },
       mistral: { 
-        name: "Mistral AI", 
+        name: "Mistral AI (Mistral Large)", 
         webEndpoint: "https://chat.mistral.ai/api/chat", 
         apiEndpoint: "https://api.mistral.ai/v1/chat/completions", 
-        model: "mistral-large-latest" 
+        model: "mistral-large" 
       },
       ollama: { 
-        name: "Ollama (Local / Open-WebUI)", 
+        name: "Ollama (Llama 3 Local / Open-WebUI)", 
         webEndpoint: "http://localhost:3000/api/chat", 
         apiEndpoint: "http://localhost:11434/api/generate", 
         model: "llama3" 
@@ -666,7 +537,7 @@
       if (!select) return;
       select.innerHTML = Object.keys(AI_ENGINES).map(key => {
         const e = AI_ENGINES[key];
-        return `<option value="${key}">${e.name} (${e.model})</option>`;
+        return `<option value="${key}">${e.name}</option>`;
       }).join('');
       onAiEngineChange();
     }
@@ -674,12 +545,12 @@
     function getActiveAiEndpoint() {
       const engineKey = document.getElementById('aiEngineSelect').value;
       const trafficType = document.getElementById('aiTrafficTypeSelect').value;
-      const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai_unauth;
+      const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai;
       
       let targetUrl = "https://httpbin.org/post";
-      if (trafficType === 'direct_web') {
+      if (trafficType === 'web_endpoint') {
         targetUrl = engine.webEndpoint;
-      } else if (trafficType === 'direct_api') {
+      } else if (trafficType === 'api_endpoint') {
         targetUrl = engine.apiEndpoint;
       }
 
@@ -689,8 +560,8 @@
     function onAiEngineChange() {
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
       const welcome = document.getElementById('aiWelcomeMsg');
-      welcome.innerText = `🤖 Sandbox active for ${engine.name} [Mode: ${trafficType.toUpperCase()}]. Target route: ${targetUrl}`;
-      log(`Switched target AI Engine to ${engine.name} (${trafficType.toUpperCase()} target: ${targetUrl}).`);
+      welcome.innerText = `🤖 Sandbox active for ${engine.name} [Routing: ${trafficType === 'web_endpoint' ? 'Web-Endpoint' : (trafficType === 'api_endpoint' ? 'API-Endpoint' : 'Proxy Mirror')}]. Target: ${targetUrl}`;
+      log(`Switched AI Engine target to ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
     }
 
     function generateLuhnCard() {
@@ -983,19 +854,19 @@
       log(`Transmitting AI prompt outbound (${trafficType.toUpperCase()} mode) to target: ${targetUrl}...`);
 
       try {
-        const isDirectWeb = (trafficType === 'direct_web');
+        const isWebEndpoint = (trafficType === 'web_endpoint');
         const fetchOptions = {
           method: 'POST',
-          mode: isDirectWeb ? 'no-cors' : 'cors',
-          headers: { 'Content-Type': isDirectWeb ? 'application/x-www-form-urlencoded' : 'application/json' },
-          body: isDirectWeb ? new URLSearchParams({ f_req: promptText, prompt: promptText, query: promptText }) : JSON.stringify({ engine: engine.name, traffic_type: trafficType, simulated_endpoint: targetUrl, model: engine.model, prompt: promptText })
+          mode: isWebEndpoint ? 'no-cors' : 'cors',
+          headers: { 'Content-Type': isWebEndpoint ? 'application/x-www-form-urlencoded' : 'application/json' },
+          body: isWebEndpoint ? new URLSearchParams({ f_req: promptText, prompt: promptText, query: promptText }) : JSON.stringify({ engine: engine.name, traffic_type: trafficType, simulated_endpoint: targetUrl, model: engine.model, prompt: promptText })
         };
 
         if (trafficType === 'mirror') fetchOptions.headers['X-Simulated-Target'] = targetUrl;
         
         const response = await fetch(targetUrl, fetchOptions);
         
-        if (isDirectWeb) {
+        if (isWebEndpoint) {
           log(`AI DIRECT TRAFFIC DISPATCHED: Opaque HTTP POST packet transmitted over network card to ${targetUrl}. Firewall / SWG inspected wire payload.`);
           appendChatMessage(`🤖 ${engine.name}`, `Direct TCP/TLS packet dispatched to ${targetUrl}. Inline SWG/DLP inspected the outbound wire traffic.`);
         } else if (response.ok) {
@@ -1025,14 +896,14 @@
       log(`Transmitting AI file attachment outbound (${trafficType.toUpperCase()} mode) to ${targetUrl}...`);
 
       try {
-        const isDirectWeb = (trafficType === 'direct_web');
+        const isWebEndpoint = (trafficType === 'web_endpoint');
         const response = await fetch(targetUrl, { 
           method: 'POST', 
-          mode: isDirectWeb ? 'no-cors' : 'cors',
+          mode: isWebEndpoint ? 'no-cors' : 'cors',
           body: formData 
         });
         
-        if (isDirectWeb) {
+        if (isWebEndpoint) {
           log(`AI DIRECT FILE UPLOAD DISPATCHED: Multipart attachment packet transmitted over network card to ${targetUrl}.`);
           appendChatMessage(`🤖 ${engine.name}`, `Direct multipart file upload transmitted to ${targetUrl}.`);
         } else if (response.ok) {
@@ -1044,7 +915,7 @@
         }
       } catch (err) {
         log(`AI FILE TRAFFIC BLOCKED: Multipart attachment request to ${targetUrl} intercepted or reset by inline DLP proxy! (${err.message})`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP.]`);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP.]`);
       }
     }
 
