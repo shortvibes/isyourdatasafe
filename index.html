@@ -64,7 +64,6 @@
 
     #jv-protection-root { display: inline-block; }
 
-    /* Hero Banner Graphic */
     .hero-banner {
       width: 100%;
       height: 180px;
@@ -78,7 +77,6 @@
     }
     .hero-banner svg { width: 100%; height: 100%; display: block; }
 
-    /* Tabbed Navigation Bar */
     .nav-tabs {
       display: flex;
       gap: 8px;
@@ -179,22 +177,11 @@
     .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #1e293b; border: 1px solid var(--border); color: var(--accent-cyan); }
     .btn-sm:hover { background: #334155; color: #fff; }
     
-    .byte-counter {
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-left: auto;
-    }
+    .byte-counter { font-size: 0.8rem; font-weight: 700; margin-left: auto; }
     .byte-counter.valid { color: var(--accent-green); }
     .byte-counter.invalid { color: var(--danger); }
 
-    canvas {
-      width: 100%;
-      height: auto;
-      border-radius: 6px;
-      background: #000;
-      border: 1px solid var(--border);
-      margin-bottom: 10px;
-    }
+    canvas { width: 100%; height: auto; border-radius: 6px; background: #000; border: 1px solid var(--border); margin-bottom: 10px; }
 
     .chat-container {
       background: #020617;
@@ -208,25 +195,9 @@
       gap: 10px;
       margin-bottom: 10px;
     }
-    .chat-msg {
-      max-width: 85%;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      line-height: 1.4;
-    }
-    .msg-user {
-      align-self: flex-end;
-      background: #1e1b4b;
-      border: 1px solid #4338ca;
-      color: #818cf8;
-    }
-    .msg-ai {
-      align-self: flex-start;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
+    .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; }
+    .msg-user { align-self: flex-end; background: #1e1b4b; border: 1px solid #4338ca; color: #818cf8; }
+    .msg-ai { align-self: flex-start; background: #0f172a; border: 1px solid var(--border); color: var(--text); }
 
     .log-box {
       background: #020617;
@@ -249,11 +220,9 @@
         <h1>🛡️ <span class="highlight">IS YOUR DATA SAFE?</span> (.org)</h1>
         <p class="subtitle">Cyber Threat & DLP Egress Traffic Inspection Playground</p>
       </div>
-      <!-- Protected Attribution Mount Point -->
       <div id="jv-protection-root"></div>
     </header>
 
-    <!-- Animated Egress Radar Hero Graphic -->
     <div class="hero-banner">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 180" preserveAspectRatio="xMidYMid slice">
         <defs>
@@ -269,10 +238,8 @@
             <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" stroke-width="0.8"/>
           </pattern>
         </defs>
-
         <rect width="1000" height="180" fill="url(#bgGrad)" />
         <rect width="1000" height="180" fill="url(#cyberGrid)" opacity="0.6" />
-
         <g stroke="#1e293b" stroke-width="1.5">
           <line x1="140" y1="90" x2="330" y2="90" stroke-dasharray="4,4"/>
           <line x1="330" y1="90" x2="500" y2="90" stroke="#06b6d4" stroke-width="2"/>
@@ -280,82 +247,62 @@
           <line x1="670" y1="90" x2="860" y2="45"/>
           <line x1="670" y1="90" x2="860" y2="135"/>
         </g>
-
-        <!-- Central Security Gateway Shield -->
         <g transform="translate(500, 90)">
           <circle r="38" fill="#0b132b" stroke="#06b6d4" stroke-width="2"/>
           <path d="M -14 -16 L 0 -22 L 14 -16 L 14 3 C 14 14 0 21 0 21 C 0 21 -14 14 -14 3 Z" fill="url(#shieldGrad)" opacity="0.9"/>
           <path d="M -5 0 L -1 5 L 7 -5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
-
-        <!-- Internal Endpoint -->
         <g transform="translate(140, 90)">
           <circle r="20" fill="#0b132b" stroke="#06b6d4" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="9" fill="#06b6d4" text-anchor="middle" font-weight="bold">ENDPOINT</text>
         </g>
-
-        <!-- AI Target Endpoint -->
         <g transform="translate(860, 45)">
           <circle r="18" fill="#0b132b" stroke="#8b5cf6" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
         </g>
-
-        <!-- Web Target Endpoint -->
         <g transform="translate(860, 135)">
           <circle r="18" fill="#0b132b" stroke="#10b981" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
         </g>
-
-        <!-- Animated Radar Scan Line -->
         <line x1="0" y1="0" x2="0" y2="180" stroke="rgba(6, 182, 212, 0.35)" stroke-width="3">
           <animateTransform attributeName="transform" type="translate" from="0 0" to="1000 0" dur="4s" repeatCount="indefinite"/>
         </line>
-
         <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">NETWORK DLP INSPECTION PLATFORM</text>
         <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#64748b">Outbound Traffic Bench &amp; Photorealistic Document Vault</text>
       </svg>
     </div>
 
-    <!-- Navigation Bar -->
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('tab-bench')">🛡️ 1. DLP Payload Bench</button>
-      <button class="tab-btn" onclick="switchTab('tab-file')">📁 2. File Upload Egress</button>
-      <button class="tab-btn" onclick="switchTab('tab-ai')">🤖 3. Shadow AI Sandbox</button>
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-bench')">🛡️ 1. DLP Payload Bench</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-file')">📁 2. File Upload Egress</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-ai')">🤖 3. Shadow AI Sandbox</button>
     </div>
 
-    <!-- TAB 1: COMBINED DLP BENCH (Text Bench + OCR Vault + Synthetic Data Vault) -->
+    <!-- TAB 1: DLP PAYLOAD BENCH -->
     <div id="tab-bench" class="tab-content active">
-      
-      <!-- Sub-section A: Outbound Traffic Bench -->
       <div class="section">
         <h2>🌐 Outbound Traffic Test Bench</h2>
         <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords, click any card to inject into the payload area, and transmit live HTTP POST traffic across your firewall.</p>
-        
         <div class="selector-bar">
           <label for="countrySelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target Jurisdiction:</label>
           <select id="countrySelect" onchange="updateCountryData()"></select>
           <button class="btn btn-sm" onclick="regenerateData()">🎲 Randomize Order &amp; Regenerate</button>
         </div>
-
         <form onsubmit="sendRealNetworkPost(event)">
           <textarea id="payload" oninput="updateByteCount()" placeholder="Paste or inject sensitive test data here..."></textarea>
-          
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
             <button type="button" class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="padPayloadToMinBytes()">
               + Add Native Bogus Data (Pad to 250+ Bytes)
             </button>
             <span id="byteCounter" class="byte-counter invalid">0 / 250 bytes min</span>
           </div>
-
           <button type="submit" class="btn btn-cyan">⚡ Transmit Payload Outbound</button>
         </form>
       </div>
 
-      <!-- Sub-section B: Photorealistic Document OCR Vault -->
       <div class="section">
         <h2>🪪 Photorealistic Document OCR Vault</h2>
-        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Führerschein*, *Paspoort*), and hard-coded pixel signatures. Transmitting sends the raw PNG binary across your firewall for OCR inspection.</p>
-
+        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Führerschein*, *Paspoort*), and hard-coded pixel signatures.</p>
         <div class="grid-3">
           <div class="card">
             <h3 id="ocr-passport-title">Passport Specimen</h3>
@@ -365,7 +312,6 @@
               <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('passportCanvas', 'passport_specimen.png')">Transmit Outbound</button>
             </div>
           </div>
-
           <div class="card">
             <h3 id="ocr-dl-title">Driver License Specimen</h3>
             <canvas id="dlCanvas" width="400" height="260"></canvas>
@@ -374,7 +320,6 @@
               <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('dlCanvas', 'license_specimen.png')">Transmit Outbound</button>
             </div>
           </div>
-
           <div class="card">
             <h3>Credit Card (PCI)</h3>
             <canvas id="ccCanvas" width="400" height="260"></canvas>
@@ -386,53 +331,21 @@
         </div>
       </div>
 
-      <!-- Sub-section C: Synthetic Data Vault -->
       <div class="section">
         <h2>🔑 Synthetic Test Data Vault</h2>
         <p>Click <strong>"Copy &amp; Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
-        
         <div class="grid">
-          <div class="card">
-            <h3 id="label-tax">Tax ID</h3>
-            <code id="val-tax">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-tax', 'tax')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3 id="label-passport">Passport Number</h3>
-            <code id="val-passport">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-passport', 'passport')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3 id="label-dl">Driver License ID</h3>
-            <code id="val-dl">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-dl', 'dl')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3>Payment Card (Luhn Valid)</h3>
-            <code id="val-card">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-card', 'card')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3>IBAN Account Number</h3>
-            <code id="val-iban">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-iban', 'iban')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3>API Secret Key</h3>
-            <code id="val-secret">AWS Secret Key: AKIAIOSFODNN7EXAMPLE</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-secret', 'secret')">Copy &amp; Inject</button>
-          </div>
+          <div class="card"><h3 id="label-tax">Tax ID</h3><code id="val-tax">-</code><button class="btn btn-sm" onclick="copyAndInject('val-tax', 'tax')">Copy &amp; Inject</button></div>
+          <div class="card"><h3 id="label-passport">Passport Number</h3><code id="val-passport">-</code><button class="btn btn-sm" onclick="copyAndInject('val-passport', 'passport')">Copy &amp; Inject</button></div>
+          <div class="card"><h3 id="label-dl">Driver License ID</h3><code id="val-dl">-</code><button class="btn btn-sm" onclick="copyAndInject('val-dl', 'dl')">Copy &amp; Inject</button></div>
+          <div class="card"><h3>Payment Card (Luhn Valid)</h3><code id="val-card">-</code><button class="btn btn-sm" onclick="copyAndInject('val-card', 'card')">Copy &amp; Inject</button></div>
+          <div class="card"><h3>IBAN Account Number</h3><code id="val-iban">-</code><button class="btn btn-sm" onclick="copyAndInject('val-iban', 'iban')">Copy &amp; Inject</button></div>
+          <div class="card"><h3>API Secret Key</h3><code id="val-secret">AWS Secret Key: AKIAIOSFODNN7EXAMPLE</code><button class="btn btn-sm" onclick="copyAndInject('val-secret', 'secret')">Copy &amp; Inject</button></div>
         </div>
       </div>
-
     </div>
 
-    <!-- TAB 2: SEPARATED FILE UPLOAD EGRESS -->
+    <!-- TAB 2: FILE UPLOAD EGRESS -->
     <div id="tab-file" class="tab-content">
       <div class="section">
         <h2>📁 Standard Outbound File Transfer Test</h2>
@@ -444,36 +357,30 @@
       </div>
     </div>
 
-    <!-- TAB 3: SEPARATED SHADOW AI SANDBOX WITH WEB vs API TOGGLE -->
+    <!-- TAB 3: SHADOW AI SANDBOX -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox (Live Egress Routing)</h2>
-        <p>Select a target AI Engine and choose whether to route test packets using **End-User Web Application HTTP POSTs** (browser employee traffic) or **Developer API Calls** (code traffic).</p>
-        
+        <p>Select a target AI Engine and choose your **Egress Routing Mode**. Direct Web App mode transmits HTTP POST requests directly to real application hosts (e.g. `chatgpt.com`, `chat.claude.ai`) from your browser to trigger inline SWG / proxy interception rules.</p>
         <div class="selector-bar">
           <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
           <select id="aiEngineSelect" onchange="onAiEngineChange()"></select>
         </div>
-
         <div class="selector-bar" style="margin-bottom:15px;">
-          <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Traffic Type:</label>
+          <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label>
           <select id="aiTrafficTypeSelect" onchange="onAiEngineChange()">
-            <option value="web">🌐 Browser Web App Traffic (End-User UI POSTs)</option>
-            <option value="api">⚡ Developer API Traffic (Script/Backend POSTs)</option>
+            <option value="direct_web">🌐 Direct Web App Target (Browser UI POST to Target Domain)</option>
+            <option value="direct_api">⚡ Direct Developer API Target (Script POST to Target Domain)</option>
+            <option value="mirror">🔁 Proxy Mirror / Echo Route (httpbin.org with Target Headers)</option>
           </select>
         </div>
-
         <div class="chat-container" id="chatBox">
-          <div class="chat-msg msg-ai" id="aiWelcomeMsg">
-            🤖 GenAI Sandbox initialized for OpenAI.
-          </div>
+          <div class="chat-msg msg-ai" id="aiWelcomeMsg">🤖 GenAI Sandbox initialized.</div>
         </div>
-
         <div style="display: flex; gap: 8px; margin-bottom: 12px;">
           <input type="text" id="aiPromptInput" placeholder="Type AI prompt here (e.g. Summarize SSN: 000-12-3456)..." style="flex: 1;" />
           <button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button>
         </div>
-
         <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
           <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom: 6px;">Attach File to AI Assistant (Uploads Real Packet):</label>
           <div style="display: flex; gap: 8px;">
@@ -484,26 +391,21 @@
       </div>
     </div>
 
-    <!-- Persistent Egress Inspector Log -->
+    <!-- Persistent Inspector Log -->
     <div class="section">
       <h2>📡 Real-Time Egress Traffic Inspector Log</h2>
-      <div class="log-box" id="logBox">
-        [Awaiting network request execution...]
-      </div>
+      <div class="log-box" id="logBox">[Awaiting network request execution...]</div>
     </div>
   </div>
 
   <script>
-    // --- PROTECTED ATTRIBUTION SYSTEM (SHADOW DOM + MUTATION GUARD) ---
     const AUTHOR_CREDIT = "Jeroen Vermeulen";
 
     function mountProtectedAttribution() {
       const container = document.getElementById('jv-protection-root');
       if (!container) return;
-
       container.innerHTML = '';
       const shadow = container.attachShadow({ mode: 'closed' });
-      
       const badge = document.createElement('div');
       badge.style.cssText = `
         background: linear-gradient(135deg, #1e293b, #0f172a);
@@ -527,22 +429,17 @@
 
     const observer = new MutationObserver(() => {
       const root = document.getElementById('jv-protection-root');
-      if (!root || !root.shadowRoot) {
-        mountProtectedAttribution();
-      }
+      if (!root || !root.shadowRoot) mountProtectedAttribution();
     });
     observer.observe(document.body, { childList: true, subtree: true, attributes: true });
 
-    // --- TAB SWITCHING LOGIC ---
-    function switchTab(tabId) {
+    function switchTab(evt, tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
-      event.target.classList.add('active');
+      evt.currentTarget.classList.add('active');
       document.getElementById(tabId).classList.add('active');
     }
 
-    // --- PATTERN MASK & UTILITIES ---
     function formatPattern(pattern) {
       const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       return pattern.replace(/[9A]/g, (match) => {
@@ -561,81 +458,64 @@
       return arr;
     }
 
-    // COMPLETE UNABRIDGED 195 SOVEREIGN NATIONS DATASET
-    const COUNTRY_DEFINITIONS = [
-      { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است. لطفا مطمئن شوید که خط‌مشی‌های امنیت شبکه و فیلترهای خروجی به درستی پیکربندی شده‌اند.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
-      { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna të identifikimit shtetëror. Ju lutemi sigurohuni që politikat e filtrimit të rrjetit DLP janë aktive.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
-      { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
-      { code: "AND", country: "Andorra", dlTitle: "PERMÍS DE CONDUIR", passportTitle: "PASSAPORT", taxLabel: "NIA", bogusText: "Aquest és un document confidencial de prova de seguretat que conté dades d'identificació oficial. Assegureu-vos que les polítiques de filtratge de la xarxa funcionin adequadament.", formats: { taxNumber: "A-999999-A", passport: "AD9999999", driverLicense: "DL-AND-999999", iban: "AD9999999999999999999999" } },
-      { code: "AGO", country: "Angola", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "NIF", bogusText: "Este é um documento confidencial de teste de segurança que contém dados de identificação do estado. Certifique-se de que as políticas de inspeção da rede estejam ativas.", formats: { taxNumber: "9999999999LA999", passport: "AO9999999", driverLicense: "DL-AGO-999999", iban: "AO9999999999999999999999" } },
-      { code: "ATG", country: "Antigua and Barbuda", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "ABST TIN", bogusText: "This is a confidential security benchmarking test document containing state identification records. Please verify that your outbound proxy egress rules are active.", formats: { taxNumber: "9999999", passport: "AG9999999", driverLicense: "DL-ATG-999999", iban: "AG99AAAA99999999999999" } },
-      { code: "ARG", country: "Argentina", dlTitle: "LICENCIA DE CONDUCIR", passportTitle: "PASAPORTE", taxLabel: "CUIT/CUIL", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "99-99999999-9", passport: "AR9999999", driverLicense: "DL-ARG-999999", iban: "AR9999999999999999999999" } },
-      { code: "ARM", country: "Armenia", dlTitle: "VARORDAKAN IRAVUNK", passportTitle: "PASSPORT", taxLabel: "TIN / HVHH", bogusText: "Սա գաղտնի անվտանգության թեստային փաստաթուղթ է, որը պարունակում է պետական նույնականացման տվյալներ։ Խնդրում ենք համոզվել, որ ցանցային զտման կանոնները ակտիվ են։", formats: { taxNumber: "99999999", passport: "AM9999999", driverLicense: "DL-ARM-999999", iban: "AM9999999999999999999999" } },
-      { code: "AUS", country: "Australia", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "AU TFN", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records. Ensure that corporate network egress filters evaluate this outbound stream.", formats: { taxNumber: "999 999 999", passport: "PA999999", driverLicense: "DL-9999999", iban: "AU99AAAA99999999999999" } },
-      { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten. Bitte stellen Sie sicher, dass Ihre Datenverlustpräventions-Filter ordnungsgemäß greifen.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
-      { code: "AZE", country: "Azerbaijan", dlTitle: "SURUCULUK VESIYESI", passportTitle: "PASPORT", taxLabel: "VOEN", bogusText: "Bu dövlət eyniləşdirmə məlumatlarını ehtiva edən məxfi təhlükəsizlik sınaq sənədidir. Zəhmət olmasa şəbəkə süzgəci qaydalarının aktiv olduğuna əmin olun.", formats: { taxNumber: "9999999999", passport: "AZ9999999", driverLicense: "DL-AZE-999999", iban: "AZ99AAAA99999999999999" } },
-      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat. Controleer of de uitgaande netwerkfilters van de proxy actief zijn.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
-      { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
-      { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records. Ce document est confidentiel et utilisé pour tester les filtres de sécurité réseau.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
-      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络数据泄漏防护（DLP）策略已正确配置并能够有效拦截。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
-      { code: "DNK", country: "Denmark", dlTitle: "KØREKORT", passportTitle: "PAS", taxLabel: "DK CPR", bogusText: "Dette er et fortroligt sikkerhedstestdokument, der indeholder officielle identifikationsdata. Sørg for, at dit netværks udgående DLP-filtre fungerer korrekt.", formats: { taxNumber: "999999-9999", passport: "54999999", driverLicense: "DL-99999999", iban: "DK9999999999999999" } },
-      { code: "FIN", country: "Finland", dlTitle: "AJOKORTTI / KÖRKORT", passportTitle: "PASSI / PASS", taxLabel: "Henkilötunnus (HETU)", bogusText: "Tämä on luottamuksellinen turvallisuustestiasiakirja, joka sisältää virallisia henkilötietoja. Varmista, että verkon tietovuotojen estojärjestelmä toimii.", formats: { taxNumber: "999999-999A", passport: "FI9999999", driverLicense: "DL-FIN-999999", iban: "FI9999999999999999" } },
-      { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau et filtres DLP.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
-      { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen. Es enthält staatliche Identifikationsdaten zur Validierung der Netzwerksicherheit.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
-      { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers. Please ensure that corporate gateway firewalls and DLP engines inspect this packet.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
-      { code: "ITA", country: "Italy", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "IT Codice Fiscale", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali. Si prega di verificare che i filtri di prevenzione della fuga di dati siano attivi.", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999", iban: "IT99A9999999999999999999999" } },
-      { code: "JPN", country: "Japan", dlTitle: "UNTEN MENKYO SHO", passportTitle: "RYOKAN", taxLabel: "JP My Number", bogusText: "これは国家識別データを含む機密のセキュリティテスト用テキストです。ネットワークの送信データ漏洩防止（DLP）ルールが正常に動作しているか確認してください。", formats: { taxNumber: "9999 9999 9999", passport: "TR999999", driverLicense: "DL-99999999", iban: "JP99AAAA99999999999999" } },
-      { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat. Zorg ervoor dat het uitgaande netwerkfilter van uw proxy correct is ingesteld om dit gegevensverkeer te inspecteren.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
-      { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata. Vennligst sjekk at utgående nettverksfiltre fungerer som forventet.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
-      { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne. Upewnij się, że reguły filtrowania sieci wyjściowej DLP są aktywne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
-      { code: "PRT", country: "Portugal", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "PT NIF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "299999999", passport: "PT9999999", driverLicense: "DL-PRT-999999", iban: "PT509999999999999999999" } },
-      { code: "RUS", country: "Russia", dlTitle: "VODITELSKOYE UDOSTOVERENIYE", passportTitle: "PASPORT", taxLabel: "INN", bogusText: "Это конфиденциальный тестовый документ безопасности, содержащий государственные идентификационные данные. Убедитесь, что правила сетевой фильтрации DLP функционируют.", formats: { taxNumber: "779999999999", passport: "RU9999999", driverLicense: "DL-RUS-999999", iban: "RU99AAAA99999999999999" } },
-      { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
-      { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter. Se till att nätverkets utgående DLP-filter fungerar som det ska.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
-      { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen. Ce document est confidentiel et contient des données d'identification officielles.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
-      { code: "TUR", country: "Turkey", dlTitle: "SÜRÜCÜ BELGESİ", passportTitle: "PASAPORT", taxLabel: "VKN / T.C. Kimlik", bogusText: "Bu, resmi devlet kimlik verilerini içeren gizli bir güvenlik testi belgesidir. Lütfen ağ veri sızıntısı önleme (DLP) filtrelerinizin aktif olduğundan emin olun.", formats: { taxNumber: "9999999999", passport: "TR9999999", driverLicense: "DL-TUR-999999", iban: "TR999999999999999999999999" } },
-      { code: "GBR", country: "United Kingdom", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "UK NINO", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records. Ensure that corporate network egress filters evaluate this outbound stream.", formats: { taxNumber: "AA 99 99 99 A", passport: "999999999", driverLicense: "AAAAA999999AA9AA", iban: "GB99AAAA99999999999999" } },
-      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers. Please ensure corporate DLP rules intercept this payload stream.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } }
+    // 195 UN SOVEREIGN NATIONS GENERATOR DATASET
+    const UN_COUNTRIES_SEED = [
+      { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
+      { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
+      { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
+      { code: "AND", country: "Andorra", dlTitle: "PERMÍS DE CONDUIR", passportTitle: "PASSAPORT", taxLabel: "NIA", bogusText: "Aquest és un document confidencial de prova de seguretat que conté dades.", formats: { taxNumber: "A-999999-A", passport: "AD9999999", driverLicense: "DL-AND-999999", iban: "AD9999999999999999999999" } },
+      { code: "AGO", country: "Angola", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "NIF", bogusText: "Este é um documento confidencial de teste de segurança que contém dados.", formats: { taxNumber: "9999999999LA999", passport: "AO9999999", driverLicense: "DL-AGO-999999", iban: "AO9999999999999999999999" } },
+      { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
+      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
+      { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
+      { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
+      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
+      { code: "DNK", country: "Denmark", dlTitle: "KØREKORT", passportTitle: "PAS", taxLabel: "DK CPR", bogusText: "Dette er et fortroligt sikkerhedstestdokument, der indeholder officielle identifikationsdata.", formats: { taxNumber: "999999-9999", passport: "54999999", driverLicense: "DL-99999999", iban: "DK9999999999999999" } },
+      { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
+      { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
+      { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
+      { code: "ITA", country: "Italy", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "IT Codice Fiscale", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali.", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999", iban: "IT99A9999999999999999999999" } },
+      { code: "JPN", country: "Japan", dlTitle: "UNTEN MENKYO SHO", passportTitle: "RYOKAN", taxLabel: "JP My Number", bogusText: "これは国家識別データを含む機密のセキュリティテスト用テキストです。DLPルールを確認してください。", formats: { taxNumber: "9999 9999 9999", passport: "TR999999", driverLicense: "DL-99999999", iban: "JP99AAAA99999999999999" } },
+      { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
+      { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
+      { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
+      { code: "PRT", country: "Portugal", dlTitle: "CARTA DE CONDUÇÃO", passportTitle: "PASSAPORTE", taxLabel: "PT NIF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional.", formats: { taxNumber: "299999999", passport: "PT9999999", driverLicense: "DL-PRT-999999", iban: "PT509999999999999999999" } },
+      { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
+      { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
+      { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
+      { code: "GBR", country: "United Kingdom", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "UK NINO", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records.", formats: { taxNumber: "AA 99 99 99 A", passport: "999999999", driverLicense: "AAAAA999999AA9AA", iban: "GB99AAAA99999999999999" } },
+      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } }
     ];
 
-    // SHADOW AI ENGINES WITH DUAL ENDPOINTS (WEB APP vs DEVELOPER API)
+    const ALL_195_ISO_CODES = ["AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE","BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH","BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF","TCD","CHL","CHN","COL","COM","COG","COD","CRI","CIV","HRV","CUB","CYP","CZE","DNK","DJI","DMA","DOM","ECU","EGY","SLV","GNQ","ERI","EST","SWZ","ETH","FJI","FIN","FRA","GAB","GMB","GEO","DEU","GHA","GRC","GRD","GTM","GIN","GNB","GUY","HTI","HND","HUN","ISL","IND","IDN","IRN","IRQ","IRL","ISR","ITA","JAM","JPN","JOR","KAZ","KEN","KIR","PRK","KOR","KWT","KGZ","LAO","LVA","LBN","LSO","LBR","LBY","LIE","LTU","LUX","MDG","MWI","MYS","MDV","MLI","MLT","MHL","MRT","MUS","MEX","FSM","MDA","MCO","MNG","MNE","MAR","MOZ","MMR","NAM","NRU","NPL","NLD","NZL","NIC","NER","NGA","MKD","NOR","OMN","PAK","PLW","PSE","PAN","PNG","PRY","PER","PHL","POL","PRT","QAT","ROU","RUS","RWA","KNA","LCA","VCT","WSM","SMR","STP","SAU","SEN","SRB","SYC","SLE","SGP","SVK","SVN","SLB","SOM","ZAF","SSD","ESP","LKA","SDN","SUR","SWE","CHE","SYR","TWN","TJK","TZA","THA","TLS","TGO","TON","TTO","TUN","TUR","TKM","TUV","UGA","UKR","ARE","GBR","USA","URY","UZB","VUT","VAT","VEN","VNM","YEM","ZMB","ZWE"];
+
+    // Expand seed to full 195 ISO list dynamically
+    const COUNTRY_DEFINITIONS = ALL_195_ISO_CODES.map(code => {
+      const found = UN_COUNTRIES_SEED.find(item => item.code === code);
+      if (found) return found;
+      return {
+        code: code,
+        country: `Jurisdiction (${code})`,
+        dlTitle: "DRIVER LICENSE",
+        passportTitle: "PASSPORT",
+        taxLabel: `${code} Tax ID`,
+        bogusText: `This is a confidential security benchmark test payload containing official state identification records for jurisdiction ${code}.`,
+        formats: {
+          taxNumber: `${code}-99999999`,
+          passport: `${code.substring(0,2)}9999999`,
+          driverLicense: `DL-${code}-999999`,
+          iban: `${code.substring(0,2)}99AAAA999999999999`
+        }
+      };
+    });
+
     const AI_ENGINES = {
-      openai: { 
-        name: "OpenAI ChatGPT", 
-        webEndpoint: "https://chatgpt.com/backend-api/conversation", 
-        apiEndpoint: "https://api.openai.com/v1/chat/completions", 
-        model: "gpt-4o" 
-      },
-      anthropic: { 
-        name: "Anthropic Claude", 
-        webEndpoint: "https://chat.claude.ai/api/organizations/chat_conversations", 
-        apiEndpoint: "https://api.anthropic.com/v1/messages", 
-        model: "claude-3-5-sonnet-20240620" 
-      },
-      gemini: { 
-        name: "Google Gemini", 
-        webEndpoint: "https://gemini.google.com/_/BardChatUi/data/batchexecute", 
-        apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", 
-        model: "gemini-1.5-pro" 
-      },
-      copilot: { 
-        name: "Microsoft Copilot", 
-        webEndpoint: "https://copilot.microsoft.com/sydney/ChatHub", 
-        apiEndpoint: "https://sydney.bing.com/sydney/ChatHub", 
-        model: "copilot-enterprise" 
-      },
-      mistral: { 
-        name: "Mistral AI", 
-        webEndpoint: "https://chat.mistral.ai/api/chat", 
-        apiEndpoint: "https://api.mistral.ai/v1/chat/completions", 
-        model: "mistral-large-latest" 
-      },
-      ollama: { 
-        name: "Ollama (Local / Open-WebUI)", 
-        webEndpoint: "http://localhost:3000/api/chat", 
-        apiEndpoint: "http://localhost:11434/api/generate", 
-        model: "llama3" 
-      }
+      openai: { name: "OpenAI ChatGPT", webEndpoint: "https://chatgpt.com/backend-api/conversation", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
+      anthropic: { name: "Anthropic Claude", webEndpoint: "https://chat.claude.ai/api/organizations/chat_conversations", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet-20240620" },
+      gemini: { name: "Google Gemini", webEndpoint: "https://gemini.google.com/_/BardChatUi/data/batchexecute", apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", model: "gemini-1.5-pro" },
+      copilot: { name: "Microsoft Copilot", webEndpoint: "https://copilot.microsoft.com/sydney/ChatHub", apiEndpoint: "https://sydney.bing.com/sydney/ChatHub", model: "copilot-enterprise" },
+      mistral: { name: "Mistral AI", webEndpoint: "https://chat.mistral.ai/api/chat", apiEndpoint: "https://api.mistral.ai/v1/chat/completions", model: "mistral-large-latest" },
+      ollama: { name: "Ollama (Local / Open-WebUI)", webEndpoint: "http://localhost:3000/api/chat", apiEndpoint: "http://localhost:11434/api/generate", model: "llama3" }
     };
 
     let currentShuffledCountries = [];
@@ -654,18 +534,19 @@
       const engineKey = document.getElementById('aiEngineSelect').value;
       const trafficType = document.getElementById('aiTrafficTypeSelect').value;
       const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai;
-      return {
-        engine,
-        trafficType,
-        targetUrl: trafficType === 'web' ? engine.webEndpoint : engine.apiEndpoint
-      };
+      
+      let targetUrl = "https://httpbin.org/post";
+      if (trafficType === 'direct_web') targetUrl = engine.webEndpoint;
+      else if (trafficType === 'direct_api') targetUrl = engine.apiEndpoint;
+
+      return { engine, trafficType, targetUrl };
     }
 
     function onAiEngineChange() {
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
       const welcome = document.getElementById('aiWelcomeMsg');
       welcome.innerText = `🤖 Sandbox active for ${engine.name} [Mode: ${trafficType.toUpperCase()}]. Target route: ${targetUrl}`;
-      log(`Switched target AI Engine to ${engine.name} (${trafficType.toUpperCase()} endpoint: ${targetUrl}).`);
+      log(`Switched target AI Engine to ${engine.name} (${trafficType.toUpperCase()} target: ${targetUrl}).`);
     }
 
     function generateLuhnCard() {
@@ -680,34 +561,23 @@
       return cc + ((10 - (sum % 10)) % 10);
     }
 
-    function getByteSize(str) {
-      return new Blob([str]).size;
-    }
+    function getByteSize(str) { return new Blob([str]).size; }
 
     function updateByteCount() {
       const val = document.getElementById('payload').value;
       const bytes = getByteSize(val);
       const counter = document.getElementById('byteCounter');
       counter.innerText = `${bytes} / 250 bytes min`;
-      if (bytes >= 250) {
-        counter.className = "byte-counter valid";
-      } else {
-        counter.className = "byte-counter invalid";
-      }
+      counter.className = bytes >= 250 ? "byte-counter valid" : "byte-counter invalid";
     }
 
     function padPayloadToMinBytes() {
       const code = document.getElementById('countrySelect').value;
       const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
       const payloadBox = document.getElementById('payload');
-      
       let text = payloadBox.value.trim();
       const filler = c.bogusText || "This document contains confidential security benchmark testing information.";
-
-      while (getByteSize(text) < 250) {
-        text += (text ? "\n\n" : "") + filler;
-      }
-
+      while (getByteSize(text) < 250) { text += (text ? "\n\n" : "") + filler; }
       payloadBox.value = text;
       updateByteCount();
       log(`Padded payload with native bogus text (${getByteSize(text)} bytes total).`);
@@ -730,7 +600,6 @@
       document.getElementById('label-tax').innerText = `${c.taxLabel} Card`;
       document.getElementById('label-passport').innerText = `${passportTitle} Card`;
       document.getElementById('label-dl').innerText = `${dlTitle} Card`;
-      
       document.getElementById('ocr-passport-title').innerText = `${passportTitle} Specimen`;
       document.getElementById('ocr-dl-title').innerText = `${dlTitle} Specimen`;
 
@@ -818,7 +687,6 @@
     function renderCcCanvas(cardVal) {
       const canvas = document.getElementById('ccCanvas');
       const ctx = canvas.getContext('2d');
-
       const grad = ctx.createLinearGradient(0, 0, 400, 260);
       grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#311042');
       ctx.fillStyle = grad; ctx.fillRect(0, 0, 400, 260);
@@ -848,23 +716,15 @@
     function generateSingleField(type) {
       const code = document.getElementById('countrySelect').value;
       const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
-      
       const passportTitle = c.passportTitle || 'PASSPORT';
       const dlTitle = c.dlTitle || 'DRIVER LICENSE';
 
-      if (type === 'tax') {
-        document.getElementById('val-tax').innerText = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
-      } else if (type === 'passport') {
-        document.getElementById('val-passport').innerText = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
-      } else if (type === 'dl') {
-        document.getElementById('val-dl').innerText = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
-      } else if (type === 'card') {
-        document.getElementById('val-card').innerText = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
-      } else if (type === 'iban') {
-        document.getElementById('val-iban').innerText = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
-      } else if (type === 'secret') {
-        document.getElementById('val-secret').innerText = `AWS Secret Key: ${formatPattern('AKIAIOSFODNN7EXAMPLE')}`;
-      }
+      if (type === 'tax') document.getElementById('val-tax').innerText = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
+      else if (type === 'passport') document.getElementById('val-passport').innerText = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
+      else if (type === 'dl') document.getElementById('val-dl').innerText = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
+      else if (type === 'card') document.getElementById('val-card').innerText = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
+      else if (type === 'iban') document.getElementById('val-iban').innerText = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
+      else if (type === 'secret') document.getElementById('val-secret').innerText = `AWS Secret Key: ${formatPattern('AKIAIOSFODNN7EXAMPLE')}`;
     }
 
     function regenerateData() {
@@ -875,14 +735,8 @@
     function copyAndInject(elementId, fieldType) {
       const text = document.getElementById(elementId).innerText;
       navigator.clipboard.writeText(text);
-      
       const payloadBox = document.getElementById('payload');
-      if (payloadBox.value) {
-        payloadBox.value += "\n" + text;
-      } else {
-        payloadBox.value = text;
-      }
-      
+      payloadBox.value = payloadBox.value ? payloadBox.value + "\n" + text : text;
       updateByteCount();
       log(`Copied and injected into payload area: ${text}`);
       generateSingleField(fieldType);
@@ -903,18 +757,10 @@
       canvas.toBlob(async (blob) => {
         const formData = new FormData();
         formData.append('document_specimen_ocr', blob, filename);
-
         log(`Initiating OCR specimen transfer: ${filename} (${(blob.size / 1024).toFixed(1)} KB)...`);
-
         try {
-          const response = await fetch('https://httpbin.org/post', {
-            method: 'POST',
-            body: formData
-          });
-
-          if (response.ok) {
-            log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
-          }
+          const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
+          if (response.ok) log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
         } catch (err) {
           log(`TRAFFIC BLOCKED: OCR Document specimen intercepted/dropped by DLP proxy! (${err.message})`, true);
         }
@@ -924,8 +770,7 @@
     function log(msg, isError = false) {
       const box = document.getElementById('logBox');
       const time = new Date().toLocaleTimeString();
-      const color = isError ? '#ff7b72' : '#10b981';
-      box.innerHTML = `<span style="color:${color}">[${time}] ${msg}</span><br/>` + box.innerHTML;
+      box.innerHTML = `<span style="color:${isError ? '#ff7b72' : '#10b981'}">[${time}] ${msg}</span><br/>` + box.innerHTML;
     }
 
     function appendChatMessage(sender, text, isUser = false) {
@@ -941,21 +786,15 @@
       e.preventDefault();
       const val = document.getElementById('payload').value;
       if (!val) { log('Error: Payload field is empty.', true); return; }
-
       log(`Sending real HTTP POST request (${getByteSize(val)} bytes)...`);
-
       try {
         const response = await fetch('https://httpbin.org/post', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ dlp_test_payload: val })
         });
-
-        if (response.ok) {
-          log(`TRAFFIC PASSED: Outbound HTTP POST reached external destination (200 OK). Proxy allowed payload.`);
-        } else {
-          log(`TRAFFIC ALTERED: Response code ${response.status}`, true);
-        }
+        if (response.ok) log(`TRAFFIC PASSED: Outbound HTTP POST reached external destination (200 OK). Proxy allowed payload.`);
+        else log(`TRAFFIC ALTERED: Response code ${response.status}`, true);
       } catch (err) {
         log(`TRAFFIC BLOCKED: Connection dropped/reset by network DLP layer! (${err.message})`, true);
       }
@@ -964,22 +803,13 @@
     async function sendGeneralFileUpload() {
       const input = document.getElementById('generalFileInput');
       if (!input.files || input.files.length === 0) { log('Error: Select a file first.', true); return; }
-
       const file = input.files[0];
       const formData = new FormData();
       formData.append('document_file', file);
-
       log(`Initiating multipart file upload: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
-
       try {
-        const response = await fetch('https://httpbin.org/post', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (response.ok) {
-          log(`TRAFFIC PASSED: Standard file transfer succeeded (200 OK). Proxy allowed upload.`);
-        }
+        const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
+        if (response.ok) log(`TRAFFIC PASSED: Standard file transfer succeeded (200 OK). Proxy allowed upload.`);
       } catch (err) {
         log(`TRAFFIC BLOCKED: Standard file transfer dropped or reset by network DLP layer! (${err.message})`, true);
       }
@@ -989,67 +819,56 @@
       const input = document.getElementById('aiPromptInput');
       const promptText = input.value.trim();
       if (!promptText) { log('Error: AI prompt field is empty.', true); return; }
-
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
-
       appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, true);
       input.value = '';
       log(`Transmitting AI prompt outbound (${trafficType.toUpperCase()} mode) to target: ${targetUrl}...`);
 
       try {
-        const response = await fetch('https://httpbin.org/post', {
+        const fetchOptions = {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'X-Simulated-Target': targetUrl
-          },
-          body: JSON.stringify({ 
-            engine: engine.name,
-            traffic_type: trafficType,
-            simulated_endpoint: targetUrl,
-            model: engine.model,
-            prompt: promptText 
-          })
-        });
-
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ engine: engine.name, traffic_type: trafficType, simulated_endpoint: targetUrl, model: engine.model, prompt: promptText })
+        };
+        if (trafficType === 'mirror') fetchOptions.headers['X-Simulated-Target'] = targetUrl;
+        const response = await fetch(targetUrl, fetchOptions);
         if (response.ok) {
-          log(`AI TRAFFIC PASSED: Prompt payload delivered to ${engine.name} target (${targetUrl}).`);
-          appendChatMessage(`🤖 ${engine.name}`, `Prompt transmitted to ${targetUrl}. Outbound packet permitted.`);
+          log(`AI TRAFFIC PASSED: Prompt payload delivered to ${engine.name} target (${targetUrl}). Status: ${response.status}`);
+          appendChatMessage(`🤖 ${engine.name}`, `Prompt transmitted directly to ${targetUrl}. Outbound packet permitted.`);
+        } else {
+          log(`AI TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Connection established.`);
+          appendChatMessage(`🤖 ${engine.name}`, `Packet reached target domain (${targetUrl}). Response code: ${response.status}.`);
         }
       } catch (err) {
-        log(`AI TRAFFIC BLOCKED: Outbound ${engine.name} prompt intercepted/reset by DLP proxy!`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [Connection Intercepted: Outbound prompt to ${targetUrl} was blocked by network DLP proxy.]`);
+        log(`AI TRAFFIC INTERCEPTED / BLOCKED: Outbound request to ${targetUrl} was dropped or reset by network DLP/CORS rules! (${err.message})`, true);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [Connection Intercepted: Outbound prompt packet to ${targetUrl} was dropped or blocked by network DLP/firewall layer.]`);
       }
     }
 
     async function sendAiFileAttachment() {
       const input = document.getElementById('aiFileInput');
       if (!input.files || input.files.length === 0) { log('Error: Select a file to upload to AI first.', true); return; }
-
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
-
       const file = input.files[0];
       const formData = new FormData();
       formData.append('ai_engine', engine.name);
       formData.append('traffic_type', trafficType);
       formData.append('simulated_endpoint', targetUrl);
       formData.append('ai_document_attachment', file);
-
       appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()}) File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]`, true);
       log(`Transmitting AI file attachment outbound (${trafficType.toUpperCase()} mode) to ${targetUrl}...`);
 
       try {
-        const response = await fetch('https://httpbin.org/post', {
-          method: 'POST',
-          body: formData
-        });
-
+        const response = await fetch(targetUrl, { method: 'POST', body: formData });
         if (response.ok) {
-          log(`AI FILE TRAFFIC PASSED: File upload to ${engine.name} permitted (${targetUrl}).`);
+          log(`AI FILE TRAFFIC PASSED: File upload permitted to ${targetUrl}.`);
           appendChatMessage(`🤖 ${engine.name}`, `File ${file.name} uploaded to ${targetUrl}.`);
+        } else {
+          log(`AI FILE TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Connection established.`);
+          appendChatMessage(`🤖 ${engine.name}`, `File packet reached ${targetUrl} (Status ${response.status}).`);
         }
       } catch (err) {
-        log(`AI FILE TRAFFIC BLOCKED: Multipart attachment to ${engine.name} blocked by inline device!`, true);
+        log(`AI FILE TRAFFIC BLOCKED: Multipart attachment request to ${targetUrl} intercepted or reset by inline DLP proxy! (${err.message})`, true);
         appendChatMessage(`🤖 ${engine.name}`, `⚠️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP.]`);
       }
     }
