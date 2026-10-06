@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Is Your Data Safe? (.org) - Enterprise Network DLP Test Bench</title>
+  <title>Is Your Data Safe? (.org) - Cyber Threat & DLP Egress Bench</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --panel-bg: #1e293b;
-      --card-bg: #0f172a;
-      --border: #334155;
-      --border-accent: #3b82f6;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent-blue: #3b82f6;
-      --accent-blue-hover: #2563eb;
+      --bg: #030712;
+      --panel-bg: rgba(15, 23, 42, 0.85);
+      --card-bg: #0b132b;
+      --border: #1e293b;
+      --border-cyan: rgba(6, 182, 212, 0.4);
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-hover: #0891b2;
       --accent-green: #10b981;
       --accent-green-hover: #059669;
       --danger: #ef4444;
@@ -23,8 +23,13 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 75%),
+        linear-gradient(rgba(30, 41, 59, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 41, 59, 0.2) 1px, transparent 1px);
+      background-size: 100% 100%, 20px 20px, 20px 20px;
       color: var(--text);
       line-height: 1.5;
       padding: 20px;
@@ -51,7 +56,10 @@
       letter-spacing: -0.02em;
       font-weight: 700;
     }
-    h1 span.highlight { color: var(--accent-blue); }
+    h1 span.highlight {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+    }
     .subtitle { color: var(--muted); font-size: 0.85rem; }
 
     #jv-protection-root { display: inline-block; }
@@ -61,10 +69,12 @@
       width: 100%;
       height: 180px;
       border-radius: 8px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-cyan);
       margin-bottom: 20px;
       overflow: hidden;
-      background: #090d16;
+      background: #020617;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+      position: relative;
     }
     .hero-banner svg { width: 100%; height: 100%; display: block; }
 
@@ -77,24 +87,25 @@
       flex-wrap: wrap;
     }
     .tab-btn {
-      background: var(--panel-bg);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid var(--border);
       border-bottom: none;
       color: var(--muted);
       padding: 10px 18px;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .tab-btn:hover { color: #fff; background: #283548; }
+    .tab-btn:hover { color: #fff; border-color: var(--accent-cyan); }
     .tab-btn.active {
-      background: var(--accent-blue);
-      color: #fff;
-      border-color: var(--accent-blue);
-      box-shadow: 0 -2px 10px rgba(59, 130, 246, 0.3);
+      background: #0f172a;
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+      text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
     }
 
     .tab-content { display: none; }
@@ -106,7 +117,15 @@
       border-radius: 8px;
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      position: relative;
+    }
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
     }
     h2 {
       font-size: 1.1rem;
@@ -128,18 +147,19 @@
       flex-wrap: wrap;
     }
     select, textarea, input[type="text"] {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: inherit;
       font-size: 0.85rem;
-      background: var(--card-bg);
+      background: #020617;
       border: 1px solid var(--border);
       color: var(--text);
       padding: 8px 12px;
       border-radius: 6px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     select:focus, textarea:focus, input[type="text"]:focus {
       outline: none;
-      border-color: var(--accent-blue);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
     }
     select { cursor: pointer; flex-grow: 1; }
     textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
@@ -147,16 +167,16 @@
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 15px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card h3 { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
-    code { background: #020617; border: 1px solid var(--border); padding: 6px 8px; border-radius: 4px; color: var(--accent-green); font-size: 0.8rem; word-break: break-all; margin-bottom: 10px; display: block; font-family: monospace; }
+    .card h3 { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    code { background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(6, 182, 212, 0.2); padding: 6px 8px; border-radius: 4px; color: var(--accent-green); font-size: 0.8rem; word-break: break-all; margin-bottom: 10px; display: block; font-family: inherit; }
     
     .btn { background: var(--accent-green); color: #000; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: background 0.2s, transform 0.1s; }
     .btn:hover { background: var(--accent-green-hover); transform: translateY(-1px); }
-    .btn-blue { background: var(--accent-blue); color: #fff; }
-    .btn-blue:hover { background: var(--accent-blue-hover); }
+    .btn-cyan { background: var(--accent-cyan); color: #000; }
+    .btn-cyan:hover { background: var(--accent-cyan-hover); }
     .btn-purple { background: var(--purple); color: #fff; }
     .btn-purple:hover { background: var(--purple-hover); }
-    .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #0f172a; border: 1px solid var(--border); color: var(--accent-blue); }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #1e293b; border: 1px solid var(--border); color: var(--accent-cyan); }
     .btn-sm:hover { background: #334155; color: #fff; }
     
     .byte-counter {
@@ -177,7 +197,7 @@
     }
 
     .chat-container {
-      background: var(--card-bg);
+      background: #020617;
       border: 1px solid var(--border);
       border-radius: 6px;
       height: 240px;
@@ -213,7 +233,6 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 0.8rem;
       color: var(--accent-green);
       min-height: 110px;
@@ -228,35 +247,35 @@
     <header>
       <div>
         <h1>🛡️ <span class="highlight">IS YOUR DATA SAFE?</span> (.org)</h1>
-        <p class="subtitle">Enterprise Network DLP Inspection & Egress Benchmark</p>
+        <p class="subtitle">Cyber Threat & Egress Traffic DLP Inspection Playground</p>
       </div>
       <!-- Protected Attribution Mount Point -->
       <div id="jv-protection-root"></div>
     </header>
 
-    <!-- Cloud Proxy Gateway Topology Hero Banner -->
+    <!-- Animated Egress Radar Hero Graphic -->
     <div class="hero-banner">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 180" preserveAspectRatio="xMidYMid slice">
         <defs>
           <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0b132b"/>
-            <stop offset="100%" stop-color="#0f172a"/>
+            <stop offset="0%" stop-color="#020617"/>
+            <stop offset="100%" stop-color="#0b132b"/>
           </linearGradient>
           <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#3b82f6"/>
+            <stop offset="0%" stop-color="#06b6d4"/>
             <stop offset="100%" stop-color="#10b981"/>
           </linearGradient>
-          <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+          <pattern id="cyberGrid" width="25" height="25" patternUnits="userSpaceOnUse">
             <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" stroke-width="0.8"/>
           </pattern>
         </defs>
 
         <rect width="1000" height="180" fill="url(#bgGrad)" />
-        <rect width="1000" height="180" fill="url(#grid)" opacity="0.7" />
+        <rect width="1000" height="180" fill="url(#cyberGrid)" opacity="0.6" />
 
-        <g stroke="#334155" stroke-width="1.5">
+        <g stroke="#1e293b" stroke-width="1.5">
           <line x1="140" y1="90" x2="330" y2="90" stroke-dasharray="4,4"/>
-          <line x1="330" y1="90" x2="500" y2="90" stroke="#3b82f6" stroke-width="2"/>
+          <line x1="330" y1="90" x2="500" y2="90" stroke="#06b6d4" stroke-width="2"/>
           <line x1="500" y1="90" x2="670" y2="90" stroke="#10b981" stroke-width="2"/>
           <line x1="670" y1="90" x2="860" y2="45"/>
           <line x1="670" y1="90" x2="860" y2="135"/>
@@ -264,39 +283,36 @@
 
         <!-- Central Security Gateway Shield -->
         <g transform="translate(500, 90)">
-          <circle r="38" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+          <circle r="38" fill="#0b132b" stroke="#06b6d4" stroke-width="2"/>
           <path d="M -14 -16 L 0 -22 L 14 -16 L 14 3 C 14 14 0 21 0 21 C 0 21 -14 14 -14 3 Z" fill="url(#shieldGrad)" opacity="0.9"/>
           <path d="M -5 0 L -1 5 L 7 -5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
 
         <!-- Internal Endpoint -->
         <g transform="translate(140, 90)">
-          <circle r="20" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
-          <text x="0" y="4" font-family="sans-serif" font-size="9" fill="#3b82f6" text-anchor="middle" font-weight="bold">ENDPOINT</text>
+          <circle r="20" fill="#0b132b" stroke="#06b6d4" stroke-width="1.5"/>
+          <text x="0" y="4" font-family="monospace" font-size="9" fill="#06b6d4" text-anchor="middle" font-weight="bold">ENDPOINT</text>
         </g>
 
         <!-- AI Target Endpoint -->
         <g transform="translate(860, 45)">
-          <circle r="18" fill="#1e293b" stroke="#8b5cf6" stroke-width="1.5"/>
-          <text x="0" y="4" font-family="sans-serif" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
+          <circle r="18" fill="#0b132b" stroke="#8b5cf6" stroke-width="1.5"/>
+          <text x="0" y="4" font-family="monospace" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
         </g>
 
         <!-- Web Target Endpoint -->
         <g transform="translate(860, 135)">
-          <circle r="18" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
-          <text x="0" y="4" font-family="sans-serif" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
+          <circle r="18" fill="#0b132b" stroke="#10b981" stroke-width="1.5"/>
+          <text x="0" y="4" font-family="monospace" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
         </g>
 
-        <!-- Animated Data Packet Stream -->
-        <circle r="4" fill="#3b82f6">
-          <animateMotion path="M 140,90 L 500,90" dur="2.5s" repeatCount="indefinite" />
-        </circle>
-        <circle r="4" fill="#10b981">
-          <animateMotion path="M 500,90 L 860,135" dur="2.5s" repeatCount="indefinite" />
-        </circle>
+        <!-- Animated Radar Scan Line -->
+        <line x1="0" y1="0" x2="0" y2="180" stroke="rgba(6, 182, 212, 0.35)" stroke-width="3">
+          <animateTransform attributeName="transform" type="translate" from="0 0" to="1000 0" dur="4s" repeatCount="indefinite"/>
+        </line>
 
-        <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="0.5">OUTBOUND NETWORK INSPECTOR ARCHITECTURE</text>
-        <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#94a3b8">Simulated SWG Proxy, DLP Inspection Engine &amp; Egress Router</text>
+        <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">NETWORK DLP INSPECTION PLATFORM</text>
+        <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#64748b">Outbound Traffic Bench &amp; Photorealistic Document Vault</text>
       </svg>
     </div>
 
@@ -325,13 +341,13 @@
           <textarea id="payload" oninput="updateByteCount()" placeholder="Paste or inject sensitive test data here..."></textarea>
           
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-            <button type="button" class="btn btn-sm" style="background:#0f172a; color:var(--accent-blue);" onclick="padPayloadToMinBytes()">
+            <button type="button" class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="padPayloadToMinBytes()">
               + Add Native Bogus Data (Pad to 250+ Bytes)
             </button>
             <span id="byteCounter" class="byte-counter invalid">0 / 250 bytes min</span>
           </div>
 
-          <button type="submit" class="btn btn-blue">⚡ Transmit Payload Outbound</button>
+          <button type="submit" class="btn btn-cyan">⚡ Transmit Payload Outbound</button>
         </form>
       </div>
 
@@ -421,9 +437,9 @@
       <div class="section">
         <h2>📁 Standard Outbound File Transfer Test</h2>
         <p>Upload a document, archive, or specimen file to transmit raw multipart network packets across your firewall or Secure Web Gateway (SWG).</p>
-        <div style="background:#0f172a; border:2px dashed var(--border); border-radius:6px; padding:30px; text-align:center; margin-bottom:15px;">
+        <div style="background:#020617; border:2px dashed var(--border); border-radius:6px; padding:30px; text-align:center; margin-bottom:15px;">
           <input type="file" id="generalFileInput" style="margin-bottom: 15px;" /><br/>
-          <button class="btn btn-blue" onclick="sendGeneralFileUpload()">🚀 Transmit File Outbound</button>
+          <button class="btn btn-cyan" onclick="sendGeneralFileUpload()">🚀 Transmit File Outbound</button>
         </div>
       </div>
     </div>
@@ -488,22 +504,22 @@
       
       const badge = document.createElement('div');
       badge.style.cssText = `
-        background: #0f172a;
-        border: 1px solid #3b82f6;
-        color: #f8fafc;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border: 1px solid #06b6d4;
+        color: #f1f5f9;
+        font-family: ui-monospace, SFMono-Regular, monospace;
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
         padding: 6px 12px;
-        border-radius: 6px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 9999px;
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
         display: flex;
         align-items: center;
         gap: 6px;
         user-select: none;
         pointer-events: none;
       `;
-      badge.innerHTML = `<span style="color:#3b82f6;">Created by</span> ${AUTHOR_CREDIT.toUpperCase()} <span style="color:#10b981; font-size:0.65rem;">[VERIFIED 🔒]</span>`;
+      badge.innerHTML = `<span style="color:#06b6d4;">⚙️ CREATED BY</span> ${AUTHOR_CREDIT.toUpperCase()} <span style="color:#10b981; font-size:0.65rem;">[VERIFIED 🔒]</span>`;
       shadow.appendChild(badge);
     }
 
@@ -698,7 +714,7 @@
       ctx.fillText(`NATIONALITY: ${countryCode}`, 120, 115);
       ctx.fillText(passNum, 120, 135);
 
-      ctx.fillStyle = 'rgba(2, 132, 199, 0.4)'; ctx.font = 'bold 9px monospace';
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.4)'; ctx.font = 'bold 9px monospace';
       ctx.fillText(`CREATED BY ${AUTHOR_CREDIT.toUpperCase()}`, 120, 165);
 
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 185, 400, 75);
