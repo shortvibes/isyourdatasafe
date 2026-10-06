@@ -49,9 +49,10 @@
       border-radius: 6px;
     }
     select { cursor: pointer; flex-grow: 1; }
-    textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
+    textarea { width: 100%; height: 100px; resize: vertical; margin-bottom: 10px; }
     
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 15px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
     .card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
     .card h3 { font-size: 0.85rem; color: #8b949e; margin-bottom: 4px; text-transform: uppercase; }
     code { background: rgba(110, 118, 129, 0.2); padding: 4px 6px; border-radius: 4px; color: #7ee787; font-size: 0.85rem; font-family: monospace; word-break: break-all; margin-bottom: 10px; display: block; }
@@ -63,11 +64,20 @@
     .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #21262d; border: 1px solid var(--border); color: var(--link); }
     .btn-sm:hover { background: #30363d; color: #fff; }
     
+    canvas {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      background: #000;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
     .chat-container {
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 6px;
-      height: 250px;
+      height: 220px;
       overflow-y: auto;
       padding: 12px;
       display: flex;
@@ -123,9 +133,47 @@
       </form>
     </div>
 
-    <!-- 2. Dynamic Synthetic Data Cards with Proximity Keywords -->
+    <!-- 2. Photorealistic Document Specimen OCR Vault -->
     <div class="section">
-      <h2>2. Synthetic Test Data Vault</h2>
+      <h2>2. Photorealistic Document OCR Vault</h2>
+      <p>Dynamically rendered document specimens with authentic background guilloche patterns, official headers, and scannable MRZ/barcodes. Transmitting sends the actual PNG image binary across your firewall for OCR inspection.</p>
+
+      <div class="grid-3">
+        <!-- Passport -->
+        <div class="card">
+          <h3>Passport Specimen</h3>
+          <canvas id="passportCanvas" width="400" height="260"></canvas>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('passportCanvas', 'passport')">Download PNG</button>
+            <button class="btn btn-sm" style="flex:1; background:var(--accent); color:#fff;" onclick="sendCanvasAsFile('passportCanvas', 'passport_specimen.png')">Transmit Outbound</button>
+          </div>
+        </div>
+
+        <!-- Driver License / SSN -->
+        <div class="card">
+          <h3>Driver License / SSN</h3>
+          <canvas id="dlCanvas" width="400" height="260"></canvas>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('dlCanvas', 'license')">Download PNG</button>
+            <button class="btn btn-sm" style="flex:1; background:var(--accent); color:#fff;" onclick="sendCanvasAsFile('dlCanvas', 'license_specimen.png')">Transmit Outbound</button>
+          </div>
+        </div>
+
+        <!-- Credit Card -->
+        <div class="card">
+          <h3>Credit Card (PCI)</h3>
+          <canvas id="ccCanvas" width="400" height="260"></canvas>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('ccCanvas', 'credit_card')">Download PNG</button>
+            <button class="btn btn-sm" style="flex:1; background:var(--accent); color:#fff;" onclick="sendCanvasAsFile('ccCanvas', 'credit_card_specimen.png')">Transmit Outbound</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Dynamic Synthetic Data Cards with Proximity Keywords -->
+    <div class="section">
+      <h2>3. Synthetic Test Data Vault</h2>
       <p>Click <strong>"Copy & Inject"</strong> to copy the value with its proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
       
       <div class="grid">
@@ -167,9 +215,17 @@
       </div>
     </div>
 
-    <!-- 3. Shadow AI Conversation Sandbox with AI Engine Selection -->
+    <!-- 4. Standard File Upload Egress Test -->
     <div class="section">
-      <h2>3. Shadow AI Prompt Sandbox (Live Egress)</h2>
+      <h2>4. Standard Outbound File Transfer Test</h2>
+      <p>Upload a document or specimen file to transmit raw multipart network packets across your firewall or Secure Web Gateway (SWG).</p>
+      <input type="file" id="generalFileInput" style="margin-bottom: 10px;" /><br/>
+      <button class="btn" onclick="sendGeneralFileUpload()">Transmit File Outbound</button>
+    </div>
+
+    <!-- 5. Shadow AI Conversation Sandbox -->
+    <div class="section">
+      <h2>5. Shadow AI Prompt Sandbox (Live Egress)</h2>
       <p>Select a target AI Provider and model, then send prompts or attached files. Submitting here sends **actual HTTP POST requests** structured for that provider's API endpoint.</p>
       
       <div class="selector-bar">
@@ -203,9 +259,9 @@
       </div>
     </div>
 
-    <!-- 4. Real-time Response Inspector -->
+    <!-- 6. Real-time Response Inspector -->
     <div class="section">
-      <h2>4. Egress Traffic Inspector Log</h2>
+      <h2>6. Egress Traffic Inspector Log</h2>
       <div class="log-box" id="logBox">
         [Awaiting network request execution...]
       </div>
@@ -213,9 +269,6 @@
   </div>
 
   <script>
-    // Pattern Mask Evaluator:
-    // '9' -> Random Digit (0-9)
-    // 'A' -> Random Uppercase Letter (A-Z)
     function formatPattern(pattern) {
       const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       return pattern.replace(/[9A]/g, (match) => {
@@ -225,7 +278,6 @@
       });
     }
 
-    // Fisher-Yates array shuffling algorithm
     function shuffleArray(array) {
       const arr = [...array];
       for (let i = arr.length - 1; i > 0; i--) {
@@ -235,7 +287,6 @@
       return arr;
     }
 
-    // FULL UN-RECOGNIZED 195 SOVEREIGN NATIONS DATASET
     const COUNTRY_DEFINITIONS = [
       { code: "AFG", country: "Afghanistan", taxLabel: "TIN", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
       { code: "ALB", country: "Albania", taxLabel: "NIPT", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
@@ -294,12 +345,113 @@
       
       document.getElementById('label-tax').innerText = c.taxLabel;
       
-      // Proximity Context Strings
-      document.getElementById('val-tax').innerText = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
-      document.getElementById('val-passport').innerText = `Passport Number: ${formatPattern(c.formats.passport)}`;
-      document.getElementById('val-dl').innerText = `Driver License ID: ${formatPattern(c.formats.driverLicense)}`;
-      document.getElementById('val-card').innerText = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
-      document.getElementById('val-iban').innerText = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
+      const taxVal = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
+      const passVal = `Passport Number: ${formatPattern(c.formats.passport)}`;
+      const dlVal = `Driver License ID: ${formatPattern(c.formats.driverLicense)}`;
+      const cardVal = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
+      const ibanVal = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
+
+      document.getElementById('val-tax').innerText = taxVal;
+      document.getElementById('val-passport').innerText = passVal;
+      document.getElementById('val-dl').innerText = dlVal;
+      document.getElementById('val-card').innerText = cardVal;
+      document.getElementById('val-iban').innerText = ibanVal;
+
+      // Render Visual Document OCR Canvases
+      renderPassportCanvas(c.country, c.code, passVal);
+      renderDlCanvas(c.country, c.code, dlVal, taxVal);
+      renderCcCanvas(cardVal);
+    }
+
+    // Canvas OCR Specimen Generators
+    function renderPassportCanvas(countryName, countryCode, passNum) {
+      const canvas = document.getElementById('passportCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, 400, 260);
+
+      // Guilloche pattern
+      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.5;
+      for (let i = 0; i < 260; i += 8) {
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.bezierCurveTo(100, i + 10, 200, i - 10, 400, i); ctx.stroke();
+      }
+
+      ctx.fillStyle = '#0284c7'; ctx.fillRect(0, 0, 400, 40);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`PASSPORT - ${countryName.toUpperCase()}`, 12, 24);
+
+      ctx.fillStyle = '#cbd5e1'; ctx.fillRect(15, 55, 90, 110);
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath(); ctx.arc(60, 95, 20, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(60, 150, 32, 0, Math.PI, true); ctx.fill();
+
+      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
+      ctx.fillText("SURNAME: SPECIMEN", 120, 75);
+      ctx.fillText("GIVEN NAMES: EMMA LISANNE", 120, 95);
+      ctx.fillText(`NATIONALITY: ${countryCode}`, 120, 115);
+      ctx.fillText(passNum, 120, 135);
+
+      // MRZ Zone
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 185, 400, 75);
+      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px monospace';
+      ctx.fillText(`P<${countryCode}SPECIMEN<<EMMA<LISANNE<<<<<<<<<<<<<<`, 10, 215);
+      ctx.fillText(`${passNum.replace(/[^A-Z0-9]/g,'')}4${countryCode}8412254F2810010<<<<<<02`, 10, 240);
+    }
+
+    function renderDlCanvas(countryName, countryCode, dlVal, taxVal) {
+      const canvas = document.getElementById('dlCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#e2e8f0'; ctx.fillRect(0, 0, 400, 260);
+
+      ctx.fillStyle = '#1e3a8a'; ctx.fillRect(0, 0, 400, 40);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`DRIVER LICENSE / SSN - ${countryCode}`, 15, 24);
+
+      ctx.fillStyle = '#cbd5e1'; ctx.fillRect(15, 55, 90, 110);
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath(); ctx.arc(60, 95, 20, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(60, 150, 32, 0, Math.PI, true); ctx.fill();
+
+      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
+      ctx.fillText("1. NAME: DE BRUIJN, EMMA", 120, 75);
+      ctx.fillText("2. DOB: 25.12.1984", 120, 95);
+      ctx.fillText(`3. ${dlVal}`, 120, 120);
+      ctx.fillText(`4. ${taxVal}`, 120, 145);
+
+      // Barcode
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 200, 400, 60);
+      ctx.fillStyle = '#000000';
+      for (let x = 15; x < 385; x += Math.floor(Math.random() * 5 + 2)) {
+        ctx.fillRect(x, 210, Math.floor(Math.random() * 3 + 1), 40);
+      }
+    }
+
+    function renderCcCanvas(cardVal) {
+      const canvas = document.getElementById('ccCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 400, 260);
+      grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#311042');
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, 400, 260);
+
+      // EMV Chip
+      ctx.fillStyle = '#f59e0b'; ctx.fillRect(30, 60, 42, 32);
+      ctx.strokeStyle = '#78350f'; ctx.strokeRect(30, 60, 42, 32);
+
+      // Contactless Icon
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+      for (let r = 8; r <= 18; r += 5) {
+        ctx.beginPath(); ctx.arc(95, 76, r, -Math.PI / 4, Math.PI / 4); ctx.stroke();
+      }
+
+      ctx.fillStyle = '#ffffff'; ctx.font = 'italic bold 18px sans-serif';
+      ctx.fillText("VISA", 320, 45);
+
+      ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 15px monospace';
+      ctx.fillText(cardVal, 30, 150);
+
+      ctx.font = '10px sans-serif'; ctx.fillStyle = '#94a3b8';
+      ctx.fillText("VALID THRU: 12/28", 30, 185);
+      ctx.fillText("SPECIMEN CARD HOLDER", 30, 210);
     }
 
     function generateSingleField(type) {
@@ -338,9 +490,40 @@
       }
       
       log(`Copied and injected into payload area: ${text}`);
-
-      // Auto-regenerate fresh value for this specific field
       generateSingleField(fieldType);
+    }
+
+    function downloadCanvas(canvasId, filenamePrefix) {
+      const canvas = document.getElementById(canvasId);
+      const code = document.getElementById('countrySelect').value;
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = `${filenamePrefix}_${code.toLowerCase()}.png`;
+      a.click();
+      log(`Downloaded ${a.download}`);
+    }
+
+    function sendCanvasAsFile(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      canvas.toBlob(async (blob) => {
+        const formData = new FormData();
+        formData.append('document_specimen_ocr', blob, filename);
+
+        log(`Initiating OCR specimen transfer: ${filename} (${(blob.size / 1024).toFixed(1)} KB)...`);
+
+        try {
+          const response = await fetch('https://httpbin.org/post', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (response.ok) {
+            log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
+          }
+        } catch (err) {
+          log(`TRAFFIC BLOCKED: OCR Document specimen intercepted/dropped by DLP proxy! (${err.message})`, true);
+        }
+      }, 'image/png');
     }
 
     function onAiEngineChange() {
@@ -367,7 +550,7 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // 1. Standard Form HTTP POST
+    // 1. Text Payload HTTP POST
     async function sendRealNetworkPost(e) {
       e.preventDefault();
       const val = document.getElementById('payload').value;
@@ -392,7 +575,32 @@
       }
     }
 
-    // 2. AI Prompt Submission
+    // 2. Standard File Upload Egress Test
+    async function sendGeneralFileUpload() {
+      const input = document.getElementById('generalFileInput');
+      if (!input.files || input.files.length === 0) { log('Error: Select a file first.', true); return; }
+
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('document_file', file);
+
+      log(`Initiating multipart file upload: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
+
+      try {
+        const response = await fetch('https://httpbin.org/post', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          log(`TRAFFIC PASSED: Standard file transfer succeeded (200 OK). Proxy allowed upload.`);
+        }
+      } catch (err) {
+        log(`TRAFFIC BLOCKED: Standard file transfer dropped or reset by network DLP layer! (${err.message})`, true);
+      }
+    }
+
+    // 3. AI Prompt Submission
     async function sendAiPrompt() {
       const input = document.getElementById('aiPromptInput');
       const promptText = input.value.trim();
@@ -430,7 +638,7 @@
       }
     }
 
-    // 3. AI File Attachment Upload
+    // 4. AI File Attachment Upload
     async function sendAiFileAttachment() {
       const input = document.getElementById('aiFileInput');
       if (!input.files || input.files.length === 0) { log('Error: Select a file to upload to AI first.', true); return; }
