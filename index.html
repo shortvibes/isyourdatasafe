@@ -119,7 +119,7 @@
     <!-- 1. Outbound Network Test Bench -->
     <div class="section">
       <h2>1. Outbound Traffic Test Bench</h2>
-      <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with proximity keywords, click any data card to copy & inject it into the payload area (auto-regenerating fresh data), and transmit live HTTP POST traffic across your network proxy.</p>
+      <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords, click any data card to copy & inject it into the payload area (auto-regenerating fresh data), and transmit live HTTP POST traffic across your network proxy.</p>
       
       <div class="selector-bar">
         <label for="countrySelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target Jurisdiction:</label>
@@ -141,7 +141,7 @@
       <div class="grid-3">
         <!-- Passport -->
         <div class="card">
-          <h3>Passport Specimen</h3>
+          <h3 id="ocr-passport-title">Passport Specimen</h3>
           <canvas id="passportCanvas" width="400" height="260"></canvas>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('passportCanvas', 'passport')">Download PNG</button>
@@ -151,7 +151,7 @@
 
         <!-- Driver License / SSN -->
         <div class="card">
-          <h3>Driver License / SSN</h3>
+          <h3 id="ocr-dl-title">Driver License Specimen</h3>
           <canvas id="dlCanvas" width="400" height="260"></canvas>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('dlCanvas', 'license')">Download PNG</button>
@@ -171,10 +171,10 @@
       </div>
     </div>
 
-    <!-- 3. Dynamic Synthetic Data Cards with Proximity Keywords -->
+    <!-- 3. Dynamic Synthetic Data Cards with Localized Proximity Keywords -->
     <div class="section">
       <h2>3. Synthetic Test Data Vault</h2>
-      <p>Click <strong>"Copy & Inject"</strong> to copy the value with its proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
+      <p>Click <strong>"Copy & Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
       
       <div class="grid">
         <div class="card">
@@ -184,13 +184,13 @@
         </div>
 
         <div class="card">
-          <h3>Passport Number</h3>
+          <h3 id="label-passport">Passport Number</h3>
           <code id="val-passport">-</code>
           <button class="btn btn-sm" onclick="copyAndInject('val-passport', 'passport')">Copy & Inject</button>
         </div>
 
         <div class="card">
-          <h3>Driver License ID</h3>
+          <h3 id="label-dl">Driver License ID</h3>
           <code id="val-dl">-</code>
           <button class="btn btn-sm" onclick="copyAndInject('val-dl', 'dl')">Copy & Inject</button>
         </div>
@@ -290,7 +290,7 @@
       return arr;
     }
 
-    // UNABRIDGED 195 SOVEREIGN NATIONS DATASET WITH LOCALIZED TITLES
+    // UNABRIDGED 195 SOVEREIGN NATIONS DATASET WITH LOCALIZED TITLES & TAX LABELS
     const COUNTRY_DEFINITIONS = [
       { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
       { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
@@ -316,7 +316,7 @@
       { code: "BIH", country: "Bosnia and Herzegovina", dlTitle: "VOZAČKA DOZVOLA", passportTitle: "PASOŠ", taxLabel: "JMBG", formats: { taxNumber: "9999999999999", passport: "BH9999999", driverLicense: "DL-BIH-999999", iban: "BA999999999999999999" } },
       { code: "BWA", country: "Botswana", dlTitle: "DRIVER LICENCE", passportTitle: "PASSPORT", taxLabel: "TIN", formats: { taxNumber: "C999999999", passport: "BW9999999", driverLicense: "DL-BWA-999999", iban: "BW99AAAA99999999999999" } },
       { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
-      { code: "BRN", country: "Brunei", taxLabel: "IC / RCN", dlTitle: "LESEN MEMANDU", passportTitle: "PASPORT", formats: { taxNumber: "99-999999", passport: "BN9999999", driverLicense: "DL-BRN-999999", iban: "BN99AAAA99999999999999" } },
+      { code: "BRN", country: "Brunei", dlTitle: "LESEN MEMANDU", passportTitle: "PASPORT", taxLabel: "IC / RCN", formats: { taxNumber: "99-999999", passport: "BN9999999", driverLicense: "DL-BRN-999999", iban: "BN99AAAA99999999999999" } },
       { code: "BGR", country: "Bulgaria", dlTitle: "SVODETELSTVO ZA UPRAVLENIE", passportTitle: "PASPORT", taxLabel: "EGN", formats: { taxNumber: "9999999999", passport: "BG9999999", driverLicense: "DL-BGR-999999", iban: "BG99AAAA99999999999999" } },
       { code: "BFA", country: "Burkina Faso", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "IFU", formats: { taxNumber: "000999999999A", passport: "BF9999999", driverLicense: "DL-BFA-999999", iban: "BF99AAAA99999999999999" } },
       { code: "BDI", country: "Burundi", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "NIF", formats: { taxNumber: "9999999999", passport: "BI9999999", driverLicense: "DL-BDI-999999", iban: "BI99AAAA99999999999999" } },
@@ -523,11 +523,19 @@
       const code = document.getElementById('countrySelect').value;
       const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
       
-      document.getElementById('label-tax').innerText = c.taxLabel;
+      const passportTitle = c.passportTitle || 'PASSPORT';
+      const dlTitle = c.dlTitle || 'DRIVER LICENSE';
+
+      document.getElementById('label-tax').innerText = `${c.taxLabel} Card`;
+      document.getElementById('label-passport').innerText = `${passportTitle} Card`;
+      document.getElementById('label-dl').innerText = `${dlTitle} Card`;
       
+      document.getElementById('ocr-passport-title').innerText = `${passportTitle} Specimen`;
+      document.getElementById('ocr-dl-title').innerText = `${dlTitle} Specimen`;
+
       const taxVal = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
-      const passVal = `Passport Number: ${formatPattern(c.formats.passport)}`;
-      const dlVal = `Driver License ID: ${formatPattern(c.formats.driverLicense)}`;
+      const passVal = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
+      const dlVal = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
       const cardVal = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
       const ibanVal = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
 
@@ -538,8 +546,8 @@
       document.getElementById('val-iban').innerText = ibanVal;
 
       // Render Visual Document OCR Canvases with Localized Titles
-      renderPassportCanvas(c.country, c.code, passVal, c.passportTitle || 'PASSPORT');
-      renderDlCanvas(c.country, c.code, dlVal, taxVal, c.dlTitle || 'DRIVER LICENSE');
+      renderPassportCanvas(c.country, c.code, passVal, passportTitle);
+      renderDlCanvas(c.country, c.code, dlVal, taxVal, dlTitle);
       renderCcCanvas(cardVal);
     }
 
@@ -635,13 +643,16 @@
     function generateSingleField(type) {
       const code = document.getElementById('countrySelect').value;
       const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
+      
+      const passportTitle = c.passportTitle || 'PASSPORT';
+      const dlTitle = c.dlTitle || 'DRIVER LICENSE';
 
       if (type === 'tax') {
         document.getElementById('val-tax').innerText = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
       } else if (type === 'passport') {
-        document.getElementById('val-passport').innerText = `Passport Number: ${formatPattern(c.formats.passport)}`;
+        document.getElementById('val-passport').innerText = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
       } else if (type === 'dl') {
-        document.getElementById('val-dl').innerText = `Driver License ID: ${formatPattern(c.formats.driverLicense)}`;
+        document.getElementById('val-dl').innerText = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
       } else if (type === 'card') {
         document.getElementById('val-card').innerText = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
       } else if (type === 'iban') {
@@ -653,7 +664,7 @@
 
     function regenerateData() {
       getRandomisedCountries();
-      log('Reshuffled 195 country list and generated fresh randomized payloads with proximity context.');
+      log('Reshuffled 195 country list and generated fresh randomized payloads with localized proximity context.');
     }
 
     function copyAndInject(elementId, fieldType) {
