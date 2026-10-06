@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Is Your Data Safe? (.org) - Simple DLP Test Bench</title>
+  <title>Is Your Data Safe? (.org) - Real Egress DLP Test</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -12,6 +12,7 @@
       --text: #c9d1d9;
       --accent: #238636;
       --accent-hover: #2ea043;
+      --danger: #da3633;
       --link: #58a6ff;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,104 +23,22 @@
       line-height: 1.5;
       padding: 20px;
     }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    header {
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 15px;
-      margin-bottom: 25px;
-    }
-    h1 {
-      font-size: 1.8rem;
-      color: #fff;
-    }
-    .subtitle {
-      color: #8b949e;
-      font-size: 0.95rem;
-    }
-    .section {
-      background: var(--panel-bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    h2 {
-      font-size: 1.2rem;
-      color: #fff;
-      margin-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-    }
-    p {
-      font-size: 0.9rem;
-      margin-bottom: 12px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
-    }
-    .card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-    }
-    .card h3 {
-      font-size: 0.95rem;
-      color: var(--link);
-      margin-bottom: 6px;
-    }
-    code, textarea {
-      font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
-      font-size: 0.85rem;
-    }
-    code {
-      background: rgba(110, 118, 129, 0.4);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: #ff7b72;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px;
-      border-radius: 6px;
-      resize: vertical;
-      margin-bottom: 10px;
-    }
-    .btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
-    .btn:hover {
-      background: var(--accent-hover);
-    }
-    .log-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      font-family: monospace;
-      font-size: 0.85rem;
-      color: #7ee787;
-      min-height: 80px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
+    .container { max-width: 900px; margin: 0 auto; }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; }
+    h1 { font-size: 1.8rem; color: #fff; }
+    .subtitle { color: #8b949e; font-size: 0.95rem; }
+    .section { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+    h2 { font-size: 1.2rem; color: #fff; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    p { font-size: 0.9rem; margin-bottom: 12px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+    .card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+    .card h3 { font-size: 0.95rem; color: var(--link); margin-bottom: 6px; }
+    code, textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; }
+    code { background: rgba(110, 118, 129, 0.4); padding: 2px 6px; border-radius: 4px; color: #ff7b72; display: inline-block; margin-bottom: 8px; }
+    textarea { width: 100%; height: 100px; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 6px; resize: vertical; margin-bottom: 10px; }
+    .btn { background: var(--accent); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+    .btn:hover { background: var(--accent-hover); }
+    .log-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.85rem; color: #7ee787; min-height: 100px; max-height: 250px; overflow-y: auto; }
   </style>
 </head>
 <body>
@@ -127,105 +46,132 @@
   <div class="container">
     <header>
       <h1>Is Your Data Safe? (.org)</h1>
-      <p class="subtitle">Data Loss Prevention (DLP) & Proxy Testing Playground</p>
+      <p class="subtitle">Live Outbound Traffic DLP Test Bench</p>
     </header>
 
-    <!-- 1. Form POST Test Bench -->
+    <!-- 1. Real Network Form POST -->
     <div class="section">
-      <h2>1. Text & Form Data Test Bench</h2>
-      <p>Use this form to test outbound web POST filtering. Input sample credit card or SSN data and click submit.</p>
-      <form id="dlpForm" onsubmit="handleFormSubmit(event)">
+      <h2>1. Outbound Network Payload Test</h2>
+      <p>Submitting this form executes a real HTTP POST request over the network interface to allow inline DLP proxies to intercept or block the connection.</p>
+      <form onsubmit="sendRealNetworkPost(event)">
         <textarea id="payload" placeholder="Paste sensitive test data here... (e.g., Credit Card: 4532 0123 4567 8901 or SSN: 000-12-3456)"></textarea>
-        <button type="submit" class="btn">Post Test Data</button>
+        <button type="submit" class="btn">Transmit Data Outbound</button>
       </form>
     </div>
 
-    <!-- 2. Sample Data Repository -->
+    <!-- 2. Test Data Library -->
     <div class="section">
-      <h2>2. Sample Sensitive Data (Copy & Paste)</h2>
-      <p>Click any button below to copy synthetic test data to your clipboard for policy testing.</p>
-      
+      <h2>2. Copy Test Data</h2>
       <div class="grid">
         <div class="card">
           <h3>Credit Card (PCI)</h3>
-          <p>Luhn-valid fake card:</p>
-          <code id="cc">4532 0123 4567 8901</code><br/><br/>
-          <button class="btn" style="padding:4px 10px; font-size:0.75rem;" onclick="copyData('cc')">Copy Card</button>
+          <code id="cc">4532 0123 4567 8901</code><br/>
+          <button class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="copyAndFill('cc')">Inject & Test</button>
         </div>
-
         <div class="card">
-          <h3>Social Security (US SSN)</h3>
-          <p>Standard SSN format:</p>
-          <code id="ssn">000-12-3456</code><br/><br/>
-          <button class="btn" style="padding:4px 10px; font-size:0.75rem;" onclick="copyData('ssn')">Copy SSN</button>
+          <h3>US SSN</h3>
+          <code id="ssn">000-12-3456</code><br/>
+          <button class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="copyAndFill('ssn')">Inject & Test</button>
         </div>
-
         <div class="card">
-          <h3>Dutch BSN / Tax ID</h3>
-          <p>NL Tax Identifier:</p>
-          <code id="bsn">123456789</code><br/><br/>
-          <button class="btn" style="padding:4px 10px; font-size:0.75rem;" onclick="copyData('bsn')">Copy BSN</button>
+          <h3>Dutch BSN</h3>
+          <code id="bsn">123456789</code><br/>
+          <button class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="copyAndFill('bsn')">Inject & Test</button>
         </div>
-
         <div class="card">
           <h3>API Secret Key</h3>
-          <p>Dummy AWS Access Key:</p>
-          <code id="aws">AKIAIOSFODNN7EXAMPLE</code><br/><br/>
-          <button class="btn" style="padding:4px 10px; font-size:0.75rem;" onclick="copyData('aws')">Copy Secret</button>
+          <code id="aws">AKIAIOSFODNN7EXAMPLE</code><br/>
+          <button class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="copyAndFill('aws')">Inject & Test</button>
         </div>
       </div>
     </div>
 
-    <!-- 3. Test File Uploads -->
+    <!-- 3. Real File Upload Transmission -->
     <div class="section">
-      <h2>3. Sample Test File Upload</h2>
-      <p>Select a file containing sensitive text patterns to test multipart file upload DLP controls.</p>
+      <h2>3. Outbound File Upload Test</h2>
+      <p>Upload a file to send raw multipart network packets across your gateway.</p>
       <input type="file" id="fileInput" style="margin-bottom: 10px;" /><br/>
-      <button class="btn" onclick="handleFileUpload()">Upload File</button>
+      <button class="btn" onclick="sendRealFileUpload()">Transmit File Outbound</button>
     </div>
 
-    <!-- 4. Result Log -->
+    <!-- 4. Real-time Network Response Log -->
     <div class="section">
-      <h2>4. Execution Response Log</h2>
+      <h2>4. Egress Traffic Inspector Log</h2>
       <div class="log-box" id="logBox">
-        [Awaiting test execution...]
+        [Awaiting network request execution...]
       </div>
     </div>
   </div>
 
   <script>
-    function log(msg) {
+    function log(msg, isError = false) {
       const box = document.getElementById('logBox');
       const time = new Date().toLocaleTimeString();
-      box.innerHTML = `[${time}] ${msg}<br/>` + box.innerHTML;
+      const color = isError ? '#ff7b72' : '#7ee787';
+      box.innerHTML = `<span style="color:${color}">[${time}] ${msg}</span><br/>` + box.innerHTML;
     }
 
-    function copyData(id) {
+    function copyAndFill(id) {
       const text = document.getElementById(id).innerText;
-      navigator.clipboard.writeText(text);
-      log(`Copied data item: ${text}`);
+      document.getElementById('payload').value = text;
+      log(`Injected test payload into text area: ${text}`);
     }
 
-    function handleFormSubmit(e) {
+    // Sends an actual HTTP POST request out over the wire
+    async function sendRealNetworkPost(e) {
       e.preventDefault();
       const val = document.getElementById('payload').value;
       if (!val) {
-        log('Error: Payload field is empty.');
+        log('Error: Textarea is empty.', true);
         return;
       }
-      log(`HTTP POST Request Sent! Size: ${val.length} bytes.`);
-      log(`Response: Status 200 OK — Payload received and discarded in-memory.`);
+
+      log(`Initiating real outbound HTTP POST request (${val.length} bytes)...`);
+
+      try {
+        const response = await fetch('https://httpbin.org/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: val })
+        });
+
+        if (response.ok) {
+          log(`TRAFFIC PASSED: Outbound packet reached external destination (200 OK). Network DLP did NOT block this payload.`);
+        } else {
+          log(`TRAFFIC ALTERED: Response code ${response.status}`, true);
+        }
+      } catch (err) {
+        // Network DLP/Firewalls usually drop or reset TCP packets when blocking
+        log(`TRAFFIC BLOCKED: Connection dropped/reset by network DLP layer! (${err.message})`, true);
+      }
     }
 
-    function handleFileUpload() {
+    // Sends actual multipart file upload packets over the wire
+    async function sendRealFileUpload() {
       const input = document.getElementById('fileInput');
       if (!input.files || input.files.length === 0) {
-        log('Error: Please select a file first.');
+        log('Error: Select a file first.', true);
         return;
       }
+
       const file = input.files[0];
-      log(`Multipart Upload Sent: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
-      log(`Response: Status 200 OK — File received and analyzed safely.`);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      log(`Initiating multipart file transfer: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
+
+      try {
+        const response = await fetch('https://httpbin.org/post', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          log(`TRAFFIC PASSED: File egress succeeded (200 OK). DLP proxy did NOT block file upload.`);
+        }
+      } catch (err) {
+        log(`TRAFFIC BLOCKED: File upload dropped or reset by inline security device!`, true);
+      }
     }
   </script>
 </body>
