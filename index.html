@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is Your Data Safe? (.org) - Global Data & OCR Test Platform</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            900: '#14532d',
+                        },
+                        darkbg: '#080c14',
+                        cardbg: '#0f172a',
+                        cardborder: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080c14;
+            color: #f1f5f9;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080c14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        .canvas-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-black">
+
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-lg text-white tracking-tight">Is Your Data Safe? <span class="text-emerald-400">(.org)</span></span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            [No Logs - In-Memory Only]
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">Global Data Loss Prevention (DLP) & Photorealistic OCR Specimen Benchmark</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-3 text-xs code-font bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-300">
+                    <span class="text-emerald-400"><i class="fa-solid fa-route"></i> Direct Route</span>
+                    <span class="text-slate-700">|</span>
+                    <span class="text-slate-400"><i class="fa-solid fa-microchip text-cyan-400"></i> Local Canvas OCR</span>
+                </div>
+                <button onclick="togglePrivacyModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-lg border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-emerald-400"></i>
+                    <span>Privacy Guarantee</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
+
+        <!-- Navigation Tabs -->
+        <div class="border-b border-slate-800 overflow-x-auto">
+            <nav class="flex space-x-2 md:space-x-6 min-w-max pb-px" aria-label="Tabs">
+                <button onclick="switchTab('ocr-generator')" id="tab-btn-ocr-generator" class="tab-btn active border-emerald-400 text-emerald-400 whitespace-nowrap py-3 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-id-card text-xs"></i> Data Generation & OCR Specimen Vault
+                </button>
+                <button onclick="switchTab('bench')" id="tab-btn-bench" class="tab-btn border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700 whitespace-nowrap py-3 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-xs"></i> Web / HTTP Test Bench
+                </button>
+                <button onclick="switchTab('shadowai')" id="tab-btn-shadowai" class="tab-btn border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700 whitespace-nowrap py-3 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-robot text-xs"></i> Shadow AI DLP Test
+                </button>
+                <button onclick="switchTab('cli-docs')" id="tab-btn-cli-docs" class="tab-btn border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700 whitespace-nowrap py-3 px-3 border-b-2 font-medium text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-terminal text-xs"></i> SOC Benchmarks & CLI Scripts
+                </button>
+            </nav>
+        </div>
+
+        <section id="tab-ocr-generator" class="tab-content block space-y-6">
+            
+            <!-- Jurisdiction Selector Panel -->
+            <div class="bg-cardbg border border-cardborder p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-globe"></i> Select Target Jurisdiction (All ISO-3166 Sovereign Nations)
+                    </label>
+                    <p class="text-xs text-slate-400">Generates photorealistic scannable documents (Passports with MRZ, Driver Cards, Credit Cards) & localized text PII.</p>
+                </div>
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <div class="relative flex-grow md:w-80">
+                        <select id="country-selector" onchange="onCountryChange()" class="w-full bg-slate-950 border border-slate-700 text-white text-xs rounded-xl p-3 pl-10 focus:border-emerald-500 focus:outline-none appearance-none cursor-pointer">
+                            <!-- Populated dynamically -->
+                        </select>
+                        <i class="fa-solid fa-flag absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+                    </div>
+                    <button onclick="regenerateAllData()" class="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold text-xs px-4 py-3 rounded-xl transition flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-arrows-rotate"></i> Randomize Payload
+                    </button>
+                </div>
+            </div>
+
+            <!-- Photorealistic Documents Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- PASSPORT SPECIMEN CARD -->
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center gap-1.5">
+                                <i class="fa-solid fa-passport"></i> Photorealistic Passport
+                            </span>
+                            <span class="text-[11px] code-font text-slate-400 font-bold" id="passport-country-code">NLD</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Authentic passport page with guilloche security background, portrait box, emblems, and ICAO 9303 MRZ zone.</p>
+
+                        <!-- Canvas Holder -->
+                        <div class="relative bg-slate-950 border border-slate-800 rounded-xl overflow-hidden p-2 flex items-center justify-center">
+                            <canvas id="passport-canvas" width="500" height="340" class="w-full h-auto rounded canvas-shadow max-w-full"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="downloadCanvasImage('passport-canvas', 'passport_specimen')" class="flex-1 text-xs bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-download text-cyan-400"></i> Download OCR Image
+                        </button>
+                        <button onclick="sendCanvasToBench('passport-canvas', 'passport_specimen.png')" class="flex-1 text-xs bg-emerald-600 hover:bg-emerald-500 text-black font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-paper-plane"></i> Send to Bench
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DRIVER'S LICENSE SPECIMEN CARD -->
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
+                                <i class="fa-solid fa-id-card"></i> Driver's License
+                            </span>
+                            <span class="text-[11px] code-font text-slate-400 font-bold" id="dl-country-code">NLD</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Standard polycarbonate format with country banner, flag badge, photo frame, signature, and barcode.</p>
+
+                        <!-- Canvas Holder -->
+                        <div class="relative bg-slate-950 border border-slate-800 rounded-xl overflow-hidden p-2 flex items-center justify-center">
+                            <canvas id="dl-canvas" width="500" height="340" class="w-full h-auto rounded canvas-shadow max-w-full"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="downloadCanvasImage('dl-canvas', 'drivers_license_specimen')" class="flex-1 text-xs bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-download text-amber-400"></i> Download OCR Image
+                        </button>
+                        <button onclick="sendCanvasToBench('dl-canvas', 'drivers_license_specimen.png')" class="flex-1 text-xs bg-emerald-600 hover:bg-emerald-500 text-black font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-paper-plane"></i> Send to Bench
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CREDIT CARD SPECIMEN CARD -->
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1.5">
+                                <i class="fa-solid fa-credit-card"></i> Payment Card (PCI)
+                            </span>
+                            <select id="cc-brand-selector" onchange="onCcBrandChange()" class="bg-slate-950 border border-slate-800 text-slate-300 text-[11px] rounded px-2 py-0.5 focus:outline-none cursor-pointer">
+                                <option value="VISA">VISA</option>
+                                <option value="MASTERCARD">Mastercard</option>
+                                <option value="AMEX">Amex</option>
+                                <option value="DISCOVER">Discover</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Metallic finish credit card with metallic EMV chip, contactless symbol, and embossed Luhn-valid numbers.</p>
+
+                        <!-- Canvas Holder -->
+                        <div class="relative bg-slate-950 border border-slate-800 rounded-xl overflow-hidden p-2 flex items-center justify-center">
+                            <canvas id="cc-canvas" width="500" height="340" class="w-full h-auto rounded canvas-shadow max-w-full"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="downloadCanvasImage('cc-canvas', 'credit_card_specimen')" class="flex-1 text-xs bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-download text-purple-400"></i> Download OCR Image
+                        </button>
+                        <button onclick="sendCanvasToBench('cc-canvas', 'credit_card_specimen.png')" class="flex-1 text-xs bg-emerald-600 hover:bg-emerald-500 text-black font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-paper-plane"></i> Send to Bench
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Text Vault -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-5 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div>
+                        <h3 class="font-bold text-white text-base flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-emerald-400"></i> Localized Synthetic Identity Vault (<span id="summary-country-name">Netherlands</span>)
+                        </h3>
+                        <p class="text-xs text-slate-400">Copy localized synthetic identity text strings or export as structured test files.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="copyAllTextPayloads()" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-regular fa-copy text-cyan-400"></i> Copy JSON
+                        </button>
+                        <button onclick="downloadJsonPayload()" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-code text-emerald-400"></i> Export JSON
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 code-font text-xs">
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span id="label-tax-id" class="text-[11px] uppercase font-bold text-slate-300">Tax / National ID</span>
+                            <button onclick="copyElementText('val-tax-id')" class="text-slate-500 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div id="val-tax-id" class="text-emerald-400 font-bold select-all">987654321</div>
+                    </div>
+
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span class="text-[11px] uppercase font-bold text-slate-300">Passport Number</span>
+                            <button onclick="copyElementText('val-passport')" class="text-slate-500 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div id="val-passport" class="text-cyan-400 font-bold select-all">SPECi2026</div>
+                    </div>
+
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span class="text-[11px] uppercase font-bold text-slate-300">Driver License ID</span>
+                            <button onclick="copyElementText('val-dl')" class="text-slate-500 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div id="val-dl" class="text-amber-400 font-bold select-all">5100982143</div>
+                    </div>
+
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span id="label-health-id" class="text-[11px] uppercase font-bold text-slate-300">Health ID</span>
+                            <button onclick="copyElementText('val-health')" class="text-slate-500 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div id="val-health" class="text-rose-400 font-bold select-all">UZI-9021-984</div>
+                    </div>
+
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-slate-400">
+                            <span class="text-[11px] uppercase font-bold text-slate-300">Local Phone</span>
+                            <button onclick="copyElementText('val-phone')" class="text-slate-500 hover:text-white"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div id="val-phone" class="text-purple-400 font-bold select-all">+31 6 12345678</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-bench" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Transmission Form -->
+                <div class="lg:col-span-5 bg-cardbg border border-cardborder rounded-2xl p-5 space-y-4">
+                    <div class="border-b border-slate-800 pb-3">
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane text-emerald-400"></i> Direct HTTP Test Bench
+                        </h2>
+                        <p class="text-xs text-slate-400">Transmit raw payloads or generated OCR documents directly to the endpoint.</p>
+                    </div>
+
+                    <form id="test-bench-form" onsubmit="executeBenchSubmission(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Standard Web Target Route</label>
+                            <div class="flex gap-2">
+                                <select id="http-method" class="bg-slate-950 border border-slate-800 text-emerald-400 code-font text-xs rounded-xl p-2.5 font-bold focus:outline-none">
+                                    <option value="POST">POST</option>
+                                    <option value="PUT">PUT</option>
+                                </select>
+                                <input type="text" readonly value="https://isyourdatasafe.org/api/v1/test/sinkhole" class="w-full bg-slate-950 border border-slate-800 text-slate-400 code-font text-xs rounded-xl p-2.5">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Transmission Mode</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="setBenchMode('text')" id="btn-mode-text" class="p-2.5 rounded-xl border border-emerald-500/50 bg-emerald-950/30 text-emerald-400 text-xs font-medium text-center transition">
+                                    JSON / Text Payload
+                                </button>
+                                <button type="button" onclick="setBenchMode('file')" id="btn-mode-file" class="p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-medium text-center hover:border-slate-700 transition">
+                                    OCR Document File
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Text Input -->
+                        <div id="bench-block-text" class="space-y-2">
+                            <label class="block text-xs font-semibold text-slate-300">Payload Content</label>
+                            <textarea id="bench-text-area" rows="5" class="w-full bg-slate-950 border border-slate-800 text-slate-200 code-font text-xs rounded-xl p-3 focus:border-emerald-500 focus:outline-none resize-none" placeholder="Paste test payload here..."></textarea>
+                        </div>
+
+                        <!-- File Input -->
+                        <div id="bench-block-file" class="hidden space-y-2">
+                            <label class="block text-xs font-semibold text-slate-300">File Attachment</label>
+                            <div class="border-2 border-dashed border-slate-800 hover:border-emerald-500/50 bg-slate-950 p-6 rounded-xl text-center cursor-pointer transition relative">
+                                <i class="fa-solid fa-file-image text-3xl text-slate-600 mb-2"></i>
+                                <p class="text-xs text-slate-300 mb-1">Select or drop document specimen image</p>
+                                <p class="text-[10px] text-slate-500">Supports PNG, JPG up to 10MB</p>
+                                <input type="file" id="bench-file-input" onchange="onBenchFileSelected(event)" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
+                            <div id="bench-file-preview-tag" class="hidden bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs code-font text-emerald-400">
+                                <span id="bench-file-name">ocr_image.png</span>
+                                <span id="bench-file-size" class="text-slate-500">24.5 KB</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Submit for Test Analysis
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Live Request Log Table -->
+                <div class="lg:col-span-7 bg-cardbg border border-cardborder rounded-2xl p-5 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div>
+                                <h2 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-list-check text-cyan-400"></i> Live Request Log & Egress Inspector
+                                </h2>
+                                <p class="text-xs text-slate-400">Real-time log of test payloads sent through standard routes.</p>
+                            </div>
+                            <button onclick="clearRequestLogs()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                                Clear Log
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs code-font">
+                                <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-2.5">Timestamp</th>
+                                        <th class="p-2.5">Endpoint</th>
+                                        <th class="p-2.5">Payload / File</th>
+                                        <th class="p-2.5">Detected PII</th>
+                                        <th class="p-2.5">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="request-log-tbody" class="divide-y divide-slate-800 text-slate-300">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-800 pt-3 mt-4 flex items-center justify-between text-[11px] text-slate-500">
+                        <span><i class="fa-solid fa-shield-cat text-emerald-400"></i> Direct Route Egress Analysis</span>
+                        <span class="code-font">In-Memory Engine</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="tab-shadowai" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-5 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-robot text-purple-400"></i> Shadow AI DLP Prompt Sandbox
+                        </h2>
+                        <p class="text-xs text-slate-400">Test if your network policies intercept outbound LLM prompts containing sensitive records.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400">Route:</span>
+                        <span class="text-xs code-font px-2.5 py-1 rounded-md bg-slate-950 text-purple-300 border border-purple-500/30">api.openai.com/v1/chat</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-[460px]">
+                    <div class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span class="text-xs font-mono text-slate-400 ml-2">GenAI Prompt Inspector</span>
+                        </div>
+                        <span class="text-[10px] text-purple-400 bg-purple-950/60 border border-purple-800/80 px-2.5 py-0.5 rounded-full">Monitored Egress</span>
+                    </div>
+
+                    <div id="ai-chat-messages" class="flex-grow p-4 overflow-y-auto space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-purple-600/20 border border-purple-500/40 text-purple-400 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs max-w-xl text-slate-300">
+                                <p>GenAI assistant prompt tester initialized. Inject test PII below to analyze egress rules.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 border-t border-slate-800 p-2 flex items-center gap-2 overflow-x-auto text-xs">
+                        <span class="text-[11px] text-slate-400 whitespace-nowrap px-2">Inject Prompt Payload:</span>
+                        <button onclick="injectAiPreset('passport')" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs whitespace-nowrap">
+                            <i class="fa-solid fa-passport text-cyan-400"></i> Passport Data
+                        </button>
+                        <button onclick="injectAiPreset('tax')" class="bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-500/30 px-2.5 py-1 rounded-lg text-xs whitespace-nowrap">
+                            <i class="fa-solid fa-id-card text-rose-400"></i> National Tax ID
+                        </button>
+                        <button onclick="injectAiPreset('card')" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 px-2.5 py-1 rounded-lg text-xs whitespace-nowrap">
+                            <i class="fa-solid fa-credit-card text-purple-400"></i> Credit Card
+                        </button>
+                    </div>
+
+                    <div class="p-3 bg-slate-900 border-t border-slate-800 flex gap-2">
+                        <textarea id="ai-user-input" rows="1" placeholder="Type or paste prompt with sensitive data..." class="w-full bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl p-2.5 focus:border-purple-500 focus:outline-none resize-none"></textarea>
+                        <button onclick="submitAiPrompt()" class="bg-purple-600 hover:bg-purple-500 text-white font-medium px-4 rounded-xl text-xs transition flex items-center gap-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-paper-plane"></i> Send Prompt
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-cli-docs" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-5 space-y-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-emerald-400"></i> SOC Benchmarks & Automated CLI Scripts
+                    </h2>
+                    <p class="text-xs text-slate-400">Pre-configured testing scripts populated for <span id="cli-selected-country" class="text-emerald-400 font-bold">Netherlands</span>.</p>
+                </div>
+
+                <div class="space-y-5">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-code text-cyan-400"></i> 1. cURL Command (Bash / Linux)
+                            </span>
+                            <button onclick="copyElementText('cli-curl-code')" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                <i class="fa-regular fa-copy"></i> Copy cURL
+                            </button>
+                        </div>
+                        <pre id="cli-curl-code" class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-xs code-font text-emerald-400 overflow-x-auto"></pre>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                <i class="fa-brands fa-python text-amber-400"></i> 2. Python Automation Script
+                            </span>
+                            <button onclick="copyElementText('cli-python-code')" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                <i class="fa-regular fa-copy"></i> Copy Python
+                            </button>
+                        </div>
+                        <pre id="cli-python-code" class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-xs code-font text-amber-300 overflow-x-auto"></pre>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-terminal text-blue-400"></i> 3. Windows PowerShell Script
+                            </span>
+                            <button onclick="copyElementText('cli-ps-code')" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-2.5 py-1 rounded-lg border border-slate-700 transition">
+                                <i class="fa-regular fa-copy"></i> Copy PowerShell
+                            </button>
+                        </div>
+                        <pre id="cli-ps-code" class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl text-xs code-font text-blue-300 overflow-x-auto"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-800 bg-cardbg py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                <span class="font-bold text-sm text-white">isyourdatasafe.org</span>
+                <span class="text-xs text-slate-500">| Global Data & OCR Test Platform</span>
+            </div>
+            <div class="text-xs text-slate-500 text-center md:text-right">
+                <span>Zero-Log Environment. All canvas document specimens generated locally.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-emerald-500 text-black px-4 py-2.5 rounded-xl shadow-xl font-medium text-xs flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-message">Copied to clipboard!</span>
+    </div>
+
+    <!-- Privacy Notice Modal -->
+    <div id="privacy-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-cardborder rounded-2xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-emerald-400"></i> Privacy & Processing Guarantee
+                </h3>
+                <button onclick="togglePrivacyModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                <p><strong>1. Local Canvas Specimen Generator:</strong> Passports, driver licenses, and payment cards are rendered in your browser canvas using HTML5 context standard algorithms.</p>
+                <p><strong>2. Direct Route Testing:</strong> All test transmissions follow direct routes to evaluate standard browser outbound response behavior.</p>
+                <p><strong>3. Zero Data Retention:</strong> Payloads are analyzed in volatile browser memory and discarded immediately.</p>
+            </div>
+            <button onclick="togglePrivacyModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-black font-semibold py-2.5 rounded-xl text-xs transition">Acknowledge</button>
+        </div>
+    </div>
+
+    <script>
+        // ISO-3166 Global Sovereign Nations Data
+        const COUNTRY_DATA = [
+            { code: "NLD", name: "Netherlands", flag: "🇳🇱", officialTitle: "KONINKRIJK DER NEDERLANDEN", taxLabel: "NL BSN", taxFormat: () => `${randNum(100000000,999999999)}`, passportFormat: () => `SPECi2026`, dlTitle: "RIJBEWIJS", dlFormat: () => `51${randNum(10000000,99999999)}`, healthLabel: "NL UZI Health ID", healthFormat: () => `900${randNum(100000,999999)}`, phoneFormat: () => `+31 6 ${randNum(10000000,99999999)}`, mrzCode: "NLD" },
+            { code: "BEL", name: "Belgium", flag: "🇧🇪", officialTitle: "BELGIQUE / BELGIË", taxLabel: "BE Rijksregister", taxFormat: () => `84.12.25-${randNum(100,999)}.${randNum(10,99)}`, passportFormat: () => `TA${randNum(100000,999999)}`, dlTitle: "PERMIS DE CONDUIRE", dlFormat: () => `5100${randNum(100000,999999)}`, healthLabel: "BE SIS Health", healthFormat: () => `800101-${randNum(100,999)}-${randNum(10,99)}`, phoneFormat: () => `+32 470 ${randNum(10,99)} ${randNum(10,99)} ${randNum(10,99)}`, mrzCode: "BEL" },
+            { code: "DEU", name: "Germany", flag: "🇩🇪", officialTitle: "BUNDESREPUBLIK DEUTSCHLAND", taxLabel: "DE Steuer-ID", taxFormat: () => `${randNum(10,99)} ${randNum(100,999)} ${randNum(100,999)} ${randNum(10,99)}`, passportFormat: () => `C01X${randNum(10000,99999)}`, dlTitle: "FÜHRERSCHEIN", dlFormat: () => `B072${randNum(100000,999999)}`, healthLabel: "DE KV-Nummer", healthFormat: () => `A${randNum(100000000,999999999)}`, phoneFormat: () => `+49 170 ${randNum(1000000,9999999)}`, mrzCode: "DEU" },
+            { code: "FRA", name: "France", flag: "🇫🇷", officialTitle: "RÉPUBLIQUE FRANÇAISE", taxLabel: "FR NIR / INSEE", taxFormat: () => `1 85 02 75 ${randNum(100,999)} ${randNum(100,999)} ${randNum(10,99)}`, passportFormat: () => `${randNum(10,99)}AA${randNum(10000,99999)}`, dlTitle: "PERMIS DE CONDUIRE", dlFormat: () => `15AA${randNum(10000,99999)}`, healthLabel: "FR Carte Vitale", healthFormat: () => `1 85 02 75 ${randNum(100,999)} ${randNum(100,999)} ${randNum(10,99)}`, phoneFormat: () => `+33 6 ${randNum(10,99)} ${randNum(10,99)} ${randNum(10,99)} ${randNum(10,99)}`, mrzCode: "FRA" },
+            { code: "GBR", name: "United Kingdom", flag: "🇬🇧", officialTitle: "UNITED KINGDOM OF GREAT BRITAIN", taxLabel: "UK NINO", taxFormat: () => `QQ ${randNum(10,99)} ${randNum(10,99)} ${randNum(10,99)} A`, passportFormat: () => `${randNum(100000000,999999999)}`, dlTitle: "DRIVING LICENCE", dlFormat: () => `SMITH901011A99AA`, healthLabel: "UK NHS Number", healthFormat: () => `943 ${randNum(100,999)} ${randNum(1000,9999)}`, phoneFormat: () => `+44 7700 ${randNum(900000,999999)}`, mrzCode: "GBR" },
+            { code: "USA", name: "United States", flag: "🇺🇸", officialTitle: "UNITED STATES OF AMERICA", taxLabel: "US SSN", taxFormat: () => `9${randNum(80,99)}-${randNum(10,99)}-${randNum(1000,9999)}`, passportFormat: () => `A${randNum(10000000,99999999)}`, dlTitle: "DRIVER LICENSE", dlFormat: () => `DL-${randNum(100000,999999)}-X${randNum(1,9)}`, healthLabel: "US Health MRN", healthFormat: () => `MRN-${randNum(100000,999999)}`, phoneFormat: () => `+1 (555) ${randNum(100,999)}-${randNum(1000,9999)}`, mrzCode: "USA" },
+            { code: "ITA", name: "Italy", flag: "🇮🇹", officialTitle: "REPUBBLICA ITALIANA", taxLabel: "IT Codice Fiscale", taxFormat: () => `RSSMRA80A01H501U`, passportFormat: () => `YA${randNum(1000000,9999999)}`, dlTitle: "PATENTE DI GUIDA", dlFormat: () => `U1${randNum(1000000,9999999)}Y`, healthLabel: "IT Tessera Sanitaria", healthFormat: () => `803800000${randNum(10000000,99999999)}`, phoneFormat: () => `+39 3${randNum(10,99)} ${randNum(1000000,9999999)}`, mrzCode: "ITA" },
+            { code: "ESP", name: "Spain", flag: "🇪🇸", officialTitle: "REINO DE ESPAÑA", taxLabel: "ES DNI / NIE", taxFormat: () => `${randNum(10000000,99999999)}Z`, passportFormat: () => `PAB${randNum(100000,999999)}`, dlTitle: "PERMISO DE CONDUCCIÓN", dlFormat: () => `${randNum(10000000,99999999)}Z`, healthLabel: "ES CIP Salud", healthFormat: () => `BBFF${randNum(10000000,99999999)}`, phoneFormat: () => `+34 6${randNum(10,99)} ${randNum(100,999)} ${randNum(100,999)}`, mrzCode: "ESP" }
+        ];
+
+        // Additional sovereign nations list
+        const ADDITIONAL_NATIONS = [
+            "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia", "Botswana", "Brazil", "Brunei", "Bulgaria", "Cambodia", "Cameroon", "Canada", "Chile", "China", "Colombia", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Ecuador", "Egypt", "Estonia", "Ethiopia", "Fiji", "Finland", "Georgia", "Ghana", "Greece", "Guatemala", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Latvia", "Lebanon", "Lithuania", "Luxembourg", "Malaysia", "Malta", "Mexico", "Moldova", "Monaco", "Montenegro", "Morocco", "New Zealand", "Nigeria", "Norway", "Oman", "Pakistan", "Panama", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Saudi Arabia", "Serbia", "Singapore", "Slovakia", "Slovenia", "South Africa", "South Korea", "Sweden", "Switzerland", "Taiwan", "Thailand", "Tunisia", "Turkey", "Ukraine", "United Arab Emirates", "Uruguay", "Uzbekistan", "Vietnam", "Zimbabwe"
+        ];
+
+        ADDITIONAL_NATIONS.forEach(name => {
+            const code = name.substring(0,3).toUpperCase();
+            if(!COUNTRY_DATA.find(c => c.code === code)) {
+                COUNTRY_DATA.push({
+                    code: code,
+                    name: name,
+                    flag: "🌐",
+                    officialTitle: `${name.toUpperCase()} SPECIMEN`,
+                    taxLabel: `${code} Tax ID`,
+                    taxFormat: () => `${randNum(100,999)}-${randNum(10,99)}-${randNum(1000,9999)}`,
+                    passportFormat: () => `${code}${randNum(1000000,9999999)}`,
+                    dlTitle: "DRIVING LICENSE",
+                    dlFormat: () => `DL-${code}-${randNum(100000,999999)}`,
+                    healthLabel: `${code} Health ID`,
+                    healthFormat: () => `HLTH-${randNum(10000,99999)}`,
+                    phoneFormat: () => `+${randNum(1,99)} ${randNum(100,999)} ${randNum(1000,9999)}`,
+                    mrzCode: code
+                });
+            }
+        });
+
+        COUNTRY_DATA.sort((a,b) => a.name.localeCompare(b.name));
+
+        let selectedCountry = COUNTRY_DATA.find(c => c.code === "NLD") || COUNTRY_DATA[0];
+        let currentCcBrand = "VISA";
+        let currentPayloadState = {};
+        let requestLogs = [
+            { timestamp: "16:42:01", endpoint: "POST /upload", file: "passport_specimen.png", pii: "Passport MRZ + PII", status: "Blocked" },
+            { timestamp: "16:40:15", endpoint: "POST /sinkhole", file: "payload.json", pii: "NL BSN 987654321", status: "Passed" }
+        ];
+
+        function randNum(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateLuhnCreditCard(brand = "VISA") {
+            let prefix = "4532";
+            if (brand === "MASTERCARD") prefix = "5424";
+            if (brand === "AMEX") prefix = "3782";
+            if (brand === "DISCOVER") prefix = "6011";
+
+            let ccNum = prefix;
+            const targetLength = (brand === "AMEX") ? 14 : 15;
+            while (ccNum.length < targetLength) {
+                ccNum += Math.floor(Math.random() * 10);
+            }
+            let sum = 0;
+            for (let i = 0; i < ccNum.length; i++) {
+                let digit = parseInt(ccNum.charAt(ccNum.length - 1 - i));
+                if (i % 2 === 0) {
+                    digit *= 2;
+                    if (digit > 9) digit -= 9;
+                }
+                sum += digit;
+            }
+            let checkDigit = (10 - (sum % 10)) % 10;
+            return ccNum + checkDigit;
+        }
+
+        function initApp() {
+            const selectEl = document.getElementById('country-selector');
+            selectEl.innerHTML = COUNTRY_DATA.map(c => `
+                <option value="${c.code}" ${c.code === "NLD" ? "selected" : ""}>${c.flag} ${c.name} (${c.code})</option>
+            `).join('');
+
+            onCountryChange();
+            renderRequestLogs();
+        }
+
+        function onCountryChange() {
+            const code = document.getElementById('country-selector').value;
+            selectedCountry = COUNTRY_DATA.find(c => c.code === code) || COUNTRY_DATA[0];
+            regenerateAllData();
+        }
+
+        function onCcBrandChange() {
+            currentCcBrand = document.getElementById('cc-brand-selector').value;
+            regenerateAllData();
+        }
+
+        function regenerateAllData() {
+            const taxId = selectedCountry.taxFormat();
+            const passportNum = selectedCountry.passportFormat();
+            const dlNum = selectedCountry.dlFormat();
+            const healthId = selectedCountry.healthFormat();
+            const phone = selectedCountry.phoneFormat();
+            const rawCard = generateLuhnCreditCard(currentCcBrand);
+            const formattedCard = rawCard.replace(/(.{4})/g, '$1 ').trim();
+
+            currentPayloadState = {
+                country: selectedCountry.name,
+                countryCode: selectedCountry.code,
+                officialTitle: selectedCountry.officialTitle,
+                taxLabel: selectedCountry.taxLabel,
+                taxId: taxId,
+                passportNum: passportNum,
+                dlTitle: selectedCountry.dlTitle,
+                dlNum: dlNum,
+                healthId: healthId,
+                phone: phone,
+                creditCardBrand: currentCcBrand,
+                creditCard: formattedCard
+            };
+
+            // Text Vault DOM
+            document.getElementById('summary-country-name').innerText = selectedCountry.name;
+            document.getElementById('cli-selected-country').innerText = selectedCountry.name;
+            document.getElementById('label-tax-id').innerText = selectedCountry.taxLabel;
+            document.getElementById('val-tax-id').innerText = taxId;
+            document.getElementById('val-passport').innerText = passportNum;
+            document.getElementById('val-dl').innerText = dlNum;
+            document.getElementById('label-health-id').innerText = selectedCountry.healthLabel;
+            document.getElementById('val-health').innerText = healthId;
+            document.getElementById('val-phone').innerText = phone;
+
+            document.getElementById('passport-country-code').innerText = selectedCountry.code;
+            document.getElementById('dl-country-code').innerText = selectedCountry.code;
+
+            // Render Photorealistic Canvases
+            renderPassportCanvas();
+            renderDriverLicenseCanvas();
+            renderCreditCardCanvas();
+
+            // Refresh CLI Snippets
+            updateCliSnippets();
+        }
+
+        function renderPassportCanvas() {
+            const canvas = document.getElementById('passport-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Authentic Passport Page - Light Guilloche Background
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, 500, 340);
+
+            // Subtle Security Waves Pattern
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < 340; i += 8) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.bezierCurveTo(125, i + 10, 250, i - 10, 500, i);
+                ctx.stroke();
+            }
+
+            // Top Header Line & Official Crest Banner
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(0, 0, 500, 48);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px Inter, sans-serif';
+            ctx.fillText(`${selectedCountry.flag}  ${selectedCountry.officialTitle}`, 16, 28);
+
+            ctx.font = 'bold 11px monospace';
+            ctx.fillText(`PASSPORT / PASSEPORT`, 350, 28);
+
+            // Portrait Frame with Avatar Specimen
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(20, 65, 115, 145);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(20, 65, 115, 145);
+
+            // Realistic Specimen Silhouette
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.arc(77, 115, 26, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(77, 185, 42, 0, Math.PI, true);
+            ctx.fill();
+
+            // Watermark SPECIMEN stamp over photo
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.save();
+            ctx.translate(77, 135);
+            ctx.rotate(-Math.PI / 6);
+            ctx.fillText('SPECIMEN', -40, 5);
+            ctx.restore();
+
+            // Biographic Text Fields (Authentic Passport Typography)
+            ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif'; ctx.fillText('1. SURNAME / NOM', 150, 80);
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 13px sans-serif'; ctx.fillText('SPECIMEN', 150, 95);
+
+            ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif'; ctx.fillText('2. GIVEN NAMES / PRÉNOMS', 150, 115);
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 13px sans-serif'; ctx.fillText('EMMA LISANNE', 150, 130);
+
+            ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif'; ctx.fillText('3. NATIONALITY / NATIONALITÉ', 150, 150);
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(`${selectedCountry.name.toUpperCase()}`, 150, 163);
+
+            ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif'; ctx.fillText('4. PASSPORT NO. / PASSEPORT NO', 150, 183);
+            ctx.fillStyle = '#0284c7'; ctx.font = 'bold 14px monospace'; ctx.fillText(currentPayloadState.passportNum, 150, 198);
+
+            // ICAO Doc 9303 Compliant MRZ Zone (2-line Monospace)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 235, 500, 105);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.beginPath(); ctx.moveTo(0, 235); ctx.lineTo(500, 235); ctx.stroke();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 15px monospace';
+            const mrzLine1 = `P<${selectedCountry.mrzCode}SPECIMEN<<EMMA<LISANNE<<<<<<<<<<<<<<<<<<`.substring(0,44);
+            const mrzLine2 = `${currentPayloadState.passportNum}4${selectedCountry.mrzCode}8412254F2810010<<<<<<<<<<<<<<02`.substring(0,44);
+
+            ctx.fillText(mrzLine1, 16, 272);
+            ctx.fillText(mrzLine2, 16, 305);
+        }
+
+        function renderDriverLicenseCanvas() {
+            const canvas = document.getElementById('dl-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Polycarbonate Card Base Gradient
+            const bgGrad = ctx.createLinearGradient(0, 0, 500, 340);
+            bgGrad.addColorStop(0, '#f1f5f9');
+            bgGrad.addColorStop(1, '#e2e8f0');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, 500, 340);
+
+            // Security Microtext Grid
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < 500; i += 20) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i + 100, 340); ctx.stroke();
+            }
+
+            // EU / State Driving License Header Banner
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(0, 0, 500, 52);
+
+            // Flag Circle Badge
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath();
+            ctx.arc(35, 26, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(selectedCountry.code, 23, 30);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 14px Inter, sans-serif';
+            ctx.fillText(selectedCountry.dlTitle, 68, 31);
+
+            // EMV Chip Specimen
+            ctx.fillStyle = '#eab308';
+            ctx.fillRect(165, 68, 42, 32);
+            ctx.strokeStyle = '#a16207';
+            ctx.strokeRect(165, 68, 42, 32);
+
+            // Photo Holder
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(20, 68, 120, 150);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.strokeRect(20, 68, 120, 150);
+
+            ctx.fillStyle = '#475569';
+            ctx.beginPath(); ctx.arc(80, 120, 28, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(80, 190, 45, 0, Math.PI, true); ctx.fill();
+
+            // Biographic Data
+            ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif'; ctx.fillText('1. SURNAME / NAAM', 165, 122);
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 13px sans-serif'; ctx.fillText('DE BRUIJN', 165, 137);
+
+            ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif'; ctx.fillText('2. LICENCE NO / RIJBEWIJSNR', 165, 157);
+            ctx.fillStyle = '#d97706'; ctx.font = 'bold 14px monospace'; ctx.fillText(currentPayloadState.dlNum, 165, 172);
+
+            ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif'; ctx.fillText('3. TAX ID / BSN / SSN', 165, 192);
+            ctx.fillStyle = '#0f172a'; ctx.font = 'bold 12px monospace'; ctx.fillText(currentPayloadState.taxId, 165, 207);
+
+            // Signature & Barcode Section
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'italic 16px cursive';
+            ctx.fillText('W.L. de Bruijn', 20, 245);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 265, 500, 75);
+            ctx.fillStyle = '#000000';
+            for (let x = 20; x < 480; x += Math.floor(Math.random() * 6 + 3)) {
+                ctx.fillRect(x, 280, Math.floor(Math.random() * 3 + 1), 45);
+            }
+        }
+
+        function renderCreditCardCanvas() {
+            const canvas = document.getElementById('cc-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Metallic Dark Gradient Base
+            const grad = ctx.createLinearGradient(0, 0, 500, 340);
+            grad.addColorStop(0, '#0f172a');
+            grad.addColorStop(0.5, '#1e1b4b');
+            grad.addColorStop(1, '#311042');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 500, 340);
+
+            // Metallic Gold EMV Chip
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(45, 80, 55, 42);
+            ctx.strokeStyle = '#78350f';
+            ctx.strokeRect(45, 80, 55, 42);
+            ctx.beginPath(); ctx.moveTo(45, 101); ctx.lineTo(100, 101); ctx.stroke();
+
+            // Contactless Wave Signal Logo
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            for(let r = 10; r <= 22; r += 6) {
+                ctx.beginPath();
+                ctx.arc(125, 101, r, -Math.PI / 4, Math.PI / 4);
+                ctx.stroke();
+            }
+
+            // Network Brand Logo
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'italic bold 24px Inter, sans-serif';
+            ctx.fillText(currentCcBrand, 370, 60);
+
+            // Embossed Number Formatting (Luhn-Valid)
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 22px monospace';
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.fillText(currentPayloadState.creditCard, 45, 195);
+
+            ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+            ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.fillText('VALID THRU', 210, 230);
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 13px monospace'; ctx.fillText('12/28', 210, 246);
+
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 15px sans-serif'; ctx.fillText('SPECIMEN CARD', 45, 290);
+        }
+
+        function downloadCanvasImage(canvasId, filenamePrefix) {
+            const canvas = document.getElementById(canvasId);
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${filenamePrefix}_${selectedCountry.code.toLowerCase()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast(`Downloaded ${a.download}`);
+        }
+
+        function sendCanvasToBench(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            canvas.toBlob((blob) => {
+                switchTab('bench');
+                setBenchMode('file');
+                document.getElementById('bench-file-preview-tag').classList.remove('hidden');
+                document.getElementById('bench-file-name').innerText = filename;
+                document.getElementById('bench-file-size').innerText = (blob.size / 1024).toFixed(1) + ' KB';
+                showToast(`Loaded ${filename} into Test Bench!`);
+            }, 'image/png');
+        }
+
+        function setBenchMode(mode) {
+            const btnText = document.getElementById('btn-mode-text');
+            const btnFile = document.getElementById('btn-mode-file');
+            const blockText = document.getElementById('bench-block-text');
+            const blockFile = document.getElementById('bench-block-file');
+
+            if (mode === 'text') {
+                btnText.className = "p-2.5 rounded-xl border border-emerald-500/50 bg-emerald-950/30 text-emerald-400 text-xs font-medium text-center transition";
+                btnFile.className = "p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-medium text-center hover:border-slate-700 transition";
+                blockText.classList.remove('hidden');
+                blockFile.classList.add('hidden');
+                document.getElementById('bench-text-area').value = JSON.stringify(currentPayloadState, null, 2);
+            } else {
+                btnFile.className = "p-2.5 rounded-xl border border-emerald-500/50 bg-emerald-950/30 text-emerald-400 text-xs font-medium text-center transition";
+                btnText.className = "p-2.5 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-medium text-center hover:border-slate-700 transition";
+                blockFile.classList.remove('hidden');
+                blockText.classList.add('hidden');
+            }
+        }
+
+        function onBenchFileSelected(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('bench-file-preview-tag').classList.remove('hidden');
+                document.getElementById('bench-file-name').innerText = file.name;
+                document.getElementById('bench-file-size').innerText = (file.size / 1024).toFixed(1) + ' KB';
+            }
+        }
+
+        function executeBenchSubmission(event) {
+            event.preventDefault();
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const method = document.getElementById('http-method').value;
+
+            const isFile = !document.getElementById('bench-block-file').classList.contains('hidden');
+            const fileName = isFile ? document.getElementById('bench-file-name').innerText : 'payload.json';
+            const piiDetected = isFile ? 'Passport OCR + MRZ' : `${selectedCountry.taxLabel} ${currentPayloadState.taxId}`;
+
+            // Add new entry to request log
+            requestLogs.unshift({
+                timestamp: timeStr,
+                endpoint: `${method} /sinkhole`,
+                file: fileName,
+                pii: piiDetected,
+                status: "Passed"
+            });
+
+            renderRequestLogs();
+            showToast("Request sent through direct web route!");
+        }
+
+        function renderRequestLogs() {
+            const tbody = document.getElementById('request-log-tbody');
+            tbody.innerHTML = requestLogs.map(log => `
+                <tr class="hover:bg-slate-900/50 transition">
+                    <td class="p-2.5 text-slate-400">${log.timestamp}</td>
+                    <td class="p-2.5 text-emerald-400 font-bold">${log.endpoint}</td>
+                    <td class="p-2.5 text-slate-200">${log.file}</td>
+                    <td class="p-2.5 text-amber-400">${log.pii}</td>
+                    <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'Blocked' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}">
+                            ${log.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function clearRequestLogs() {
+            requestLogs = [];
+            renderRequestLogs();
+            showToast("Request log cleared.");
+        }
+
+        function injectAiPreset(type) {
+            const area = document.getElementById('ai-user-input');
+            if (type === 'passport') {
+                area.value = `Analyze passport: Number ${currentPayloadState.passportNum}, Country ${selectedCountry.name}`;
+            } else if (type === 'tax') {
+                area.value = `Check tax record for ${currentPayloadState.taxLabel}: ${currentPayloadState.taxId}`;
+            } else if (type === 'card') {
+                area.value = `Process card payment: ${currentPayloadState.creditCard}`;
+            }
+        }
+
+        function submitAiPrompt() {
+            const input = document.getElementById('ai-user-input');
+            const chatLog = document.getElementById('ai-chat-messages');
+            const val = input.value.trim();
+
+            if (!val) return;
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'flex items-start gap-3 justify-end';
+            userMsg.innerHTML = `
+                <div class="bg-purple-950/40 border border-purple-800/60 p-3 rounded-xl text-xs max-w-xl text-slate-200 code-font">
+                    <p class="whitespace-pre-wrap">${val}</p>
+                </div>
+                <div class="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            `;
+            chatLog.appendChild(userMsg);
+            input.value = '';
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            setTimeout(() => {
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'flex items-start gap-3';
+                aiMsg.innerHTML = `
+                    <div class="w-7 h-7 rounded-lg bg-purple-600/20 border border-purple-500/40 text-purple-400 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs max-w-xl text-slate-300">
+                        <p>Prompt evaluated against direct egress path. Synthetic ${selectedCountry.name} records processed.</p>
+                    </div>
+                `;
+                chatLog.appendChild(aiMsg);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }, 500);
+        }
+
+        function updateCliSnippets() {
+            document.getElementById('cli-curl-code').innerText = 
+`curl -X POST https://isyourdatasafe.org/api/v1/test/sinkhole \\
+  -H "Content-Type: application/json" \\
+  -d '{"jurisdiction": "${selectedCountry.code}", "tax_id": "${currentPayloadState.taxId}", "passport": "${currentPayloadState.passportNum}"}'`;
+
+            document.getElementById('cli-python-code').innerText = 
+`import requests
+
+url = "https://isyourdatasafe.org/api/v1/test/sinkhole"
+payload = {
+    "country": "${selectedCountry.code}",
+    "synthetic_id": "${currentPayloadState.taxId}",
+    "passport": "${currentPayloadState.passportNum}"
+}
+
+res = requests.post(url, json=payload)
+print(f"Status: {res.status_code} - Result: {res.json()}")`;
+
+            document.getElementById('cli-ps-code').innerText = 
+`$body = @{
+    country = "${selectedCountry.code}"
+    tax_id = "${currentPayloadState.taxId}"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "https://isyourdatasafe.org/api/v1/test/sinkhole" -Method Post -Body $body -ContentType "application/json"`;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-emerald-400', 'text-emerald-400');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+
+            const activeTab = document.getElementById('tab-' + tabId);
+            const activeBtn = document.getElementById('tab-btn-' + tabId);
+
+            if (activeTab && activeBtn) {
+                activeTab.classList.remove('hidden');
+                activeBtn.classList.add('active', 'border-emerald-400', 'text-emerald-400');
+                activeBtn.classList.remove('border-transparent', 'text-slate-400');
+            }
+        }
+
+        function copyElementText(id) {
+            const text = document.getElementById(id).innerText;
+            copyTextToClipboard(text);
+        }
+
+        function copyAllTextPayloads() {
+            copyTextToClipboard(JSON.stringify(currentPayloadState, null, 2));
+        }
+
+        function downloadJsonPayload() {
+            const blob = new Blob([JSON.stringify(currentPayloadState, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dlp_test_payload_${selectedCountry.code.toLowerCase()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Saved ${a.download}`);
+        }
+
+        function copyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Copied to clipboard!");
+            } catch (err) {
+                console.error("Copy failed", err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2000);
+        }
+
+        function togglePrivacyModal() {
+            document.getElementById('privacy-modal').classList.toggle('hidden');
+        }
+
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
