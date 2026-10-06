@@ -283,7 +283,7 @@
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox (Live Direct Egress)</h2>
-        <p>Select a target AI Engine and choose your **Egress Routing Mode**. Direct Web App mode transmits HTTP POST requests directly to real application hosts (`chatgpt.com/uc`, `claude.ai/chat`, `perplexity.ai/search`) from your browser to trigger inline SWG / proxy interception rules.</p>
+        <p>Select a target AI Engine and choose your **Egress Routing Mode**. Direct Web App mode transmits HTTP POST requests directly to real application hosts (`chatgpt.com/unauth-mweb/conversation/updates`, `claude.ai/chat`, `perplexity.ai/search`) from your browser to trigger inline SWG / proxy interception rules.</p>
         <div class="selector-bar">
           <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
           <select id="aiEngineSelect" onchange="onAiEngineChange()"></select>
@@ -291,7 +291,7 @@
         <div class="selector-bar" style="margin-bottom:15px;">
           <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label>
           <select id="aiTrafficTypeSelect" onchange="onAiEngineChange()">
-            <option value="direct_web">🌐 Direct Web App Target (Browser UI POST to Real End-User Target Domain)</option>
+            <option value="direct_web">🌐 Direct Web App Target (Browser UI POST to Real Target Endpoints)</option>
             <option value="direct_api">⚡ Direct Developer API Target (Script POST to API Host Domain)</option>
             <option value="mirror">🔁 Proxy Mirror / Echo Route (httpbin.org with Target Headers)</option>
           </select>
@@ -389,7 +389,7 @@
       { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
       { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
       { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
-      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
+      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请確保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
       { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
       { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
       { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
@@ -423,8 +423,9 @@
 
     // SHADOW AI ENGINES WITH YOUR SPECIFIC ENDPOINTS INCLUDED
     const AI_ENGINES = {
-      openai: { name: "OpenAI ChatGPT", webEndpoint: "https://chatgpt.com/uc", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
-      anthropic: { name: "Anthropic Claude", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet-20240620" },
+      openai_unauth: { name: "OpenAI ChatGPT (Logged-Out / Unauth Web)", webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o-mini (unauth-mweb)" },
+      openai: { name: "OpenAI ChatGPT (Web Application)", webEndpoint: "https://chatgpt.com/backend-api/conversation", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
+      anthropic: { name: "Anthropic Claude (Web Application)", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet-20240620" },
       perplexity: { name: "Perplexity AI", webEndpoint: "https://www.perplexity.ai/search", apiEndpoint: "https://api.perplexity.ai/search", model: "sonar-reasoning" },
       gemini: { name: "Google Gemini", webEndpoint: "https://gemini.google.com/_/BardChatUi/data/batchexecute", apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", model: "gemini-1.5-pro" },
       copilot: { name: "Microsoft Copilot", webEndpoint: "https://copilot.microsoft.com/sydney/ChatHub", apiEndpoint: "https://sydney.bing.com/sydney/ChatHub", model: "copilot-enterprise" },
@@ -447,7 +448,7 @@
     function getActiveAiEndpoint() {
       const engineKey = document.getElementById('aiEngineSelect').value;
       const trafficType = document.getElementById('aiTrafficTypeSelect').value;
-      const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai;
+      const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai_unauth;
       let targetUrl = "https://httpbin.org/post";
       if (trafficType === 'direct_web') targetUrl = engine.webEndpoint;
       else if (trafficType === 'direct_api') targetUrl = engine.apiEndpoint;
