@@ -116,7 +116,7 @@
     textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
     
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 15px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
     .card h3 { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
     code { background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(6, 182, 212, 0.2); padding: 6px 8px; border-radius: 4px; color: var(--accent-green); font-size: 0.8rem; word-break: break-all; margin-bottom: 10px; display: block; font-family: inherit; }
@@ -255,10 +255,13 @@
 
       <!-- Sub-section B: Photorealistic Document OCR Vault -->
       <div class="section">
-        <h2>🪪 Photorealistic Document OCR Vault</h2>
-        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Führerschein*, *Paspoort*), localized field labels, and native holder names. Transmitting sends raw PNG binary for OCR proxy inspection.</p>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <h2 style="margin-bottom:0; border:none; padding:0;">🪪 Photorealistic Document OCR Vault</h2>
+          <button class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="rotateOcrSpecimenName()">🔄 Rotate Specimen Name</button>
+        </div>
+        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Personalausweis*, *Paspoort*), localized field labels, and native holder names. Transmitting sends raw PNG binary for OCR proxy inspection.</p>
 
-        <div class="grid-3">
+        <div class="grid-4">
           <div class="card">
             <h3 id="ocr-passport-title">Passport Specimen</h3>
             <canvas id="passportCanvas" width="400" height="260"></canvas>
@@ -274,6 +277,15 @@
             <div style="display:flex; gap:6px;">
               <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('dlCanvas', 'license')">Download PNG</button>
               <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('dlCanvas', 'license_specimen.png')">Transmit Outbound</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 id="ocr-id-title">National ID Specimen</h3>
+            <canvas id="idCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('idCanvas', 'national_id')">Download PNG</button>
+              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('idCanvas', 'national_id_specimen.png')">Transmit Outbound</button>
             </div>
           </div>
 
@@ -486,24 +498,37 @@
       return arr;
     }
 
-    // LOCALIZED SPECIMEN SEED DATA (FULL DYNAMIC LOCALIZATION)
-    const LOCALIZED_SPECIMENS = {
-      NLD: { name: "DE BRUIJN, EMMA LISANNE", passport: "PASPOORT", dl: "RIJBEWIJS", surnameLbl: "1. NAAM:", givenLbl: "2. VOORNAMEN:", dobLbl: "3. GEBOORTEDATUM:", natLbl: "NATIONALITEIT: Nederlandse" },
-      DEU: { name: "MÜLLER, MAXIMILIAN", passport: "REISEPASS", dl: "FÜHRERSCHEIN", surnameLbl: "1. NAME:", givenLbl: "2. VORNAMEN:", dobLbl: "3. GEBURTSDATUM:", natLbl: "STAATSANGEHÖRIGKEIT: Deutsch" },
-      FRA: { name: "DUBOIS, CAMILLE SOPHIE", passport: "PASSEPORT", dl: "PERMIS DE CONDUIRE", surnameLbl: "1. NOM:", givenLbl: "2. PRÉNOMS:", dobLbl: "3. DATE DE NAISS.:", natLbl: "NATIONALITÉ: Française" },
-      ESP: { name: "GARCÍA MARTÍNEZ, ALEJANDRO", passport: "PASAPORTE", dl: "PERMISO DE CONDUCCIÓN", surnameLbl: "1. APELLIDOS:", givenLbl: "2. NOMBRE:", dobLbl: "3. FECHA DE NAC.:", natLbl: "NACIONALIDAD: Española" },
-      ITA: { name: "ROSSI, EMMA MARIA", passport: "PASSAPORTO", dl: "PATENTE DI GUIDA", surnameLbl: "1. COGNOME:", givenLbl: "2. NOME:", dobLbl: "3. DATA DI NASCITA:", natLbl: "CITTADINANZA: Italiana" },
-      JPN: { name: "SATO, TARO (佐藤 太郎)", passport: "RYOKAN (護照)", dl: "UNTEN MENKYO SHO", surnameLbl: "氏名 (NAME):", givenLbl: "名 (GIVEN NAME):", dobLbl: "生年月日 (DOB):", natLbl: "国籍 (NATIONALITY): 日本" },
-      USA: { name: "SPECIMEN, EMMA LISANNE", passport: "PASSPORT", dl: "DRIVER LICENSE", surnameLbl: "SURNAME:", givenLbl: "GIVEN NAMES:", dobLbl: "DATE OF BIRTH:", natLbl: "NATIONALITY: USA" },
-      GBR: { name: "SPECIMEN, OLIVER JAMES", passport: "PASSPORT", dl: "DRIVING LICENCE", surnameLbl: "SURNAME:", givenLbl: "GIVEN NAMES:", dobLbl: "DATE OF BIRTH:", natLbl: "NATIONALITY: British" }
+    // ROTATING CULTURALLY AUTHENTIC SPECIMEN POOLS
+    const LOCALIZED_NAMES_POOL = {
+      NLD: ["DE BRUIJN, EMMA LISANNE", "VAN DIJK, Daan BERNARD", "BAKKER, SOPHIE MARIE", "JANSEN, LARS JOHANNES"],
+      DEU: ["MÜLLER, MAXIMILIAN", "SCHMIDT, HANNAH LENA", "SCHNEIDER, LUKAS PAUL", "FISCHER, EMILY SOPHIE"],
+      FRA: ["DUBOIS, CAMILLE SOPHIE", "MARTIN, LOUIS ANTOINE", "BERNARD, LÉA MARIE", "PETIT, THOMAS LAURENT"],
+      ESP: ["GARCÍA MARTÍNEZ, ALEJANDRO", "RODRÍGUEZ LÓPEZ, LUCÍA", "SÁNCHEZ GÓMEZ, MATEO", "FERNÁNDEZ PÉREZ, SOFÍA"],
+      ITA: ["ROSSI, EMMA MARIA", "RUSSO, MATTEO LUCA", "FERRARI, GIULIA ELENA", "ESPOSITO, LEONARDO"],
+      JPN: ["SATO, TARO (佐藤 太郎)", "SUZUKI, HANAKO (鈴木 花子)", "TAKAHASHI, KEN (高橋 健)", "TANAKA, YUI (田中 結衣)"],
+      USA: ["SPECIMEN, EMMA LISANNE", "SMITH, ALEXANDER JAMES", "JOHNSON, OLIVIA ROSE", "WILLIAMS, BENJAMIN ARTHUR"],
+      GBR: ["SPECIMEN, OLIVER JAMES", "BROWN, CHARLOTTE ELIZABETH", "HARRIS, HARRY WILLIAM", "TAYLOR, AMELIA GRACE"]
     };
+
+    const LOCALIZED_LABELS = {
+      NLD: { passport: "PASPOORT", dl: "RIJBEWIJS", id: "IDENTITEITSKAART", surname: "1. NAAM:", given: "2. VOORNAMEN:", dob: "3. GEBOORTEDATUM:", nat: "NATIONALITEIT: Nederlandse" },
+      DEU: { passport: "REISEPASS", dl: "FÜHRERSCHEIN", id: "PERSONALAUSWEIS", surname: "1. NAME:", given: "2. VORNAMEN:", dob: "3. GEBURTSDATUM:", nat: "STAATSANGEHÖRIGKEIT: Deutsch" },
+      FRA: { passport: "PASSEPORT", dl: "PERMIS DE CONDUIRE", id: "CARTE D'IDENTITÉ", surname: "1. NOM:", given: "2. PRÉNOMS:", dob: "3. DATE DE NAISS.:", nat: "NATIONALITÉ: Française" },
+      ESP: { passport: "PASAPORTE", dl: "PERMISO DE CONDUCCIÓN", id: "DOCUMENTO NACIONAL DE IDENTIDAD", surname: "1. APELLIDOS:", given: "2. NOMBRE:", dob: "3. FECHA DE NAC.:", nat: "NACIONALIDAD: Española" },
+      ITA: { passport: "PASSAPORTO", dl: "PATENTE DI GUIDA", id: "CARTA D'IDENTITÀ", surname: "1. COGNOME:", given: "2. NOME:", dob: "3. DATA DI NASCITA:", nat: "CITTADINANZA: Italiana" },
+      JPN: { passport: "RYOKAN (護照)", dl: "UNTEN MENKYO SHO", id: "MY NUMBER CARD", surname: "氏名:", given: "名:", dob: "生年月日:", nat: "国籍: 日本" },
+      USA: { passport: "PASSPORT", dl: "DRIVER LICENSE", id: "NATIONAL IDENTIFICATION CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: USA" },
+      GBR: { passport: "PASSPORT", dl: "DRIVING LICENCE", id: "NATIONAL IDENTITY CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: British" }
+    };
+
+    let ocrNameIndex = {};
 
     const UN_COUNTRIES_SEED = [
       { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
       { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
       { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
       { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
-      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE999999999999" } },
+      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
       { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
       { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
       { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
@@ -524,7 +549,6 @@
 
     const ALL_195_ISO_CODES = ["AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE","BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH","BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF","TCD","CHL","CHN","COL","COM","COG","COD","CRI","CIV","HRV","CUB","CYP","CZE","DNK","DJI","DMA","DOM","ECU","EGY","SLV","GNQ","ERI","EST","SWZ","ETH","FJI","FIN","FRA","GAB","GMB","GEO","DEU","GHA","GRC","GRD","GTM","GIN","GNB","GUY","HTI","HND","HUN","ISL","IND","IDN","IRN","IRQ","IRL","ISR","ITA","JAM","JPN","JOR","KAZ","KEN","KIR","PRK","KOR","KWT","KGZ","LAO","LVA","LBN","LSO","LBR","LBY","LIE","LTU","LUX","MDG","MWI","MYS","MDV","MLI","MLT","MHL","MRT","MUS","MEX","FSM","MDA","MCO","MNG","MNE","MAR","MOZ","MMR","NAM","NRU","NPL","NLD","NZL","NIC","NER","NGA","MKD","NOR","OMN","PAK","PLW","PSE","PAN","PNG","PRY","PER","PHL","POL","PRT","QAT","ROU","RUS","RWA","KNA","LCA","VCT","WSM","SMR","STP","SAU","SEN","SRB","SYC","SLE","SGP","SVK","SVN","SLB","SOM","ZAF","SSD","ESP","LKA","SDN","SUR","SWE","CHE","SYR","TWN","TJK","TZA","THA","TLS","TGO","TON","TTO","TUN","TUR","TKM","TUV","UGA","UKR","ARE","GBR","USA","URY","UZB","VUT","VAT","VEN","VNM","YEM","ZMB","ZWE"];
 
-    // ISO LABELS MAPPED TO CLEAN COUNTRY NAMES
     const COUNTRY_NAMES_MAP = {
       AFG:"Afghanistan", ALB:"Albania", DZA:"Algeria", AND:"Andorra", AGO:"Angola", ATG:"Antigua and Barbuda", ARG:"Argentina", ARM:"Armenia", AUS:"Australia", AUT:"Austria", AZE:"Azerbaijan", BHS:"Bahamas", BHR:"Bahrain", BGD:"Bangladesh", BRB:"Barbados", BLR:"Belarus", BEL:"Belgium", BLZ:"Belize", BEN:"Benin", BTN:"Bhutan", BOL:"Bolivia", BIH:"Bosnia and Herzegovina", BWA:"Botswana", BRA:"Brazil", BRN:"Brunei", BGR:"Bulgaria", BFA:"Burkina Faso", BDI:"Burundi", CPV:"Cabo Verde", KHM:"Cambodia", CMR:"Cameroon", CAN:"Canada", CAF:"Central African Republic", TCD:"Chad", CHL:"Chile", CHN:"China", COL:"Colombia", COM:"Comoros", COG:"Congo", COD:"Congo (DRC)", CRI:"Costa Rica", CIV:"Côte d'Ivoire", HRV:"Croatia", CUB:"Cuba", CYP:"Cyprus", CZE:"Czech Republic", DNK:"Denmark", DJI:"Djibouti", DMA:"Dominica", DOM:"Dominican Republic", ECU:"Ecuador", EGY:"Egypt", SLV:"El Salvador", GNQ:"Equatorial Guinea", ERI:"Eritrea", EST:"Estonia", SWZ:"Eswatini", ETH:"Ethiopia", FJI:"Fiji", FIN:"Finland", FRA:"France", GAB:"Gabon", GMB:"Gambia", GEO:"Georgia", DEU:"Germany", GHA:"Ghana", GRC:"Greece", GRD:"Grenada", GTM:"Guatemala", GIN:"Guinea", GNB:"Guinea-Bissau", GUY:"Guyana", HTI:"Haiti", HND:"Honduras", HUN:"Hungary", ISL:"Iceland", IND:"India", IDN:"Indonesia", IRN:"Iran", IRQ:"Iraq", IRL:"Ireland", ISR:"Israel", ITA:"Italy", JAM:"Jamaica", JPN:"Japan", JOR:"Jordan", KAZ:"Kazakhstan", KEN:"Kenya", KIR:"Kiribati", PRK:"North Korea", KOR:"South Korea", KWT:"Kuwait", KGZ:"Kyrgyzstan", LAO:"Laos", LVA:"Latvia", LBN:"Lebanon", LSO:"Lesotho", LBR:"Liberia", LBY:"Libya", LIE:"Liechtenstein", LTU:"Lithuania", LUX:"Luxembourg", MDG:"Madagascar", MWI:"Malawi", MYS:"Malaysia", MDV:"Maldives", MLI:"Mali", MLT:"Malta", MHL:"Marshall Islands", MRT:"Mauritania", MUS:"Mauritius", MEX:"Mexico", FSM:"Micronesia", MDA:"Moldova", MCO:"Monaco", MNG:"Mongolia", MNE:"Montenegro", MAR:"Morocco", MOZ:"Mozambique", MMR:"Myanmar", NAM:"Namibia", NRU:"Nauru", NPL:"Nepal", NLD:"Netherlands", NZL:"New Zealand", NIC:"Nicaragua", NER:"Niger", NGA:"Nigeria", MKD:"North Macedonia", NOR:"Norway", OMN:"Oman", PAK:"Pakistan", PLW:"Palau", PSE:"Palestine", PAN:"Panama", PNG:"Papua New Guinea", PRY:"Paraguay", PER:"Peru", PHL:"Philippines", POL:"Poland", PRT:"Portugal", QAT:"Qatar", ROU:"Romania", RUS:"Russia", RWA:"Rwanda", KNA:"Saint Kitts and Nevis", LCA:"Saint Lucia", VCT:"Saint Vincent", WSM:"Samoa", SMR:"San Marino", STP:"Sao Tome and Principe", SAU:"Saudi Arabia", SEN:"Senegal", SRB:"Serbia", SYC:"Seychelles", SLE:"Sierra Leone", SGP:"Singapore", SVK:"Slovakia", SVN:"Slovenia", SLB:"Solomon Islands", SOM:"Somalia", ZAF:"South Africa", SSD:"South Sudan", ESP:"Spain", LKA:"Sri Lanka", SDN:"Sudan", SUR:"Suriname", SWE:"Sweden", CHE:"Switzerland", SYR:"Syria", TWN:"Taiwan", TJK:"Tajikistan", TZA:"Tanzania", THA:"Thailand", TLS:"Timor-Leste", TGO:"Togo", TON:"Tonga", TTO:"Trinidad and Tobago", TUN:"Tunisia", TUR:"Turkey", TKM:"Turkmenistan", TUV:"Tuvalu", UGA:"Uganda", UKR:"Ukraine", ARE:"United Arab Emirates", GBR:"United Kingdom", USA:"United States", URY:"Uruguay", UZB:"Uzbekistan", VUT:"Vanuatu", VAT:"Vatican City", VEN:"Venezuela", VNM:"Vietnam", YEM:"Yemen", ZMB:"Zambia", ZWE:"Zimbabwe"
     };
@@ -639,12 +663,27 @@
       updateCountryData();
     }
 
+    function getActiveSpecimenName(code) {
+      const pool = LOCALIZED_NAMES_POOL[code] || LOCALIZED_NAMES_POOL.USA;
+      const idx = ocrNameIndex[code] || 0;
+      return pool[idx % pool.length];
+    }
+
+    function rotateOcrSpecimenName() {
+      const code = document.getElementById('countrySelect').value;
+      ocrNameIndex[code] = (ocrNameIndex[code] || 0) + 1;
+      updateCountryData();
+      log(`Rotated specimen name for jurisdiction ${code} to: "${getActiveSpecimenName(code)}"`);
+    }
+
     function updateCountryData() {
       const code = document.getElementById('countrySelect').value;
       const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
       
-      const passportTitle = c.passportTitle || 'PASSPORT';
-      const dlTitle = c.dlTitle || 'DRIVER LICENSE';
+      const labels = LOCALIZED_LABELS[code] || LOCALIZED_LABELS.USA;
+      const passportTitle = labels.passport || c.passportTitle || 'PASSPORT';
+      const dlTitle = labels.dl || c.dlTitle || 'DRIVER LICENSE';
+      const idTitle = labels.id || 'NATIONAL ID CARD';
 
       document.getElementById('label-tax').innerText = `${c.taxLabel} Card`;
       document.getElementById('label-passport').innerText = `${passportTitle} Card`;
@@ -652,6 +691,7 @@
       
       document.getElementById('ocr-passport-title').innerText = `${passportTitle} Specimen`;
       document.getElementById('ocr-dl-title').innerText = `${dlTitle} Specimen`;
+      document.getElementById('ocr-id-title').innerText = `${idTitle} Specimen`;
 
       const taxVal = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
       const passVal = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
@@ -667,18 +707,15 @@
 
       renderPassportCanvas(c.country, c.code, passVal, passportTitle);
       renderDlCanvas(c.country, c.code, dlVal, taxVal, dlTitle);
+      renderIdCanvas(c.country, c.code, taxVal, idTitle);
       renderCcCanvas(cardVal);
     }
 
     function renderPassportCanvas(countryName, countryCode, passNum, passportTitle) {
       const canvas = document.getElementById('passportCanvas');
       const ctx = canvas.getContext('2d');
-      const spec = LOCALIZED_SPECIMENS[countryCode] || { 
-        name: "SPECIMEN, EMMA LISANNE", 
-        surnameLbl: "SURNAME:", 
-        givenLbl: "GIVEN NAMES:", 
-        natLbl: `NATIONALITY: ${countryCode}` 
-      };
+      const labels = LOCALIZED_LABELS[countryCode] || LOCALIZED_LABELS.USA;
+      const holderName = getActiveSpecimenName(countryCode);
 
       ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, 400, 260);
 
@@ -697,14 +734,14 @@
       ctx.beginPath(); ctx.arc(60, 150, 32, 0, Math.PI, true); ctx.fill();
 
       ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
-      ctx.fillText(`${spec.surnameLbl} ${spec.name.split(',')[0] || 'SPECIMEN'}`, 120, 75);
-      ctx.fillText(`${spec.givenLbl} ${spec.name.split(',')[1] || 'EMMA LISANNE'}`, 120, 95);
-      ctx.fillText(spec.natLbl, 120, 115);
+      ctx.fillText(`${labels.surname} ${holderName.split(',')[0] || 'SPECIMEN'}`, 120, 75);
+      ctx.fillText(`${labels.given} ${holderName.split(',')[1] || 'EMMA LISANNE'}`, 120, 95);
+      ctx.fillText(labels.nat, 120, 115);
       ctx.fillText(passNum, 120, 135);
 
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 185, 400, 75);
       ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px monospace';
-      const cleanName = spec.name.replace(/[^A-Z]/g, '<');
+      const cleanName = holderName.replace(/[^A-Z]/g, '<');
       ctx.fillText(`P<${countryCode}${cleanName}<<<<<<<<<<<<<<<<<<<<<`.substring(0, 44), 10, 215);
       ctx.fillText(`${passNum.replace(/[^A-Z0-9]/g,'')}4${countryCode}8412254F2810010<<<<<<02`, 10, 240);
     }
@@ -712,10 +749,8 @@
     function renderDlCanvas(countryName, countryCode, dlVal, taxVal, dlTitle) {
       const canvas = document.getElementById('dlCanvas');
       const ctx = canvas.getContext('2d');
-      const spec = LOCALIZED_SPECIMENS[countryCode] || { 
-        name: "DE BRUIJN, EMMA", 
-        dobLbl: "2. DOB: 25.12.1984" 
-      };
+      const labels = LOCALIZED_LABELS[countryCode] || LOCALIZED_LABELS.USA;
+      const holderName = getActiveSpecimenName(countryCode);
 
       ctx.fillStyle = '#e2e8f0'; ctx.fillRect(0, 0, 400, 260);
 
@@ -729,8 +764,8 @@
       ctx.beginPath(); ctx.arc(60, 150, 32, 0, Math.PI, true); ctx.fill();
 
       ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
-      ctx.fillText(`1. NAME: ${spec.name}`, 120, 75);
-      ctx.fillText(spec.dobLbl || "2. DOB: 25.12.1984", 120, 95);
+      ctx.fillText(`${labels.surname} ${holderName}`, 120, 75);
+      ctx.fillText(labels.dob || "3. GEBOORTEDATUM: 25.12.1984", 120, 95);
       ctx.fillText(`3. ${dlVal}`, 120, 120);
       ctx.fillText(`4. ${taxVal}`, 120, 145);
 
@@ -739,6 +774,35 @@
       for (let x = 15; x < 385; x += Math.floor(Math.random() * 5 + 2)) {
         ctx.fillRect(x, 210, Math.floor(Math.random() * 3 + 1), 40);
       }
+    }
+
+    function renderIdCanvas(countryName, countryCode, taxVal, idTitle) {
+      const canvas = document.getElementById('idCanvas');
+      const ctx = canvas.getContext('2d');
+      const labels = LOCALIZED_LABELS[countryCode] || LOCALIZED_LABELS.USA;
+      const holderName = getActiveSpecimenName(countryCode);
+
+      ctx.fillStyle = '#f1f5f9'; ctx.fillRect(0, 0, 400, 260);
+
+      ctx.fillStyle = '#0f766e'; ctx.fillRect(0, 0, 400, 40);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`${idTitle} - ${countryCode}`, 15, 24);
+
+      ctx.fillStyle = '#cbd5e1'; ctx.fillRect(15, 55, 90, 110);
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath(); ctx.arc(60, 95, 20, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(60, 150, 32, 0, Math.PI, true); ctx.fill();
+
+      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(`${labels.surname} ${holderName}`, 120, 75);
+      ctx.fillText(labels.dob || "DOB: 25.12.1984", 120, 95);
+      ctx.fillText(labels.nat, 120, 120);
+      ctx.fillText(`ID / ${taxVal}`, 120, 145);
+
+      ctx.fillStyle = '#0f766e'; ctx.fillRect(0, 190, 400, 70);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px monospace';
+      ctx.fillText(`I<${countryCode}SPECIMEN<<${holderName.replace(/[^A-Z]/g, '<')}<<<<<<<<`, 10, 215);
+      ctx.fillText(`ID999999999${countryCode}8412254F2810010<<<<<<<<<<01`, 10, 240);
     }
 
     function renderCcCanvas(cardVal) {
