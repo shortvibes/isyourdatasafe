@@ -21,7 +21,17 @@
       --purple: #8b5cf6;
       --purple-hover: #7c3aed;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0;
+      user-select: none; /* Prevents casual text highlighting & copying */
+      -webkit-user-select: none;
+    }
+    textarea, input[type="text"], code {
+      user-select: text !important; /* Permits copying injected test payloads */
+      -webkit-user-select: text !important;
+    }
     body {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       background-color: var(--bg);
@@ -145,6 +155,7 @@
       <div id="jv-protection-root"></div>
     </header>
 
+    <!-- Animated Egress Radar Hero Graphic -->
     <div class="hero-banner">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 180" preserveAspectRatio="xMidYMid slice">
         <defs>
@@ -160,8 +171,10 @@
             <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" stroke-width="0.8"/>
           </pattern>
         </defs>
+
         <rect width="1000" height="180" fill="url(#bgGrad)" />
         <rect width="1000" height="180" fill="url(#cyberGrid)" opacity="0.6" />
+
         <g stroke="#1e293b" stroke-width="1.5">
           <line x1="140" y1="90" x2="330" y2="90" stroke-dasharray="4,4"/>
           <line x1="330" y1="90" x2="500" y2="90" stroke="#06b6d4" stroke-width="2"/>
@@ -169,31 +182,43 @@
           <line x1="670" y1="90" x2="860" y2="45"/>
           <line x1="670" y1="90" x2="860" y2="135"/>
         </g>
+
+        <!-- Central Security Gateway Shield -->
         <g transform="translate(500, 90)">
           <circle r="38" fill="#0b132b" stroke="#06b6d4" stroke-width="2"/>
           <path d="M -14 -16 L 0 -22 L 14 -16 L 14 3 C 14 14 0 21 0 21 C 0 21 -14 14 -14 3 Z" fill="url(#shieldGrad)" opacity="0.9"/>
           <path d="M -5 0 L -1 5 L 7 -5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
+
+        <!-- Internal Endpoint -->
         <g transform="translate(140, 90)">
           <circle r="20" fill="#0b132b" stroke="#06b6d4" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="9" fill="#06b6d4" text-anchor="middle" font-weight="bold">ENDPOINT</text>
         </g>
+
+        <!-- AI Target Endpoint -->
         <g transform="translate(860, 45)">
           <circle r="18" fill="#0b132b" stroke="#8b5cf6" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
         </g>
+
+        <!-- Web Target Endpoint -->
         <g transform="translate(860, 135)">
           <circle r="18" fill="#0b132b" stroke="#10b981" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
         </g>
+
+        <!-- Animated Radar Scan Line -->
         <line x1="0" y1="0" x2="0" y2="180" stroke="rgba(6, 182, 212, 0.35)" stroke-width="3">
           <animateTransform attributeName="transform" type="translate" from="0 0" to="1000 0" dur="4s" repeatCount="indefinite"/>
         </line>
+
         <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">NETWORK DLP INSPECTION PLATFORM</text>
         <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#64748b">Outbound Traffic Bench &amp; Photorealistic Document Vault</text>
       </svg>
     </div>
 
+    <!-- Navigation Bar -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab(event, 'tab-bench')">🛡️ 1. DLP Payload Bench</button>
       <button class="tab-btn" onclick="switchTab(event, 'tab-file')">📁 2. File Upload Egress</button>
@@ -371,6 +396,29 @@
   </div>
 
   <script>
+    // --- IN-BROWSER CODE ARMOR & ANTI-DEBUGGER GUARD ---
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 123 || // F12
+         (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+         (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
+         (e.ctrlKey && e.keyCode === 85) || // Ctrl+U (Source)
+         (e.ctrlKey && e.keyCode === 83)) { // Ctrl+S (Save)
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    setInterval(() => {
+      const startTime = performance.now();
+      debugger; // Freezes execution if DevTools is forcibly opened
+      const endTime = performance.now();
+      if (endTime - startTime > 100) {
+        document.body.innerHTML = '<div style="color:#ef4444; text-align:center; padding:50px; font-family:monospace;">⚠️ SECURITY NOTICE: Unauthorized inspection detected. Session locked.</div>';
+      }
+    }, 1000);
+
     // --- PROTECTED ATTRIBUTION SYSTEM (SHADOW DOM + MUTATION GUARD) ---
     const AUTHOR_CREDIT = "Jeroen Vermeulen";
 
@@ -438,39 +486,40 @@
       return arr;
     }
 
-    // COMPLETE UNABRIDGED 195 SOVEREIGN NATIONS DATASET HELPERS
+    // UN SOVEREIGN NATIONS BASE SEED
     const UN_COUNTRIES_SEED = [
-      { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است. لطفا مطمئن شوید که خط‌مشی‌های امنیت شبکه و فیلترهای خروجی به درستی پیکربندی شده‌اند.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
-      { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna të identifikimit shtetëror. Ju lutemi sigurohuni që politikat e filtrimit të rrjetit DLP janë aktive.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
-      { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية. يرجى التأكد من تكوين سياسات تصفية شبكة منع تسرب البيانات بشكل صحيح.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
-      { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten. Bitte stellen Sie sicher, dass Ihre Datenverlustpräventions-Filter ordnungsgemäß greifen.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
-      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat. Controleer of de uitgaande netwerkfilters van de proxy actief zijn.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
-      { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais de identificação nacional. Certifique-se de que os filtros de saída da rede estejam operacionais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
-      { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records. Ce document est confidentiel et utilisé pour tester les filtres de sécurité réseau.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
-      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络数据泄漏防护（DLP）策略已正确配置并能够有效拦截。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
-      { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles. Veuillez vérifier le bon fonctionnement de votre proxy de réseau et filtres DLP.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
-      { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen. Es enthält staatliche Identifikationsdaten zur Validierung der Netzwerksicherheit.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
-      { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers. Please ensure that corporate gateway firewalls and DLP engines inspect this packet.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
-      { code: "ITA", country: "Italy", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "IT Codice Fiscale", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali. Si prega di verificare che i filtri di prevenzione della fuga di dati siano attivi.", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999", iban: "IT99A9999999999999999999999" } },
-      { code: "JPN", country: "Japan", dlTitle: "UNTEN MENKYO SHO", passportTitle: "RYOKAN", taxLabel: "JP My Number", bogusText: "これは国家識別データを含む機密のセキュリティテスト用テキストです。ネットワークの送信データ漏洩防止（DLP）ルールが正常に動作しているか確認してください。", formats: { taxNumber: "9999 9999 9999", passport: "TR999999", driverLicense: "DL-99999999", iban: "JP99AAAA99999999999999" } },
-      { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat. Zorg ervoor dat het uitgaande netwerkfilter van uw proxy correct is ingesteld om dit gegevensverkeer te inspecteren.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
-      { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata. Vennligst sjekk at utgående nettverksfiltre fungerer som forventet.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
-      { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne. Upewnij się, że reguły filtrowania sieci wyjściowej DLP są aktywne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
-      { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional. Verifique las reglas de inspección de salida en la red.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
-      { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter. Se till att nätverkets utgående DLP-filter fungerar som det ska.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
-      { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen. Ce document est confidentiel et contient des données d'identification officielles.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
-      { code: "GBR", country: "United Kingdom", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "UK NINO", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records. Ensure that corporate network egress filters evaluate this outbound stream.", formats: { taxNumber: "AA 99 99 99 A", passport: "999999999", driverLicense: "AAAAA999999AA9AA", iban: "GB99AAAA99999999999999" } },
-      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers. Please ensure corporate DLP rules intercept this payload stream.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } }
+      { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
+      { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
+      { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
+      { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
+      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
+      { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
+      { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
+      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请确保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
+      { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
+      { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
+      { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
+      { code: "ITA", country: "Italy", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "IT Codice Fiscale", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali.", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999", iban: "IT99A9999999999999999999999" } },
+      { code: "JPN", country: "Japan", dlTitle: "UNTEN MENKYO SHO", passportTitle: "RYOKAN", taxLabel: "JP My Number", bogusText: "これは国家識別データを含む機密のセキュリティテスト用テキストです。DLPルールを確認してください。", formats: { taxNumber: "9999 9999 9999", passport: "TR999999", driverLicense: "DL-99999999", iban: "JP99AAAA99999999999999" } },
+      { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
+      { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
+      { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
+      { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
+      { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
+      { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
+      { code: "GBR", country: "United Kingdom", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "UK NINO", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records.", formats: { taxNumber: "AA 99 99 99 A", passport: "999999999", driverLicense: "AAAAA999999AA9AA", iban: "GB99AAAA99999999999999" } },
+      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } }
     ];
 
     const ALL_195_ISO_CODES = ["AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE","BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH","BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF","TCD","CHL","CHN","COL","COM","COG","COD","CRI","CIV","HRV","CUB","CYP","CZE","DNK","DJI","DMA","DOM","ECU","EGY","SLV","GNQ","ERI","EST","SWZ","ETH","FJI","FIN","FRA","GAB","GMB","GEO","DEU","GHA","GRC","GRD","GTM","GIN","GNB","GUY","HTI","HND","HUN","ISL","IND","IDN","IRN","IRQ","IRL","ISR","ITA","JAM","JPN","JOR","KAZ","KEN","KIR","PRK","KOR","KWT","KGZ","LAO","LVA","LBN","LSO","LBR","LBY","LIE","LTU","LUX","MDG","MWI","MYS","MDV","MLI","MLT","MHL","MRT","MUS","MEX","FSM","MDA","MCO","MNG","MNE","MAR","MOZ","MMR","NAM","NRU","NPL","NLD","NZL","NIC","NER","NGA","MKD","NOR","OMN","PAK","PLW","PSE","PAN","PNG","PRY","PER","PHL","POL","PRT","QAT","ROU","RUS","RWA","KNA","LCA","VCT","WSM","SMR","STP","SAU","SEN","SRB","SYC","SLE","SGP","SVK","SVN","SLB","SOM","ZAF","SSD","ESP","LKA","SDN","SUR","SWE","CHE","SYR","TWN","TJK","TZA","THA","TLS","TGO","TON","TTO","TUN","TUR","TKM","TUV","UGA","UKR","ARE","GBR","USA","URY","UZB","VUT","VAT","VEN","VNM","YEM","ZMB","ZWE"];
 
+    // EXACT ISO FORMAT MAPPING (PREVENTS DUPLICATED LABELS)
     const COUNTRY_DEFINITIONS = ALL_195_ISO_CODES.map(code => {
       const found = UN_COUNTRIES_SEED.find(item => item.code === code);
       if (found) return found;
       return {
         code: code,
-        country: `Jurisdiction (${code})`,
+        country: code, // Clean country code string to avoid "(TKM) (TKM)"
         dlTitle: "DRIVER LICENSE",
         passportTitle: "PASSPORT",
         taxLabel: `${code} Tax ID`,
