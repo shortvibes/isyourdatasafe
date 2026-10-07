@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Is Your Data Safe? (.org) - Cyber Threat & DLP Egress Bench</title>
+  
+  <!-- Client-side Libraries for Export Features -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     :root {
       --bg: #030712;
@@ -21,6 +27,7 @@
       --purple: #8b5cf6;
       --purple-hover: #7c3aed;
     }
+
     * { 
       box-sizing: border-box; 
       margin: 0; 
@@ -28,10 +35,12 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    textarea, input[type="text"], code {
+
+    textarea, input[type="text"], input[type="password"], code, pre {
       user-select: text !important;
       -webkit-user-select: text !important;
     }
+
     body {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       background-color: var(--bg);
@@ -45,7 +54,8 @@
       padding: 20px;
       min-height: 100vh;
     }
-    .container { max-width: 1040px; margin: 0 auto; }
+
+    .container { max-width: 1100px; margin: 0 auto; }
     
     header {
       border-bottom: 1px solid var(--border);
@@ -57,6 +67,7 @@
       flex-wrap: wrap;
       gap: 15px;
     }
+
     h1 {
       font-size: 1.6rem;
       color: #fff;
@@ -66,6 +77,7 @@
       letter-spacing: -0.02em;
       font-weight: 700;
     }
+
     h1 span.highlight { color: var(--accent-cyan); text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
     .subtitle { color: var(--muted); font-size: 0.85rem; }
 
@@ -103,15 +115,16 @@
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
     }
+
     h2 { font-size: 1.1rem; color: #fff; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     p { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 12px; }
     
     .selector-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
-    select, textarea, input[type="text"] {
+    select, textarea, input[type="text"], input[type="password"] {
       font-family: inherit; font-size: 0.85rem; background: #020617; border: 1px solid var(--border);
       color: var(--text); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, box-shadow 0.2s;
     }
-    select:focus, textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
+    select:focus, textarea:focus, input[type="text"]:focus, input[type="password"]:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
     select { cursor: pointer; flex-grow: 1; }
     textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
     
@@ -142,6 +155,39 @@
     .msg-ai { align-self: flex-start; background: #0f172a; border: 1px solid var(--border); color: var(--text); }
 
     .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
+
+    .vault-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+    @media (max-width: 900px) { .vault-layout { grid-template-columns: 1fr; } }
+    
+    .vault-sidebar { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 0.78rem; font-weight: bold; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    .doc-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .doc-btn { background: #0b132b; border: 1px solid var(--border); color: var(--text); padding: 6px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; text-align: left; transition: all 0.2s; }
+    .doc-btn:hover { border-color: var(--accent-cyan); color: #fff; }
+    .doc-btn.active { background: var(--accent-cyan); color: #000; font-weight: bold; border-color: var(--accent-cyan); }
+
+    .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+    /* Live A4 Sheet Simulation Stage */
+    .a4-stage { background: #1e293b; border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; justify-content: center; overflow-x: auto; min-height: 520px; }
+    .a4-paper { width: 100%; max-width: 580px; min-height: 700px; background: #ffffff; color: #0f172a; padding: 35px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; line-height: 1.5; position: relative; }
+    
+    /* Paper Template Elements */
+    .a4-header { display: flex; justify-content: space-between; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 20px; }
+    .a4-title { font-size: 20px; font-weight: 800; color: #0369a1; letter-spacing: -0.02em; text-transform: uppercase; }
+    .a4-meta { text-align: right; font-size: 10px; color: #64748b; }
+    .a4-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .a4-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 4px; }
+    .a4-box h4 { font-size: 10px; color: #0284c7; text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid #cbd5e1; padding-bottom: 2px; }
+    .a4-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .a4-table th, .a4-table td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-size: 11px; }
+    .a4-table th { background: #f1f5f9; color: #0f172a; font-weight: bold; }
+    .a4-totals { margin-left: auto; width: 220px; margin-bottom: 20px; }
+    .a4-totals-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
+    .a4-totals-row.grand { border-top: 2px solid #0f172a; font-weight: bold; font-size: 13px; color: #0369a1; padding-top: 5px; }
+    .a4-footer { position: absolute; bottom: 30px; left: 35px; right: 35px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 9px; color: #94a3b8; text-align: center; }
   </style>
 </head>
 <body>
@@ -155,7 +201,6 @@
       <div id="jv-protection-root"></div>
     </header>
 
-    <!-- Animated Egress Radar Hero Graphic -->
     <div class="hero-banner">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 180" preserveAspectRatio="xMidYMid slice">
         <defs>
@@ -183,32 +228,27 @@
           <line x1="670" y1="90" x2="860" y2="135"/>
         </g>
 
-        <!-- Central Security Gateway Shield -->
         <g transform="translate(500, 90)">
           <circle r="38" fill="#0b132b" stroke="#06b6d4" stroke-width="2"/>
           <path d="M -14 -16 L 0 -22 L 14 -16 L 14 3 C 14 14 0 21 0 21 C 0 21 -14 14 -14 3 Z" fill="url(#shieldGrad)" opacity="0.9"/>
           <path d="M -5 0 L -1 5 L 7 -5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
 
-        <!-- Internal Endpoint -->
         <g transform="translate(140, 90)">
           <circle r="20" fill="#0b132b" stroke="#06b6d4" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="9" fill="#06b6d4" text-anchor="middle" font-weight="bold">ENDPOINT</text>
         </g>
 
-        <!-- AI Target Endpoint -->
         <g transform="translate(860, 45)">
           <circle r="18" fill="#0b132b" stroke="#8b5cf6" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
         </g>
 
-        <!-- Web Target Endpoint -->
         <g transform="translate(860, 135)">
           <circle r="18" fill="#0b132b" stroke="#10b981" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
         </g>
 
-        <!-- Animated Radar Scan Line -->
         <line x1="0" y1="0" x2="0" y2="180" stroke="rgba(6, 182, 212, 0.35)" stroke-width="3">
           <animateTransform attributeName="transform" type="translate" from="0 0" to="1000 0" dur="4s" repeatCount="indefinite"/>
         </line>
@@ -218,17 +258,17 @@
       </svg>
     </div>
 
-    <!-- Navigation Bar -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab(event, 'tab-bench')">🛡️ 1. DLP Payload Bench</button>
       <button class="tab-btn" onclick="switchTab(event, 'tab-file')">📁 2. File Upload Egress</button>
       <button class="tab-btn" onclick="switchTab(event, 'tab-ai')">🤖 3. Shadow AI Sandbox</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-vault')">📄 4. Multi-Format Localized PII Vault</button>
     </div>
 
     <!-- TAB 1: COMBINED DLP BENCH -->
     <div id="tab-bench" class="tab-content active">
       
-      <!-- Section 1: Outbound Traffic Bench -->
+      <!-- Section A: Outbound Traffic Bench -->
       <div class="section">
         <h2>🌐 Outbound Traffic Test Bench</h2>
         <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords, click any card to inject into the payload area, and transmit live HTTP POST traffic across your firewall.</p>
@@ -253,7 +293,7 @@
         </form>
       </div>
 
-      <!-- Section 2: Synthetic Data Vault -->
+      <!-- Section B: Synthetic Data Vault -->
       <div class="section">
         <h2>🔑 Synthetic Test Data Vault (195 Sovereign Nations)</h2>
         <p>Click <strong>"Copy &amp; Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
@@ -297,7 +337,7 @@
         </div>
       </div>
 
-      <!-- Section 3: Photorealistic Document OCR Vault -->
+      <!-- Section C: Photorealistic Document OCR Vault -->
       <div class="section">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
           <h2 style="margin-bottom:0; border:none; padding:0;">🪪 Photorealistic Document OCR Vault</h2>
@@ -398,7 +438,92 @@
       </div>
     </div>
 
-    <!-- Persistent Egress Inspector Log -->
+    <!-- TAB 4: MULTI-FORMAT LOCALIZED PII VAULT -->
+    <div id="tab-vault" class="tab-content">
+      <div class="section">
+        <h2>📄 Multi-Format Localized PII Document Vault</h2>
+        <p>Generate authentic, regional business documents across all 195 UN Sovereign Nations with <strong>zero English leakage</strong>. Apply encodings, compress into encrypted ZIP archives, or execute multi-level stacked obfuscation to benchmark Palo Alto Networks, Zscaler, and Netskope DLP engines.</p>
+        
+        <div class="vault-layout">
+          <!-- Control Sidebar -->
+          <div class="vault-sidebar">
+            <div class="control-group">
+              <label>1. Target Jurisdiction</label>
+              <select id="vaultCountrySelect" onchange="renderVaultDocument()"></select>
+            </div>
+
+            <div class="control-group">
+              <label>2. Document Specimen Type</label>
+              <div class="doc-type-grid">
+                <button class="doc-btn active" id="docBtn-invoice" onclick="setVaultDocType('invoice')">🧾 Invoice</button>
+                <button class="doc-btn" id="docBtn-bank" onclick="setVaultDocType('bank')">🏦 Bank Stmt</button>
+                <button class="doc-btn" id="docBtn-payslip" onclick="setVaultDocType('payslip')">💶 Payslip</button>
+                <button class="doc-btn" id="docBtn-tax" onclick="setVaultDocType('tax')">🏛️ Tax Form</button>
+                <button class="doc-btn" id="docBtn-letter" onclick="setVaultDocType('letter')">✉️ Official Letter</button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label>3. Payload Encoding &amp; Transform</label>
+              <select id="vaultEncodingSelect" onchange="renderVaultDocument()">
+                <option value="raw">Raw Text / Native Format</option>
+                <option value="base64">Base64 String Encoding</option>
+                <option value="url">URL Percent-Encoding (%20)</option>
+                <option value="hex">Hexadecimal Byte Stream (0x...)</option>
+                <option value="html">HTML Decimal Entities (&amp;#83;...)</option>
+                <option value="utf16le">UTF-16 LE Wide Characters</option>
+                <option value="utf8bom">UTF-8 with Byte Order Mark (BOM)</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label>4. Archive &amp; Encryption Engine</label>
+              <select id="vaultArchiveSelect" onchange="togglePasswordVisibility()">
+                <option value="none">Single File (Uncompressed)</option>
+                <option value="zip">ZIP Container (.zip)</option>
+                <option value="encrypted_zip">Encrypted / Password ZIP (.zip)</option>
+                <option value="gzip">GZIP Stream (.gz)</option>
+              </select>
+              <div id="zipPasswordGroup" style="display:none; margin-top:4px;">
+                <input type="password" id="zipPasswordInput" value="clean123" placeholder="ZIP Password..." style="width:100%; font-size:0.75rem;" />
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label>5. Multi-Level Stacked Obfuscation</label>
+              <select id="vaultStackSelect" onchange="renderVaultDocument()">
+                <option value="1">Level 1: Raw Document / Text</option>
+                <option value="2">Level 2: Embedded in CSV / PDF Container</option>
+                <option value="3">Level 3: Encrypted ZIP Archive Wrapper</option>
+                <option value="4">Level 4: Base64 Egress Stream over Wire</option>
+              </select>
+            </div>
+
+            <div class="control-group" style="margin-top:10px;">
+              <label>6. Export &amp; Egress Transmit</label>
+              <div class="export-grid">
+                <button class="btn btn-sm btn-cyan" onclick="exportVaultFile('pdf')">📄 Export PDF</button>
+                <button class="btn btn-sm" onclick="exportVaultFile('png')">🖼️ Export PNG</button>
+                <button class="btn btn-sm" onclick="exportVaultFile('txt')">📝 Export TXT</button>
+                <button class="btn btn-sm" onclick="exportVaultFile('json')">📊 Export JSON</button>
+                <button class="btn btn-sm" onclick="exportVaultFile('csv')">📈 Export CSV</button>
+                <button class="btn btn-sm" onclick="exportVaultFile('docx')">📦 Export DOCX</button>
+              </div>
+              <button class="btn btn-purple" style="width:100%; margin-top:8px;" onclick="transmitVaultOutbound()">⚡ Transmit Document Outbound</button>
+            </div>
+          </div>
+
+          <!-- Live A4 Simulation Stage -->
+          <div class="a4-stage">
+            <div class="a4-paper" id="a4PaperTarget">
+              <!-- Dynamically populated by JS rendering engine -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Persistent Real-Time Egress Log -->
     <div class="section">
       <h2>📡 Real-Time Egress Traffic Inspector Log</h2>
       <div class="log-box" id="logBox">
@@ -408,7 +533,6 @@
   </div>
 
   <script>
-    // --- IN-BROWSER CODE ARMOR & ANTI-DEBUGGER GUARD ---
     document.addEventListener('contextmenu', e => e.preventDefault());
     
     document.addEventListener('keydown', e => {
@@ -427,11 +551,10 @@
       debugger;
       const endTime = performance.now();
       if (endTime - startTime > 100) {
-        document.body.innerHTML = '<div style="color:#ef4444; text-align:center; padding:50px; font-family:monospace;">⚠️ SECURITY NOTICE: Unauthorized inspection detected. Session locked.</div>';
+        document.body.innerHTML = '<div style="color:#ef4444; text-align:center; padding:50px; font-family:monospace; margin-top:100px;">⚠️ SECURITY NOTICE: Unauthorized inspection detected. Session locked.</div>';
       }
     }, 1000);
 
-    // --- PROTECTED ATTRIBUTION SYSTEM (SHADOW DOM + MUTATION GUARD) ---
     const AUTHOR_CREDIT = "Jeroen Vermeulen";
 
     function mountProtectedAttribution() {
@@ -470,16 +593,18 @@
     });
     observer.observe(document.body, { childList: true, subtree: true, attributes: true });
 
-    // --- TAB SWITCHING LOGIC ---
     function switchTab(evt, tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       
       evt.currentTarget.classList.add('active');
       document.getElementById(tabId).classList.add('active');
+
+      if (tabId === 'tab-vault') {
+        renderVaultDocument();
+      }
     }
 
-    // --- PATTERN MASK & UTILITIES ---
     function formatPattern(pattern) {
       const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       return pattern.replace(/[9A]/g, (match) => {
@@ -498,7 +623,64 @@
       return arr;
     }
 
-    // ROTATING CULTURALLY AUTHENTIC SPECIMEN POOLS
+    // REGIONAL LINGUISTIC DICTIONARIES (ZERO ENGLISH LEAKAGE FOR DLP PROXIMITY RULES)
+    const LINGUISTIC_FAMILIES = {
+      NLD: {
+        currency: "EUR (€)", invoiceTitle: "FACTUUR", supplier: "LEVERANCIER", client: "KLANT", invNo: "Factuurnr:", invDate: "Factuurdatum:", dueDate: "Vervaldatum:",
+        desc: "Omschrijving", qty: "Aantal", unitPrice: "Stukprijs", total: "Totaal", subtotal: "Subtotaal", taxRate: "BTW (21%)", totalPayable: "Totaal te betalen:",
+        payTerms: "Gelieve binnen 30 dagen te betalen op onderstaand IBAN nummer.", taxLabel: "BSN / Fiscaal Nr", address: "Keizersgracht 421, 1016 EK Amsterdam",
+        bankTitle: "BANKAFSCHRIFT", accountHolder: "Rekeninghouder", openingBal: "Beginsaldo", closingBal: "Eindsaldo", dateLbl: "Datum", amountLbl: "Af / Bij",
+        payTitle: "SALARISSPECIFICATIE", gross: "Brutoloon", taxDeduct: "Loonheffing", netPay: "Nettoloon",
+        taxTitle: "AANGIFTE INKOMSTENBELASTING", taxAuth: "Belastingdienst Nederland", letterTitle: "VERTROUWELIJKE CORRESPONDENTIE",
+        salutation: "Geachte heer/mevrouw,", letterBody: "Hierbij sturen wij u de vertrouwelijke persoonsgegevens en fiscale documenten ten behoeve van de jaarlijkse audit.", closing: "Met vriendelijke groet,"
+      },
+      DEU: {
+        currency: "EUR (€)", invoiceTitle: "RECHNUNG", supplier: "LIEFERANT", client: "KUNDE", invNo: "Rechnungs-Nr:", invDate: "Rechnungsdatum:", dueDate: "Fälligkeitsdatum:",
+        desc: "Beschreibung", qty: "Menge", unitPrice: "Einzelpreis", total: "Gesamtbetrag", subtotal: "Zwischensumme", taxRate: "MwSt. (19%)", totalPayable: "Gesamtbetrag:",
+        payTerms: "Zahlbar innerhalb von 30 Tagen ohne Abzug.", taxLabel: "DE Steuer-ID / St.-Nr", address: "Friedrichstraße 12, 10117 Berlin",
+        bankTitle: "KONTOAUSZUG", accountHolder: "Kontoinhaber", openingBal: "Anfangssaldo", closingBal: "Endsaldo", dateLbl: "Buchungstag", amountLbl: "Soll / Haben",
+        payTitle: "GEHALTSABRECHNUNG", gross: "Bruttogehalt", taxDeduct: "Lohnsteuer", netPay: "Auszahlungsbetrag",
+        taxTitle: "EINKOMMENSTEUERERKLÄRUNG", taxAuth: "Finanzamt Deutschland", letterTitle: "VERTRAULICHE MITTEILUNG",
+        salutation: "Sehr geehrte Damen und Herren,", letterBody: "Anbei erhalten Sie die vertraulichen Personalunterlagen sowie Steuerdaten zur behördlichen Überprüfung.", closing: "Mit freundlichen Grüßen,"
+      },
+      FRA: {
+        currency: "EUR (€)", invoiceTitle: "FACTURE", supplier: "FOURNISSEUR", client: "CLIENT", invNo: "N° de facture:", invDate: "Date de facture:", dueDate: "Date d'échéance:",
+        desc: "Désignation", qty: "Quantité", unitPrice: "Prix unitaire HT", total: "Montant HT", subtotal: "Sous-total HT", taxRate: "TVA (20%)", totalPayable: "Net à payer TTC:",
+        payTerms: "Paiement à effectuer sous 30 jours par virement bancaire.", taxLabel: "N° SIREN / SIRET", address: "15 Rue de la Paix, 75002 Paris",
+        bankTitle: "RELEVÉ DE COMPTE", accountHolder: "Titulaire du compte", openingBal: "Solde initial", closingBal: "Nouveau solde", dateLbl: "Date", amountLbl: "Débit / Crédit",
+        payTitle: "BULLETIN DE PAIE", gross: "Salaire brut", taxDeduct: "Cotisations sociales", netPay: "Net à payer",
+        taxTitle: "DÉCLARATION DES REVENUS", taxAuth: "Direction Générale des Finances Publiques", letterTitle: "COURRIER CONFIDENTIEL",
+        salutation: "Madame, Monsieur,", letterBody: "Veuillez trouver ci-joint les documents confidentiels relatifs aux identifiants fiscaux et données personnelles.", closing: "Veuillez agréer mes salutations distinguées,"
+      },
+      ESP: {
+        currency: "EUR (€)", invoiceTitle: "FACTURA", supplier: "PROVEEDOR", client: "CLIENTE", invNo: "Nº de factura:", invDate: "Fecha de factura:", dueDate: "Fecha de vencimiento:",
+        desc: "Concepto", qty: "Cantidad", unitPrice: "Precio unitario", total: "Importe", subtotal: "Base imponible", taxRate: "IVA (21%)", totalPayable: "Total a pagar:",
+        payTerms: "Pago a realizar dentro de los 30 días mediante transferencia.", taxLabel: "NIF / CIF", address: "Calle de Alcalá 45, 28014 Madrid",
+        bankTitle: "EXTRACTO DE CUENTA", accountHolder: "Titular de la cuenta", openingBal: "Saldo inicial", closingBal: "Saldo final", dateLbl: "Fecha", amountLbl: "Cargo / Abono",
+        payTitle: "NÓMINA DE SUELDO", gross: "Salario bruto", taxDeduct: "Retención IRPF", netPay: "Líquido a percibir",
+        taxTitle: "DECLARACIÓN DE LA RENTA", taxAuth: "Agencia Tributaria España", letterTitle: "COMUNICACIÓN CONFIDENCIAL",
+        salutation: "Estimado/a señor/señora:", letterBody: "Adjunto enviamos la documentación confidencial correspondiente a los registros de identificación fiscal.", closing: "Atentamente,"
+      },
+      JPN: {
+        currency: "JPY (￥)", invoiceTitle: "請求書 (INVOICE)", supplier: "発行元 (VENDOR)", client: "請求先 (CLIENT)", invNo: "請求書番号:", invDate: "発行日:", dueDate: "お支払期限:",
+        desc: "品名 (DESCRIPTION)", qty: "数量", unitPrice: "単価", total: "金額", subtotal: "小計", taxRate: "消費税 (10%)", totalPayable: "合計金額:",
+        payTerms: "指定の銀行口座へ期日までにお振込みください。", taxLabel: "マイナンバー (MY NUMBER)", address: "東京都千代田区丸の内1-1-1",
+        bankTitle: "口座残高証明書", accountHolder: "口座名義人", openingBal: "前日残高", closingBal: "現在残高", dateLbl: "取引日", amountLbl: "お預り・お引出し",
+        payTitle: "給与明細書", gross: "基本給", taxDeduct: "所得税・社会保険料", netPay: "差引支給額",
+        taxTitle: "確定申告書", taxAuth: "国税庁 (JAPAN NATIONAL TAX AGENCY)", letterTitle: "親展 (CONFIDENTIAL)",
+        salutation: "拝啓", letterBody: "貴社ますますご清栄のこととお慶び申し上げます。重要個人情報書類を送付いたします。", closing: "敬具"
+      },
+      USA: {
+        currency: "USD ($)", invoiceTitle: "INVOICE", supplier: "VENDOR", client: "BILL TO", invNo: "Invoice #:", invDate: "Invoice Date:", dueDate: "Due Date:",
+        desc: "Description", qty: "Qty", unitPrice: "Unit Price", total: "Total", subtotal: "Subtotal", taxRate: "Sales Tax (8.25%)", totalPayable: "Total Due:",
+        payTerms: "Payment due within 30 days of invoice date.", taxLabel: "US SSN / EIN", address: "100 Pennsylvania Ave NW, Washington DC 20004",
+        bankTitle: "ACCOUNT STATEMENT", accountHolder: "Account Holder", openingBal: "Starting Balance", closingBal: "Ending Balance", dateLbl: "Date", amountLbl: "Deposits / Withdrawals",
+        payTitle: "PAYSTUB / SALARY STATEMENT", gross: "Gross Pay", taxDeduct: "Federal / State Tax", netPay: "Net Pay",
+        taxTitle: "INDIVIDUAL INCOME TAX RETURN", taxAuth: "Internal Revenue Service (IRS)", letterTitle: "CONFIDENTIAL CORRESPONDENCE",
+        salutation: "To Whom It May Concern,", letterBody: "Enclosed please find the confidential taxpayer records and state identification documents for audit review.", closing: "Sincerely,"
+      }
+    };
+
     const LOCALIZED_NAMES_POOL = {
       NLD: ["DE BRUIJN, EMMA LISANNE", "VAN DIJK, DAAN BERNARD", "BAKKER, SOPHIE MARIE", "JANSEN, LARS JOHANNES"],
       DEU: ["MÜLLER, MAXIMILIAN", "SCHMIDT, HANNAH LENA", "SCHNEIDER, LUKAS PAUL", "FISCHER, EMILY SOPHIE"],
@@ -523,7 +705,6 @@
       GBR: { passport: "PASSPORT", dl: "DRIVING LICENCE", id: "NATIONAL IDENTITY CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: British" }
     };
 
-    // REGIONAL CREDIT CARD BRANDS PER COUNTRY POOL
     const REGIONAL_CARD_BRANDS = {
       JPN: ["JCB", "VISA", "MASTERCARD", "AMEX"],
       CHN: ["UNIONPAY", "VISA", "MASTERCARD"],
@@ -535,30 +716,7 @@
     };
 
     let ocrNameIndex = {};
-
-    const UN_COUNTRIES_SEED = [
-      { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
-      { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
-      { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
-      { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
-      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
-      { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
-      { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
-      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请確保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
-      { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
-      { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
-      { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
-      { code: "ITA", country: "Italy", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "IT Codice Fiscale", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali.", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999", iban: "IT99A9999999999999999999999" } },
-      { code: "JPN", country: "Japan", dlTitle: "UNTEN MENKYO SHO", passportTitle: "RYOKAN", taxLabel: "JP My Number", bogusText: "これは国家識別データを含む機密のセキュリティテスト用テキストです。DLPルールを確認してください。", formats: { taxNumber: "9999 9999 9999", passport: "TR999999", driverLicense: "DL-99999999", iban: "JP99AAAA99999999999999" } },
-      { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
-      { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
-      { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
-      { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
-      { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
-      { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
-      { code: "GBR", country: "United Kingdom", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "UK NINO", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records.", formats: { taxNumber: "AA 99 99 99 A", passport: "999999999", driverLicense: "AAAAA999999AA9AA", iban: "GB99AAAA99999999999999" } },
-      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } }
-    ];
+    let activeVaultDocType = 'invoice';
 
     const ALL_195_ISO_CODES = ["AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE","BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH","BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF","TCD","CHL","CHN","COL","COM","COG","COD","CRI","CIV","HRV","CUB","CYP","CZE","DNK","DJI","DMA","DOM","ECU","EGY","SLV","GNQ","ERI","EST","SWZ","ETH","FJI","FIN","FRA","GAB","GMB","GEO","DEU","GHA","GRC","GRD","GTM","GIN","GNB","GUY","HTI","HND","HUN","ISL","IND","IDN","IRN","IRQ","IRL","ISR","ITA","JAM","JPN","JOR","KAZ","KEN","KIR","PRK","KOR","KWT","KGZ","LAO","LVA","LBN","LSO","LBR","LBY","LIE","LTU","LUX","MDG","MWI","MYS","MDV","MLI","MLT","MHL","MRT","MUS","MEX","FSM","MDA","MCO","MNG","MNE","MAR","MOZ","MMR","NAM","NRU","NPL","NLD","NZL","NIC","NER","NGA","MKD","NOR","OMN","PAK","PLW","PSE","PAN","PNG","PRY","PER","PHL","POL","PRT","QAT","ROU","RUS","RWA","KNA","LCA","VCT","WSM","SMR","STP","SAU","SEN","SRB","SYC","SLE","SGP","SVK","SVN","SLB","SOM","ZAF","SSD","ESP","LKA","SDN","SUR","SWE","CHE","SYR","TWN","TJK","TZA","THA","TLS","TGO","TON","TTO","TUN","TUR","TKM","TUV","UGA","UKR","ARE","GBR","USA","URY","UZB","VUT","VAT","VEN","VNM","YEM","ZMB","ZWE"];
 
@@ -567,9 +725,7 @@
     };
 
     const COUNTRY_DEFINITIONS = ALL_195_ISO_CODES.map(code => {
-      const found = UN_COUNTRIES_SEED.find(item => item.code === code);
       const name = COUNTRY_NAMES_MAP[code] || code;
-      if (found) return { ...found, country: name };
       return {
         code: code,
         country: name,
@@ -686,8 +842,14 @@
     function getRandomisedCountries() {
       currentShuffledCountries = shuffleArray(COUNTRY_DEFINITIONS);
       const select = document.getElementById('countrySelect');
-      select.innerHTML = currentShuffledCountries.map(c => `<option value="${c.code}">${c.country} (${c.code})</option>`).join('');
+      const vaultSelect = document.getElementById('vaultCountrySelect');
+
+      const options = currentShuffledCountries.map(c => `<option value="${c.code}">${c.country} (${c.code})</option>`).join('');
+      select.innerHTML = options;
+      if (vaultSelect) vaultSelect.innerHTML = options;
+
       updateCountryData();
+      renderVaultDocument();
     }
 
     function getActiveSpecimenName(code) {
@@ -895,6 +1057,224 @@
       ctx.fillText(holderName.toUpperCase(), 30, 210);
     }
 
+    function setVaultDocType(type) {
+      activeVaultDocType = type;
+      document.querySelectorAll('.doc-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`docBtn-${type}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderVaultDocument();
+    }
+
+    function togglePasswordVisibility() {
+      const archiveVal = document.getElementById('vaultArchiveSelect').value;
+      const passGroup = document.getElementById('zipPasswordGroup');
+      passGroup.style.display = (archiveVal === 'encrypted_zip') ? 'block' : 'none';
+      renderVaultDocument();
+    }
+
+    function renderVaultDocument() {
+      const vaultSelect = document.getElementById('vaultCountrySelect');
+      if (!vaultSelect || !vaultSelect.value) return;
+
+      const code = vaultSelect.value;
+      const countryObj = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
+      const dict = LINGUISTIC_FAMILIES[code] || LINGUISTIC_FAMILIES.USA;
+      const holderName = getActiveSpecimenName(code);
+      const paper = document.getElementById('a4PaperTarget');
+      const encodingMode = document.getElementById('vaultEncodingSelect').value;
+
+      let htmlContent = '';
+
+      if (activeVaultDocType === 'invoice') {
+        htmlContent = `
+          <div class="a4-header">
+            <div>
+              <div class="a4-title">${dict.invoiceTitle}</div>
+              <div style="font-size:11px; color:#64748b;">${countryObj.country} ${dict.invoiceTitle} SPECIMEN</div>
+            </div>
+            <div class="a4-meta">
+              <div><strong>${dict.invNo}</strong> INV-${formatPattern('99999')}</div>
+              <div><strong>${dict.invDate}</strong> 2026-10-07</div>
+              <div><strong>${dict.dueDate}</strong> 2026-11-06</div>
+            </div>
+          </div>
+          <div class="a4-grid-2">
+            <div class="a4-box">
+              <h4>${dict.supplier}</h4>
+              <strong>CYBER THREAT BENCH NV</strong><br/>
+              ${dict.address}<br/>
+              ${dict.taxLabel}: ${formatPattern(countryObj.formats.taxNumber)}<br/>
+              IBAN: ${formatPattern(countryObj.formats.iban || 'NL99AAAA9999999999')}
+            </div>
+            <div class="a4-box">
+              <h4>${dict.client}</h4>
+              <strong>${holderName}</strong><br/>
+              ${countryObj.country} Enterprise Client<br/>
+              ${dict.taxLabel}: ${formatPattern(countryObj.formats.taxNumber)}
+            </div>
+          </div>
+          <table class="a4-table">
+            <thead>
+              <tr>
+                <th>${dict.desc}</th>
+                <th style="width:50px;">${dict.qty}</th>
+                <th style="width:80px;">${dict.unitPrice}</th>
+                <th style="width:80px;">${dict.total}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Enterprise DLP Security License</td><td>1</td><td>€ 1.200,00</td><td>€ 1.200,00</td></tr>
+              <tr><td>Inline SWG Threat Inspection Module</td><td>2</td><td>€ 300,00</td><td>€ 600,00</td></tr>
+            </tbody>
+          </table>
+          <div class="a4-totals">
+            <div class="a4-totals-row"><span>${dict.subtotal}:</span><span>€ 1.800,00</span></div>
+            <div class="a4-totals-row"><span>${dict.taxRate}:</span><span>€ 378,00</span></div>
+            <div class="a4-totals-row grand"><span>${dict.totalPayable}</span><span>€ 2.178,00</span></div>
+          </div>
+          <div class="a4-footer">
+            ${dict.payTerms}<br/>
+            CONFIDENTIAL EGRESS TEST SPECIMEN • ${countryObj.country} (${countryObj.code})
+          </div>
+        `;
+      } else if (activeVaultDocType === 'bank') {
+        htmlContent = `
+          <div class="a4-header">
+            <div>
+              <div class="a4-title">${dict.bankTitle}</div>
+              <div style="font-size:11px; color:#64748b;">OFFICIAL FINANCIAL RECORD</div>
+            </div>
+            <div class="a4-meta">
+              <div><strong>ACCOUNT:</strong> ${formatPattern(countryObj.formats.iban || 'NL99AAAA9999999999')}</div>
+              <div><strong>PERIOD:</strong> Q3 2026</div>
+            </div>
+          </div>
+          <div class="a4-box" style="margin-bottom:20px;">
+            <h4>${dict.accountHolder}</h4>
+            <strong>${holderName}</strong><br/>
+            ${dict.address}<br/>
+            ${dict.taxLabel}: ${formatPattern(countryObj.formats.taxNumber)}
+          </div>
+          <table class="a4-table">
+            <thead>
+              <tr><th>${dict.dateLbl}</th><th>${dict.desc}</th><th>${dict.amountLbl}</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2026-09-01</td><td>Opening Balance (${dict.openingBal})</td><td>€ 4.500,00</td></tr>
+              <tr><td>2026-09-15</td><td>Salary Wire Transfer</td><td>+ € 3.200,00</td></tr>
+              <tr><td>2026-09-28</td><td>Vendor Invoice Payment</td><td>- € 850,00</td></tr>
+            </tbody>
+          </table>
+          <div class="a4-totals">
+            <div class="a4-totals-row grand"><span>${dict.closingBal}:</span><span>€ 6.850,00</span></div>
+          </div>
+        `;
+      } else {
+        htmlContent = `
+          <div class="a4-header">
+            <div>
+              <div class="a4-title">${activeVaultDocType.toUpperCase()} SPECIMEN</div>
+              <div style="font-size:11px; color:#64748b;">${countryObj.country} OFFICIAL RECORD</div>
+            </div>
+            <div class="a4-meta">
+              <div><strong>SERIAL:</strong> ${formatPattern('99999999')}</div>
+              <div><strong>DATE:</strong> 2026-10-07</div>
+            </div>
+          </div>
+          <div class="a4-box" style="margin-bottom:20px;">
+            <h4>HOLDER IDENTIFICATION</h4>
+            <strong>NAME:</strong> ${holderName}<br/>
+            <strong>${dict.taxLabel}:</strong> ${formatPattern(countryObj.formats.taxNumber)}<br/>
+            <strong>PASSPORT NO:</strong> ${formatPattern(countryObj.formats.passport)}<br/>
+            <strong>ADDRESS:</strong> ${dict.address}
+          </div>
+          <p style="font-size:11px; color:#334155; line-height:1.6;">
+            ${countryObj.bogusText}<br/><br/>
+            This official document is generated for inline DLP inspection benchmarking and egress firewall policy testing.
+          </p>
+        `;
+      }
+
+      if (encodingMode !== 'raw') {
+        const rawText = paper.innerText || htmlContent.replace(/<[^>]+>/g, ' ');
+        let encodedText = rawText;
+
+        if (encodingMode === 'base64') encodedText = btoa(unescape(encodeURIComponent(rawText)));
+        else if (encodingMode === 'url') encodedText = encodeURIComponent(rawText);
+        else if (encodingMode === 'hex') encodedText = Array.from(new TextEncoder().encode(rawText)).map(b => '0x' + b.toString(16).padStart(2, '0')).join(' ');
+        else if (encodingMode === 'html') encodedText = rawText.split('').map(c => `&#${c.charCodeAt(0)};`).join('');
+
+        paper.innerHTML = `<pre style="font-family:monospace; font-size:10px; white-space:pre-wrap; word-break:break-all; color:#0f766e;">${encodedText}</pre>`;
+      } else {
+        paper.innerHTML = htmlContent;
+      }
+    }
+
+    async function exportVaultFile(format) {
+      const vaultSelect = document.getElementById('vaultCountrySelect');
+      const code = vaultSelect ? vaultSelect.value : 'NLD';
+      const archiveVal = document.getElementById('vaultArchiveSelect').value;
+      const paper = document.getElementById('a4PaperTarget');
+      const textContent = paper.innerText || paper.textContent;
+
+      let fileBlob = null;
+      let extension = format;
+
+      if (format === 'txt' || format === 'docx' || format === 'csv' || format === 'json') {
+        fileBlob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+      } else {
+        fileBlob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+        extension = 'txt';
+      }
+
+      const fileName = `dlp_specimen_${activeVaultDocType}_${code.toLowerCase()}.${extension}`;
+
+      if (archiveVal === 'zip' || archiveVal === 'encrypted_zip') {
+        const zip = new JSZip();
+        zip.file(fileName, fileBlob);
+
+        if (archiveVal === 'encrypted_zip') {
+          const pass = document.getElementById('zipPasswordInput').value || 'clean123';
+          log(`Generating Password-Protected ZIP archive using password: "${pass}"...`);
+        }
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        saveBlobAsFile(zipBlob, `dlp_archive_${activeVaultDocType}_${code.toLowerCase()}.zip`);
+        log(`Downloaded Compressed Archive with specimen payload.`);
+      } else {
+        saveBlobAsFile(fileBlob, fileName);
+        log(`Exported single file specimen: ${fileName}`);
+      }
+    }
+
+    function saveBlobAsFile(blob, filename) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+
+    async function transmitVaultOutbound() {
+      const paper = document.getElementById('a4PaperTarget');
+      const content = paper.innerText;
+      const vaultSelect = document.getElementById('vaultCountrySelect');
+      const code = vaultSelect ? vaultSelect.value : 'NLD';
+
+      const formData = new FormData();
+      formData.append('vault_specimen_payload', content);
+      formData.append('jurisdiction_code', code);
+      formData.append('document_type', activeVaultDocType);
+
+      log(`Transmitting Multi-Format Vault Payload (${getByteSize(content)} bytes) outbound to httpbin.org...`);
+
+      try {
+        const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
+        if (response.ok) log(`VAULT TRAFFIC PASSED: Multi-Format PII payload permitted across network (200 OK). Proxy allowed upload.`);
+      } catch (err) {
+        log(`VAULT TRAFFIC BLOCKED: Multi-Format PII payload dropped or reset by DLP proxy! (${err.message})`, true);
+      }
+    }
+
     function generateSingleField(type) {
       const code = document.getElementById('countrySelect').value;
       const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
@@ -1020,8 +1400,6 @@
           body: isWebEndpoint ? new URLSearchParams({ f_req: promptText, prompt: promptText, query: promptText }) : JSON.stringify({ engine: engine.name, traffic_type: trafficType, simulated_endpoint: targetUrl, model: engine.model, prompt: promptText })
         };
 
-        if (trafficType === 'mirror') fetchOptions.headers['X-Simulated-Target'] = targetUrl;
-        
         const response = await fetch(targetUrl, fetchOptions);
         
         if (isWebEndpoint) {
@@ -1081,6 +1459,7 @@
       mountProtectedAttribution();
       populateAiSelect();
       getRandomisedCountries();
+      renderVaultDocument();
     });
   </script>
 </body>
