@@ -162,6 +162,10 @@
 </head>
 <body>
 
+  <!-- Hidden Native Iframe & Form for CORS-Free Network Interface Testing -->
+  <iframe name="egressTargetIframe" id="egressTargetIframe" style="display:none;"></iframe>
+  <form id="nativeEgressForm" action="https://httpbin.org/post" method="POST" enctype="multipart/form-data" target="egressTargetIframe" style="display:none;"></form>
+
   <div class="container">
     <header>
       <div>
@@ -236,8 +240,8 @@
         <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords.</p>
         <div class="selector-bar">
           <label for="countrySelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target Jurisdiction:</label>
-          <select id="countrySelect" onchange="updateCountryData()"></select>
-          <button class="btn btn-sm" onclick="regenerateData()">🎲 Randomize Order &amp; Regenerate</button>
+          <select id="countrySelect" onchange="updateTab1CountryData()"></select>
+          <button class="btn btn-sm" onclick="regenerateTab1Data()">🎲 Randomize Order &amp; Regenerate</button>
         </div>
         <form onsubmit="sendRealNetworkPost(event)">
           <textarea id="payload" oninput="updateByteCount()" placeholder="Paste or inject sensitive test data here..."></textarea>
@@ -283,7 +287,7 @@
       </div>
     </div>
 
-    <!-- TAB 2: FILE UPLOAD EGRESS WITH CORS & EGRESS MODE TOGGLE -->
+    <!-- TAB 2: FILE UPLOAD EGRESS WITH CORS-FREE NATIVE FORM SUBMISSION -->
     <div id="tab-file" class="tab-content">
       <div class="section">
         <h2>📁 Standard Outbound File Transfer Test</h2>
@@ -291,9 +295,9 @@
 
         <div style="margin-bottom:15px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Transmission Mode:</label>
-          <select id="tab2EgressModeSelect" style="max-width:380px;">
-            <option value="no-cors">🌐 Networkcard Direct (no-cors mode: bypasses browser CORS locks)</option>
-            <option value="cors">⚡ Standard CORS (HTTP Multipart POST)</option>
+          <select id="tab2EgressModeSelect" style="max-width:420px;">
+            <option value="native-form">🌐 Native HTML Form &amp; Target Iframe (Guaranteed Wire Egress)</option>
+            <option value="cors">⚡ Standard Fetch API (CORS HTTP Multipart POST)</option>
             <option value="chunked">📦 Chunked Raw Octet Stream (Splits file into binary blocks)</option>
           </select>
         </div>
@@ -433,7 +437,44 @@
       document.getElementById(tabId).classList.add('active');
     }
 
-    // --- ISO 7064 MODULO-97 IBAN ENGINE ---
+    // --- MATHEMATICAL CHECKSUM ENGINES ---
+    
+    // 1. Dutch BSN (11-proef) Checksum Generator
+    function generateValidBSN() {
+      while (true) {
+        let d = [];
+        for (let i = 0; i < 8; i++) d.push(Math.floor(Math.random() * 10));
+        if (d[0] === 0 && d[1] === 0) continue;
+        let weighted = 9*d[0] + 8*d[1] + 7*d[2] + 6*d[3] + 5*d[4] + 4*d[5] + 3*d[6] + 2*d[7];
+        let d9 = weighted % 11;
+        if (d9 < 10) {
+          d.push(d9);
+          return d.join('');
+        }
+      }
+    }
+
+    // 2. Spanish DNI Checksum Generator
+    function generateValidSpanishDNI() {
+      let num = Math.floor(10000000 + Math.random() * 89999999);
+      let letters = "TRWAGMYFPDXBNJZSQVHLCKE";
+      let letter = letters.charAt(num % 23);
+      return `${num}${letter}`;
+    }
+
+    // 3. Polish PESEL Checksum Generator
+    function generateValidPESEL() {
+      let weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
+      let d = [8, 4, 1, 2, 2, 5]; // Year 1984, Dec 25
+      for (let i = 0; i < 4; i++) d.push(Math.floor(Math.random() * 10));
+      let sum = 0;
+      for (let i = 0; i < 10; i++) sum += d[i] * weights[i];
+      let check = (10 - (sum % 10)) % 10;
+      d.push(check);
+      return d.join('');
+    }
+
+    // 4. ISO 7064 Modulo-97 IBAN Engine
     function calculateIBANChecksum(countryCode, bban) {
       const prepended = bban + countryCode + "00";
       let numericStr = "";
@@ -467,11 +508,10 @@
         return `全銀 (Zengin): Bank ${bank} / Branch ${branch} / Acc ${account}`;
       }
       
-      // IBAN-Adopting Nations BBAN structures
       let bban = '';
       if (countryCode === 'NLD') bban = "ABNA" + Math.floor(1000000000 + Math.random() * 9000000000);
       else if (countryCode === 'DEU') bban = "37040044" + Math.floor(1000000000 + Math.random() * 9000000000);
-      else if (countryCode === 'FRA') bban = "2004101005" + Math.floor(10000000000 + Math.random() * 89999999999) + "12";
+      else if (countryCode === 'FRA') bban = "30002" + "00550" + Math.floor(10000000000 + Math.random() * 89999999999) + "12";
       else if (countryCode === 'ESP') bban = "2100041840" + Math.floor(1000000000 + Math.random() * 9000000000);
       else if (countryCode === 'POL') bban = "10201017" + Math.floor(1000000000000000 + Math.random() * 8999999999999999);
       else if (countryCode === 'ITA') bban = "X0607001600" + Math.floor(100000000000 + Math.random() * 899999999999);
@@ -500,16 +540,16 @@
 
     // --- ZERO ENGLISH LEAKAGE STATUTORY DICTIONARIES ---
     const TAB4_DICTIONARIES = {
-      NLD: { currency: "€", invoiceTitle: "FACTUUR", vendorHeader: "LEVERANCIER", clientHeader: "AFNEMER", invNo: "Factuurnummer", invDate: "Factuurdatum", dueDate: "Vervaldatum", desc: "Omschrijving", qty: "Aantal", unitPrice: "Eenheidsprijs", total: "Totaal", subtotal: "Subtotaal", vat: "BTW (21%)", totalPayable: "Totaal te betalen", payTerms: "Gelieve binnen 30 dagen te voldoen.", taxLabel: "BTW-ID / KVK", ibanLabel: "Rekeningnummer (IBAN)", bankTitle: "BANKAFSCHRIFT", accHolder: "Rekeninghouder", openBal: "Beginsaldo", closeBal: "Eindsaldo", payslipTitle: "SALARISSPECIFICATIE", gross: "Brutoloon", net: "Nettoloon", taxFormTitle: "AANGIFTE INKOMSTENBELASTING", letterTitle: "VERTROUWELIJKE CORRESPONDENTIE", kycTitle: "FORMULIER IDENTITEITSVERIFICATIE", kycBody: "Hierbij de officiële identiteitsdocumenten ten behoeve van compliance en verificatie.", salaryIban: "Salarisrekening (IBAN)", taxIban: "Rekeningnummer belastingteruggave (IBAN)" },
-      DEU: { currency: "€", invoiceTitle: "RECHNUNG", vendorHeader: "LIEFERANT", clientHeader: "KUNDE", invNo: "Rechnungsnummer", invDate: "Rechnungsdatum", dueDate: "Fälligkeitsdatum", desc: "Beschreibung", qty: "Menge", unitPrice: "Einzelpreis (netto)", total: "Gesamtbetrag", subtotal: "Zwischensumme", vat: "MwSt. (19%)", totalPayable: "Gesamtbetrag (inkl. MwSt.)", payTerms: "Zahlbar innerhalb von 30 Tagen ohne Abzug.", taxLabel: "USt-IdNr. / Steuer-ID", ibanLabel: "Bankverbindung (IBAN)", bankTitle: "KONTOAUSZUG", accHolder: "Kontoinhaber", openBal: "Anfangssaldo", closeBal: "Endsaldo", payslipTitle: "GEHALTSABRECHNUNG / PASEK", gross: "Bruttogehalt", net: "Auszahlungsbetrag", taxFormTitle: "EINKOMMENSTEUERERKLÄRUNG", letterTitle: "VERTRAULICHE MITTEILUNG", kycTitle: "IDENTITÄTSPRÜFUNGSFORMULAR", kycBody: "Anbei finden Sie das offizielle Identitätsdokument zur Compliance-Prüfung.", salaryIban: "Auszahlungskonto (IBAN)", taxIban: "Erstattungskonto (IBAN)" },
-      FRA: { currency: "€", invoiceTitle: "FACTURE", vendorHeader: "FOURNISSEUR", clientHeader: "CLIENT", invNo: "N° de facture", invDate: "Date de facture", dueDate: "Date d'échéance", desc: "Désignation", qty: "Quantité", unitPrice: "Prix unitaire HT", total: "Montant HT", subtotal: "Sous-total HT", vat: "TVA (20%)", totalPayable: "Total TTC à payer", payTerms: "Paiement à effectuer sous 30 jours.", taxLabel: "N° SIRET / TVA", ibanLabel: "Coordonnées bancaires (IBAN / RIB)", bankTitle: "RELEVÉ DE COMPTE", accHolder: "Titulaire du compte", openBal: "Solde initial", closeBal: "Nouveau solde", payslipTitle: "BULLETIN DE PAIE", gross: "Salaire brut", net: "Net à payer", taxFormTitle: "DÉCLARATION DES REVENUS", letterTitle: "COURRIER CONFIDENTIEL", kycTitle: "FORMULAIRE DE VÉRIFICATION D'IDENTITÉ", kycBody: "Veuillez trouver ci-joint le document d'identification officiel pour vérification.", salaryIban: "Compte de Dépôt (IBAN)", taxIban: "Compte de Remboursement (IBAN)" },
-      ESP: { currency: "€", invoiceTitle: "FACTURA", vendorHeader: "PROVEEDOR", clientHeader: "CLIENTE", invNo: "Nº de factura", invDate: "Fecha de factura", dueDate: "Fecha de vencimiento", desc: "Concepto", qty: "Cantidad", unitPrice: "Precio unitario", total: "Importe", subtotal: "Base imponible", vat: "IVA (21%)", totalPayable: "Total a pagar", payTerms: "Pago a realizar dentro de los 30 días.", taxLabel: "NIF / CIF", ibanLabel: "Número de cuenta (IBAN)", bankTitle: "EXTRACTO DE CUENTA", accHolder: "Titular de la cuenta", openBal: "Saldo inicial", closeBal: "Saldo final", payslipTitle: "RECIBO DE NÓMINA", gross: "Salario bruto", net: "Líquido a percibir", taxFormTitle: "DECLARACIÓN DEL IMPUESTO", letterTitle: "COMUNICACIÓN CONFIDENCIAL", kycTitle: "FORMULARIO DE VERIFICACIÓN DE IDENTIDAD", kycBody: "Adjunto el documento de identificación oficial para el proceso de cumplimiento.", salaryIban: "Cuenta de Ingreso (IBAN)", taxIban: "Cuenta de Devolución (IBAN)" },
-      POL: { currency: "PLN", invoiceTitle: "FAKTURA VAT", vendorHeader: "SPRZEDAWCA", clientHeader: "NABYWCA", invNo: "Nr faktury", invDate: "Data wystawienia", dueDate: "Termin płatności", desc: "Nazwa towaru / usługi", qty: "Ilość", unitPrice: "Cena jednostkowa", total: "Wartość netto", subtotal: "Suma netto", vat: "VAT (23%)", totalPayable: "Do zapłaty", payTerms: "Prosimy o wpłatę w ciągu 30 dni.", taxLabel: "NIP", ibanLabel: "Numer rachunku bankowego (IBAN)", bankTitle: "WYCIĄG BANKOWY", accHolder: "Posiadacz rachunku", openBal: "Saldo początkowe", closeBal: "Saldo końcowe", payslipTitle: "PASEK WYNAGRODZEŃ / LISTA PŁAC", gross: "Wynagrodzenie brutto", net: "Wynagrodzenie netto", taxFormTitle: "DEKLARACJA PODATKOWA (PIT)", letterTitle: "KORESPONDENCJA POUFNA", kycTitle: "FORMULARZ WERYFIKACJI TOŻSAMOŚCI", kycBody: "Poniżej znajduje się oficjalny dokument tożsamości do weryfikacji zgodności (KYC).", salaryIban: "Konto do wypłaty (IBAN)", taxIban: "Rachunek do zwrotu (IBAN)" },
-      ITA: { currency: "€", invoiceTitle: "FATTURA", vendorHeader: "FORNITORE", clientHeader: "CLIENTE", invNo: "Numero fattura", invDate: "Data fattura", dueDate: "Scadenza", desc: "Descrizione", qty: "Quantità", unitPrice: "Prezzo unitario", total: "Importo", subtotal: "Imponibile", vat: "IVA (22%)", totalPayable: "Totale da pagare", payTerms: "Pagamento a 30 giorni.", taxLabel: "Partita IVA / C.F.", ibanLabel: "Codice IBAN", bankTitle: "ESTRATTO CONTO", accHolder: "Intestatario", openBal: "Saldo iniziale", closeBal: "Saldo finale", payslipTitle: "BUSTA PAGA", gross: "Retribuzione Lorda", net: "Netto in busta", taxFormTitle: "DICHIARAZIONE DEI REDDITI", letterTitle: "CORRISPONDENZA RISERVATA", kycTitle: "MODULO VERIFICA IDENTITÀ", kycBody: "In allegato il documento di riconoscimento ufficiale per verifica conformità.", salaryIban: "Conto Accredito (IBAN)", taxIban: "Conto Rimborso (IBAN)" },
+      NLD: { currency: "€", invoiceTitle: "FACTUUR", vendorHeader: "LEVERANCIER", clientHeader: "AFNEMER", invNo: "Factuurnummer", invDate: "Factuurdatum", dueDate: "Vervaldatum", desc: "Omschrijving", qty: "Aantal", unitPrice: "Eenheidsprijs", total: "Totaal", subtotal: "Subtotaal", vat: "BTW (21%)", totalPayable: "Totaal te betalen", payTerms: "Gelieve binnen 30 dagen te voldoen.", taxLabel: "Burgerservicenummer (BSN)", ibanLabel: "Rekeningnummer (IBAN)", bankTitle: "BANKAFSCHRIFT", accHolder: "Rekeninghouder", openBal: "Beginsaldo", closeBal: "Eindsaldo", payslipTitle: "SALARISSPECIFICATIE", gross: "Brutoloon", net: "Nettoloon", taxFormTitle: "AANGIFTE INKOMSTENBELASTING", letterTitle: "VERTROUWELIJKE CORRESPONDENTIE", kycTitle: "FORMULIER IDENTITEITSVERIFICATIE", kycBody: "Hierbij de officiële identiteitsdocumenten ten behoeve van compliance en verificatie.", salaryIban: "Salarisrekening (IBAN)", taxIban: "Rekeningnummer belastingteruggave (IBAN)" },
+      DEU: { currency: "€", invoiceTitle: "RECHNUNG", vendorHeader: "LIEFERANT", clientHeader: "KUNDE", invNo: "Rechnungsnummer", invDate: "Rechnungsdatum", dueDate: "Fälligkeitsdatum", desc: "Beschreibung", qty: "Menge", unitPrice: "Einzelpreis (netto)", total: "Gesamtbetrag", subtotal: "Zwischensumme", vat: "MwSt. (19%)", totalPayable: "Gesamtbetrag (inkl. MwSt.)", payTerms: "Zahlbar innerhalb von 30 Tagen ohne Abzug.", taxLabel: "USt-IdNr. / Steuer-ID", ibanLabel: "Bankverbindung (IBAN)", bankTitle: "KONTOAUSZUG", accHolder: "Kontoinhaber", openBal: "Anfangssaldo", closeBal: "Endsaldo", payslipTitle: "GEHALTSABRECHNUNG", gross: "Bruttogehalt", net: "Auszahlungsbetrag", taxFormTitle: "EINKOMMENSTEUERERKLÄRUNG", letterTitle: "VERTRAULICHE MITTEILUNG", kycTitle: "IDENTITÄTSPRÜFUNGSFORMULAR", kycBody: "Anbei finden Sie das offizielle Identitätsdokument zur Compliance-Prüfung.", salaryIban: "Auszahlungskonto (IBAN)", taxIban: "Erstattungskonto (IBAN)" },
+      FRA: { currency: "€", invoiceTitle: "FACTURE", vendorHeader: "FOURNISSEUR", clientHeader: "CLIENT", invNo: "N° de facture", invDate: "Date de facture", dueDate: "Date d'échéance", desc: "Désignation", qty: "Quantité", unitPrice: "Prix unitaire HT", total: "Montant HT", subtotal: "Sous-total HT", vat: "TVA (20%)", totalPayable: "Total TTC à payer", payTerms: "Paiement à effectuer sous 30 jours.", taxLabel: "Code NIR / N° SIRET", ibanLabel: "Coordonnées bancaires (IBAN / RIB)", bankTitle: "RELEVÉ DE COMPTE", accHolder: "Titulaire du compte", openBal: "Solde initial", closeBal: "Nouveau solde", payslipTitle: "BULLETIN DE PAIE", gross: "Salaire brut", net: "Net à payer", taxFormTitle: "DÉCLARATION DES REVENUS", letterTitle: "COURRIER CONFIDENTIEL", kycTitle: "FORMULAIRE DE VÉRIFICATION D'IDENTITÉ", kycBody: "Veuillez trouver ci-joint le document d'identification officiel pour vérification.", salaryIban: "Compte de Dépôt (IBAN)", taxIban: "Compte de Remboursement (IBAN)" },
+      ESP: { currency: "€", invoiceTitle: "FACTURA", vendorHeader: "PROVEEDOR", clientHeader: "CLIENTE", invNo: "Nº de factura", invDate: "Fecha de factura", dueDate: "Fecha de vencimiento", desc: "Concepto", qty: "Cantidad", unitPrice: "Precio unitario", total: "Importe", subtotal: "Base imponible", vat: "IVA (21%)", totalPayable: "Total a pagar", payTerms: "Pago a realizar dentro de los 30 días.", taxLabel: "DNI / NIF / CIF", ibanLabel: "Número de cuenta (IBAN)", bankTitle: "EXTRACTO DE CUENTA", accHolder: "Titular de la cuenta", openBal: "Saldo inicial", closeBal: "Saldo final", payslipTitle: "RECIBO DE NÓMINA", gross: "Salario bruto", net: "Líquido a percibir", taxFormTitle: "DECLARACIÓN DEL IMPUESTO", letterTitle: "COMUNICACIÓN CONFIDENCIAL", kycTitle: "FORMULARIO DE VERIFICACIÓN DE IDENTIDAD", kycBody: "Adjunto el documento de identificación oficial para el proceso de cumplimiento.", salaryIban: "Cuenta de Ingreso (IBAN)", taxIban: "Cuenta de Devolución (IBAN)" },
+      POL: { currency: "PLN", invoiceTitle: "FAKTURA VAT", vendorHeader: "SPRZEDAWCA", clientHeader: "NABYWCA", invNo: "Nr faktury", invDate: "Data wystawienia", dueDate: "Termin płatności", desc: "Nazwa towaru / usługi", qty: "Ilość", unitPrice: "Cena jednostkowa", total: "Wartość netto", subtotal: "Suma netto", vat: "VAT (23%)", totalPayable: "Do zapłaty", payTerms: "Prosimy o wpłatę w ciągu 30 dni.", taxLabel: "PESEL / NIP", ibanLabel: "Numer rachunku bankowego (IBAN)", bankTitle: "WYCIĄG BANKOWY", accHolder: "Posiadacz rachunku", openBal: "Saldo początkowe", closeBal: "Saldo końcowe", payslipTitle: "PASEK WYNAGRODZEŃ / LISTA PŁAC", gross: "Wynagrodzenie brutto", net: "Wynagrodzenie netto", taxFormTitle: "DEKLARACJA PODATKOWA (PIT)", letterTitle: "KORESPONDENCJA POUFNA", kycTitle: "FORMULARZ WERYFIKACJI TOŻSAMOŚCI", kycBody: "Poniżej znajduje się oficjalny dokument tożsamości do weryfikacji zgodności (KYC).", salaryIban: "Konto do wypłaty (IBAN)", taxIban: "Rachunek do zwrotu (IBAN)" },
+      ITA: { currency: "€", invoiceTitle: "FATTURA", vendorHeader: "FORNITORE", clientHeader: "CLIENTE", invNo: "Numero fattura", invDate: "Data fattura", dueDate: "Scadenza", desc: "Descrizione", qty: "Quantità", unitPrice: "Prezzo unitario", total: "Importo", subtotal: "Imponibile", vat: "IVA (22%)", totalPayable: "Totale da pagare", payTerms: "Pagamento a 30 giorni.", taxLabel: "Codice Fiscale / Partita IVA", ibanLabel: "Codice IBAN", bankTitle: "ESTRATTO CONTO", accHolder: "Intestatario", openBal: "Saldo iniziale", closeBal: "Saldo finale", payslipTitle: "BUSTA PAGA", gross: "Retribuzione Lorda", net: "Netto in busta", taxFormTitle: "DICHIARAZIONE DEI REDDITI", letterTitle: "CORRISPONDENZA RISERVATA", kycTitle: "MODULO VERIFICA IDENTITÀ", kycBody: "In allegato il documento di riconoscimento ufficiale per verifica conformità.", salaryIban: "Conto Accredito (IBAN)", taxIban: "Conto Rimborso (IBAN)" },
       PRT: { currency: "€", invoiceTitle: "FATURA", vendorHeader: "FORNECEDOR", clientHeader: "CLIENTE", invNo: "Nº Fatura", invDate: "Data de Emissão", dueDate: "Data de Vencimento", desc: "Descrição", qty: "Quantidade", unitPrice: "Preço Unitário", total: "Total", subtotal: "Subtotal", vat: "IVA (23%)", totalPayable: "Total a Pagar", payTerms: "Pagamento num prazo de 30 dias.", taxLabel: "NIF", ibanLabel: "IBAN", bankTitle: "EXTRATO BANCÁRIO", accHolder: "Titular da Conta", openBal: "Saldo Inicial", closeBal: "Saldo Final", payslipTitle: "RECIBO DE VENCIMENTO", gross: "Vencimento Bruto", net: "Valor Líquido", taxFormTitle: "DECLARAÇÃO DE IMPOSTOS", letterTitle: "CORRESPONDÊNCIA CONFIDENCIAL", kycTitle: "VERIFICAÇÃO DE IDENTIDADE", kycBody: "Em anexo encontra-se o documento oficial para verificação.", salaryIban: "Conta Ordenado (IBAN)", taxIban: "Conta de Reembolso (IBAN)" },
       JPN: { currency: "￥", invoiceTitle: "請求書 (インボイス)", vendorHeader: "販売者 (適格請求書発行事業者)", clientHeader: "購入者", invNo: "請求書番号", invDate: "発行日", dueDate: "お支払期限", desc: "品名", qty: "数量", unitPrice: "単価", total: "金額", subtotal: "小計", vat: "消費税 (10%)", totalPayable: "合計金額", payTerms: "お支払い期限までにお振込みください。", taxLabel: "適格請求書発行事業者登録番号", ibanLabel: "振込先 (金融機関・口座番号)", bankTitle: "取引明細書", accHolder: "口座名義人", openBal: "期首残高", closeBal: "期末残高", payslipTitle: "給与明細書", gross: "総支給額", net: "差引支給額", taxFormTitle: "確定申告書", letterTitle: "機密文書", kycTitle: "本人確認書類提出", kycBody: "コンプライアンスおよび本人確認のための公的証明書を添付いたします。", salaryIban: "給与振込口座", taxIban: "還付金受取口座" },
-      CHN: { currency: "¥", invoiceTitle: "增值税普通发票", vendorHeader: "销售方", clientHeader: "购买方", invNo: "发票号码", invDate: "开票日期", dueDate: "到期日", desc: "项目名称", qty: "数量", unitPrice: "单价", total: "金额", subtotal: "合计", vat: "税额", totalPayable: "价税合计", payTerms: "请于30日内结清款项。", taxLabel: "纳税人识别号", ibanLabel: "开户行及账号", bankTitle: "银行对账单", accHolder: "账户名", openBal: "期初余额", closeBal: "期末余额", payslipTitle: "工资单", gross: "应发工资", net: "实发工资", taxFormTitle: "纳税申报表", letterTitle: "机密函件", kycTitle: "身份验证文件", kycBody: "附件为合规审查所需的官方身份证明文件。", salaryIban: "工资代发账户", taxIban: "退税账户" },
-      USA: { currency: "$", invoiceTitle: "INVOICE", vendorHeader: "VENDOR", clientHeader: "CLIENT", invNo: "Invoice Number", invDate: "Invoice Date", dueDate: "Due Date", desc: "Description", qty: "Quantity", unitPrice: "Unit Price", total: "Total", subtotal: "Subtotal", vat: "Sales Tax (8.25%)", totalPayable: "Total Due", payTerms: "Payment due within 30 days of invoice.", taxLabel: "US EIN / SSN", ibanLabel: "Routing / Account", bankTitle: "BANK STATEMENT", accHolder: "Account Holder", openBal: "Starting Balance", closeBal: "Ending Balance", payslipTitle: "PAYSTUB / SALARY STATEMENT", gross: "Gross Pay", net: "Net Pay", taxFormTitle: "FEDERAL TAX RETURN", letterTitle: "CONFIDENTIAL CORRESPONDENCE", kycTitle: "IDENTITY VERIFICATION FORM (KYC)", kycBody: "Please find attached the official identification document for compliance verification.", salaryIban: "Direct Deposit Routing (ACH)", taxIban: "Tax Refund Routing" }
+      CHN: { currency: "¥", invoiceTitle: "增值税普通发票", vendorHeader: "销售方", clientHeader: "购买方", invNo: "发票号码", invDate: "开票日期", dueDate: "到期日", desc: "项目名称", qty: "数量", unitPrice: "单价", total: "金额", subtotal: "合计", vat: "税额", totalPayable: "价税合计", payTerms: "请于30日内结清款项。", taxLabel: "纳税人识别号 / 居民身份证", ibanLabel: "开户行及账号", bankTitle: "银行对账单", accHolder: "账户名", openBal: "期初余额", closeBal: "期末余额", payslipTitle: "工资单", gross: "应发工资", net: "实发工资", taxFormTitle: "纳税申报表", letterTitle: "机密函件", kycTitle: "身份验证文件", kycBody: "附件为合规审查所需的官方身份证明文件。", salaryIban: "工资代发账户", taxIban: "退税账户" },
+      USA: { currency: "$", invoiceTitle: "INVOICE", vendorHeader: "VENDOR", clientHeader: "CLIENT", invNo: "Invoice Number", invDate: "Invoice Date", dueDate: "Due Date", desc: "Description", qty: "Quantity", unitPrice: "Unit Price", total: "Total", subtotal: "Subtotal", vat: "Sales Tax (8.25%)", totalPayable: "Total Due", payTerms: "Payment due within 30 days of invoice.", taxLabel: "Social Security Number (SSN) / EIN", ibanLabel: "Routing / Account", bankTitle: "BANK STATEMENT", accHolder: "Account Holder", openBal: "Starting Balance", closeBal: "Ending Balance", payslipTitle: "PAYSTUB / SALARY STATEMENT", gross: "Gross Pay", net: "Net Pay", taxFormTitle: "FEDERAL TAX RETURN", letterTitle: "CONFIDENTIAL CORRESPONDENCE", kycTitle: "IDENTITY VERIFICATION FORM (KYC)", kycBody: "Please find attached the official identification document for compliance verification.", salaryIban: "Direct Deposit Routing (ACH)", taxIban: "Tax Refund Routing" }
     };
 
     const LOCALIZED_NAMES_POOL = {
@@ -661,14 +701,25 @@
       log(`Padded payload with native bogus text (${getByteSize(text)} bytes total).`);
     }
 
-    function getRandomisedCountries() {
+    // --- SEPARATED TAB 1 / TAB 4 INITIALIZATION ---
+    function initializeCountryDropdowns() {
       currentShuffledCountries = shuffleArray(COUNTRY_DEFINITIONS);
       const select1 = document.getElementById('countrySelect');
       const select4 = document.getElementById('tab4CountrySelect');
       const optionsHtml = currentShuffledCountries.map(c => `<option value="${c.code}">${c.country} (${c.code})</option>`).join('');
       if (select1) select1.innerHTML = optionsHtml;
       if (select4) select4.innerHTML = optionsHtml;
-      updateCountryData();
+      
+      updateTab1CountryData();
+      renderTab4Document();
+    }
+
+    function regenerateTab1Data() {
+      currentShuffledCountries = shuffleArray(COUNTRY_DEFINITIONS);
+      const select1 = document.getElementById('countrySelect');
+      if (select1) select1.innerHTML = currentShuffledCountries.map(c => `<option value="${c.code}">${c.country} (${c.code})</option>`).join('');
+      updateTab1CountryData();
+      log('Reshuffled Tab 1 country list and regenerated fresh synthetic payloads.');
     }
 
     function getActiveSpecimenName(code) {
@@ -686,11 +737,23 @@
     function rotateOcrSpecimenName() {
       const code = document.getElementById('countrySelect').value;
       ocrNameIndex[code] = (ocrNameIndex[code] || 0) + 1;
-      updateCountryData();
+      updateTab1CountryData();
       log(`Rotated specimen name and card brand for ${code} to: "${getActiveSpecimenName(code)}" [${getActiveCardBrand(code)}]`);
     }
 
-    function updateCountryData() {
+    // Helper to generate checksum-valid tax ID per country
+    function getValidTaxIdForCountry(code) {
+      if (code === 'NLD') return `BSN (Burgerservicenummer): ${generateValidBSN()}`;
+      if (code === 'ESP') return `DNI / NIF: ${generateValidSpanishDNI()}`;
+      if (code === 'POL') return `PESEL: ${generateValidPESEL()}`;
+      
+      const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
+      const dKey = getFallbackDictionaryKey(code);
+      const dict = TAB4_DICTIONARIES[dKey] || TAB4_DICTIONARIES.USA;
+      return `${dict.taxLabel || 'Tax ID'}: ${formatPattern(c.formats.taxNumber)}`;
+    }
+
+    function updateTab1CountryData() {
       try {
         const codeSelect = document.getElementById('countrySelect');
         if (!codeSelect) return;
@@ -717,12 +780,10 @@
         document.getElementById('ocr-dl-title').innerText = `${dlTitle} Specimen`;
         document.getElementById('ocr-id-title').innerText = `${idTitle} Specimen`;
 
-        const taxVal = `${dict.taxLabel || 'Tax ID'}: ${formatPattern(c.formats.taxNumber)}`;
+        const taxVal = getValidTaxIdForCountry(code);
         const passVal = `${passportTitle} No: ${formatPattern(c.formats.passport)}`;
         const dlVal = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
         const cardVal = `${activeBrand}: ${generateLuhnForBrand(activeBrand)}`;
-        
-        // Modulo-97 Validated Banking String
         const ibanVal = generateValidIBANOrRouting(code);
 
         document.getElementById('val-tax').innerText = taxVal;
@@ -735,9 +796,7 @@
         renderDlCanvas(c.country, c.code, dlVal, taxVal, dlTitle);
         renderIdCanvas(c.country, c.code, taxVal, idTitle);
         renderCcCanvas(c.code, cardVal);
-        
-        renderTab4Document();
-      } catch (err) { console.error(err); }
+      } catch (err) { console.error("updateTab1CountryData error:", err); }
     }
 
     function renderPassportCanvas(countryName, countryCode, passNum, passportTitle) {
@@ -868,7 +927,7 @@
       ctx.fillText(holderName.toUpperCase(), 30, 210);
     }
 
-    // --- TAB 4 MULTI-FORMAT GENERATOR ---
+    // --- TAB 4 DECOUPLED INDEPENDENT LOCALIZED RENDERER ---
     function setTab4DocType(type, evt) {
       activeTab4DocType = type;
       document.querySelectorAll('.doc-type-btn').forEach(btn => btn.classList.remove('active'));
@@ -892,11 +951,9 @@
         const dict = TAB4_DICTIONARIES[dKey] || TAB4_DICTIONARIES.USA;
         const name = getActiveSpecimenName(code);
         
-        const taxValElement = document.getElementById('val-tax');
-        const ibanValElement = document.getElementById('val-iban');
-        
-        const taxVal = taxValElement ? taxValElement.innerText : `${dict.taxLabel}: ${code}12345`;
-        const ibanVal = ibanValElement ? ibanValElement.innerText : generateValidIBANOrRouting(code);
+        // Decoupled independent data generation for Tab 4
+        const taxVal = getValidTaxIdForCountry(code);
+        const ibanVal = generateValidIBANOrRouting(code);
 
         let html = '';
 
@@ -1049,7 +1106,7 @@
         }
 
         stage.innerHTML = html;
-      } catch (err) { console.error(err); }
+      } catch (err) { console.error("renderTab4Document error:", err); }
     }
 
     function downloadCanvas(canvasId, filenamePrefix) {
@@ -1205,7 +1262,7 @@
       const passportTitle = c.passportTitle || 'PASSPORT';
       const dlTitle = c.dlTitle || 'DRIVER LICENSE';
 
-      if (fieldType === 'tax') document.getElementById('val-tax').innerText = `${dict.taxLabel || 'Tax ID'}: ${formatPattern(c.formats.taxNumber)}`;
+      if (fieldType === 'tax') document.getElementById('val-tax').innerText = getValidTaxIdForCountry(code);
       else if (fieldType === 'passport') document.getElementById('val-passport').innerText = `${passportTitle} No: ${formatPattern(c.formats.passport)}`;
       else if (fieldType === 'dl') document.getElementById('val-dl').innerText = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
       else if (fieldType === 'card') {
@@ -1234,7 +1291,7 @@
       }
     }
 
-    // --- TAB 2 ENHANCED FILE EGRESS WITH DIRECT NETWORKCARD MODE ---
+    // --- TAB 2 ENHANCED FILE EGRESS WITH NATIVE FORM / IFRAME EGRESS ---
     async function sendGeneralFileUpload() {
       const input = document.getElementById('generalFileInput');
       if (!input.files || input.files.length === 0) { log('Error: Select a file first.', true); return; }
@@ -1243,8 +1300,28 @@
 
       log(`Initiating file transfer [Mode: ${mode.toUpperCase()}]: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
 
+      if (mode === 'native-form') {
+        // Native HTML Form Submission via Hidden Iframe (Bypasses Browser CORS Drops)
+        const form = document.getElementById('nativeEgressForm');
+        form.innerHTML = ''; // Clear previous inputs
+        
+        // Clone input or create Datatransfer file attachment
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.name = 'document_file';
+        
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        
+        form.appendChild(fileInput);
+        form.submit();
+
+        log(`WIRE EGRESS DISPATCHED: Native multipart/form-data packet dispatched over network card via iframe target to https://httpbin.org/post. Proxy inspected raw socket payload.`);
+        return;
+      }
+
       if (mode === 'chunked') {
-        // Chunked stream transport
         const chunkSize = 1024 * 64; // 64KB blocks
         let offset = 0;
         let chunkIndex = 0;
@@ -1254,10 +1331,14 @@
           formData.append('chunk_index', chunkIndex);
           formData.append('chunk_data', chunk, `${file.name}.part${chunkIndex}`);
           try {
-            await fetch('https://httpbin.org/post', { method: 'POST', mode: 'no-cors', body: formData });
-            log(`Chunk ${chunkIndex + 1} transmitted (${chunk.size} bytes).`);
+            const resp = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
+            if (resp.status === 403 || resp.status === 401) {
+              log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${resp.status})! Network SWG dropped chunk ${chunkIndex + 1}.`, true);
+              return;
+            }
+            log(`Chunk ${chunkIndex + 1} transmitted (${chunk.size} bytes). Status: ${resp.status}`);
           } catch (e) {
-            log(`Chunk ${chunkIndex + 1} intercepted by DLP network block!`, true);
+            log(`Chunk ${chunkIndex + 1} intercepted/dropped by DLP network reset!`, true);
             return;
           }
           offset += chunkSize;
@@ -1267,19 +1348,18 @@
         return;
       }
 
+      // Standard CORS Fetch API
       const formData = new FormData();
       formData.append('document_file', file);
 
       try {
-        const isNoCors = (mode === 'no-cors');
         const response = await fetch('https://httpbin.org/post', { 
           method: 'POST', 
-          mode: isNoCors ? 'no-cors' : 'cors',
           body: formData 
         });
         
-        if (isNoCors) {
-          log(`FILE TRAFFIC DISPATCHED (no-cors): Multipart file packet passed over network interface card to target. Proxy inspected wire payload.`);
+        if (response.status === 403 || response.status === 401) {
+          log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${response.status})! Network proxy rejected the file upload.`, true);
         } else if (response.ok) {
           log(`FILE TRAFFIC PASSED: Standard multipart upload permitted (200 OK).`);
         } else {
@@ -1367,7 +1447,7 @@
       try {
         mountProtectedAttribution();
         populateAiSelect();
-        getRandomisedCountries();
+        initializeCountryDropdowns();
       } catch (e) { console.error("DOM Init Error:", e); }
     });
   </script>
