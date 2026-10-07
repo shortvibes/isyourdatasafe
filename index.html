@@ -309,7 +309,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX -->
+    <!-- TAB 3: SHADOW AI SANDBOX (FULL 6 ENGINES) -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox</h2>
@@ -632,9 +632,14 @@
       };
     });
 
+    // MASTER LIST OF 6 AI ENGINES WITH LATEST MODELS & ENDPOINTS
     const AI_ENGINES = {
-      openai: { name: "OpenAI ChatGPT (GPT-4o)", webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", apiEndpoint: "https://api.openai.com/v1/chat/completions" },
-      anthropic: { name: "Anthropic Claude (Claude 3.5)", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages" }
+      openai: { name: "OpenAI ChatGPT (GPT-4o)", webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
+      anthropic: { name: "Anthropic Claude (Claude 3.5 Sonnet)", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet" },
+      gemini: { name: "Google Gemini (Gemini 1.5 Pro)", webEndpoint: "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?hl=nl&rt=c", apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", model: "gemini-1.5-pro" },
+      perplexity: { name: "Perplexity AI (Sonar Reasoning)", webEndpoint: "https://www.perplexity.ai/search", apiEndpoint: "https://api.perplexity.ai/chat/completions", model: "sonar-reasoning" },
+      copilot: { name: "Microsoft Copilot (GPT-4 Turbo)", webEndpoint: "https://copilot.microsoft.com/turing/conversation/create", apiEndpoint: "https://models.inference.ai.azure.com/chat/completions", model: "gpt-4o" },
+      meta: { name: "Meta AI / Groq (Llama 3.3 70B)", webEndpoint: "https://www.meta.ai/api/graphql/", apiEndpoint: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile" }
     };
 
     function populateAiSelect() {
@@ -654,7 +659,7 @@
     function onAiEngineChange() {
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
       const welcome = document.getElementById('aiWelcomeMsg');
-      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Routing: ${trafficType.toUpperCase()}]. Target: ${targetUrl}`;
+      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Model: ${engine.model}] [Routing: ${trafficType.toUpperCase()}]. Target: ${targetUrl}`;
       log(`Switched AI Engine target to ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
     }
 
@@ -741,7 +746,6 @@
       log(`Rotated specimen name and card brand for ${code} to: "${getActiveSpecimenName(code)}" [${getActiveCardBrand(code)}]`);
     }
 
-    // Helper to generate checksum-valid tax ID per country
     function getValidTaxIdForCountry(code) {
       if (code === 'NLD') return `BSN (Burgerservicenummer): ${generateValidBSN()}`;
       if (code === 'ESP') return `DNI / NIF: ${generateValidSpanishDNI()}`;
@@ -1301,11 +1305,9 @@
       log(`Initiating file transfer [Mode: ${mode.toUpperCase()}]: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
 
       if (mode === 'native-form') {
-        // Native HTML Form Submission via Hidden Iframe (Bypasses Browser CORS Drops)
         const form = document.getElementById('nativeEgressForm');
-        form.innerHTML = ''; // Clear previous inputs
+        form.innerHTML = '';
         
-        // Clone input or create Datatransfer file attachment
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.name = 'document_file';
@@ -1348,7 +1350,6 @@
         return;
       }
 
-      // Standard CORS Fetch API
       const formData = new FormData();
       formData.append('document_file', file);
 
