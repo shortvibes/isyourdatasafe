@@ -253,7 +253,7 @@
         </form>
       </div>
 
-      <!-- Section 2: Synthetic Data Vault (MOVED ABOVE OCR VAULT FOR LOGICAL FLOW) -->
+      <!-- Section 2: Synthetic Data Vault -->
       <div class="section">
         <h2>🔑 Synthetic Test Data Vault (195 Sovereign Nations)</h2>
         <p>Click <strong>"Copy &amp; Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
@@ -301,9 +301,9 @@
       <div class="section">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
           <h2 style="margin-bottom:0; border:none; padding:0;">🪪 Photorealistic Document OCR Vault</h2>
-          <button class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="rotateOcrSpecimenName()">🔄 Rotate Specimen Name</button>
+          <button class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="rotateOcrSpecimenName()">🔄 Rotate Specimen Name &amp; Card Brand</button>
         </div>
-        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Personalausweis*, *Paspoort*), localized field labels, and native holder names. Transmitting sends raw PNG binary for OCR proxy inspection.</p>
+        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Personalausweis*, *Paspoort*), localized field labels, native holder names, and regional payment card network branding (Visa, Mastercard, AMEX, JCB, UnionPay, Maestro). Transmitting sends raw PNG binary for OCR proxy inspection.</p>
 
         <div class="grid-4">
           <div class="card">
@@ -334,7 +334,7 @@
           </div>
 
           <div class="card">
-            <h3>Credit Card (PCI)</h3>
+            <h3 id="ocr-cc-title">Payment Card (PCI)</h3>
             <canvas id="ccCanvas" width="400" height="260"></canvas>
             <div style="display:flex; gap:6px;">
               <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('ccCanvas', 'credit_card')">Download PNG</button>
@@ -500,12 +500,13 @@
 
     // ROTATING CULTURALLY AUTHENTIC SPECIMEN POOLS
     const LOCALIZED_NAMES_POOL = {
-      NLD: ["DE BRUIJN, EMMA LISANNE", "VAN DIJK, Daan BERNARD", "BAKKER, SOPHIE MARIE", "JANSEN, LARS JOHANNES"],
+      NLD: ["DE BRUIJN, EMMA LISANNE", "VAN DIJK, DAAN BERNARD", "BAKKER, SOPHIE MARIE", "JANSEN, LARS JOHANNES"],
       DEU: ["MÜLLER, MAXIMILIAN", "SCHMIDT, HANNAH LENA", "SCHNEIDER, LUKAS PAUL", "FISCHER, EMILY SOPHIE"],
       FRA: ["DUBOIS, CAMILLE SOPHIE", "MARTIN, LOUIS ANTOINE", "BERNARD, LÉA MARIE", "PETIT, THOMAS LAURENT"],
       ESP: ["GARCÍA MARTÍNEZ, ALEJANDRO", "RODRÍGUEZ LÓPEZ, LUCÍA", "SÁNCHEZ GÓMEZ, MATEO", "FERNÁNDEZ PÉREZ, SOFÍA"],
       ITA: ["ROSSI, EMMA MARIA", "RUSSO, MATTEO LUCA", "FERRARI, GIULIA ELENA", "ESPOSITO, LEONARDO"],
       JPN: ["SATO, TARO (佐藤 太郎)", "SUZUKI, HANAKO (鈴木 花子)", "TAKAHASHI, KEN (高橋 健)", "TANAKA, YUI (田中 結衣)"],
+      CHN: ["ZHANG, WEI (张 伟)", "WANG, FANG (王 芳)", "LI, NA (李 娜)", "LIU, YANG (刘 洋)"],
       USA: ["SPECIMEN, EMMA LISANNE", "SMITH, ALEXANDER JAMES", "JOHNSON, OLIVIA ROSE", "WILLIAMS, BENJAMIN ARTHUR"],
       GBR: ["SPECIMEN, OLIVER JAMES", "BROWN, CHARLOTTE ELIZABETH", "HARRIS, HARRY WILLIAM", "TAYLOR, AMELIA GRACE"]
     };
@@ -517,8 +518,20 @@
       ESP: { passport: "PASAPORTE", dl: "PERMISO DE CONDUCCIÓN", id: "DOCUMENTO NACIONAL DE IDENTIDAD", surname: "1. APELLIDOS:", given: "2. NOMBRE:", dob: "3. FECHA DE NAC.:", nat: "NACIONALIDAD: Española" },
       ITA: { passport: "PASSAPORTO", dl: "PATENTE DI GUIDA", id: "CARTA D'IDENTITÀ", surname: "1. COGNOME:", given: "2. NOME:", dob: "3. DATA DI NASCITA:", nat: "CITTADINANZA: Italiana" },
       JPN: { passport: "RYOKAN (護照)", dl: "UNTEN MENKYO SHO", id: "MY NUMBER CARD", surname: "氏名:", given: "名:", dob: "生年月日:", nat: "国籍: 日本" },
+      CHN: { passport: "HUZHAO (护照)", dl: "JIASHIZHENG", id: "RESIDENT IDENTITY CARD", surname: "姓:", given: "名:", dob: "出生日期:", nat: "国籍: 中国" },
       USA: { passport: "PASSPORT", dl: "DRIVER LICENSE", id: "NATIONAL IDENTIFICATION CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: USA" },
       GBR: { passport: "PASSPORT", dl: "DRIVING LICENCE", id: "NATIONAL IDENTITY CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: British" }
+    };
+
+    // REGIONAL CREDIT CARD BRANDS PER COUNTRY POOL
+    const REGIONAL_CARD_BRANDS = {
+      JPN: ["JCB", "VISA", "MASTERCARD", "AMEX"],
+      CHN: ["UNIONPAY", "VISA", "MASTERCARD"],
+      NLD: ["MAESTRO", "VISA", "MASTERCARD"],
+      DEU: ["MAESTRO", "MASTERCARD", "VISA"],
+      FRA: ["CB", "VISA", "MASTERCARD"],
+      USA: ["VISA", "MASTERCARD", "AMEX", "DISCOVER"],
+      GBR: ["VISA", "MASTERCARD", "AMEX"]
     };
 
     let ocrNameIndex = {};
@@ -617,16 +630,30 @@
       log(`Switched AI Engine target to ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
     }
 
-    function generateLuhnCard() {
-      let cc = "4532";
-      while (cc.length < 15) cc += Math.floor(Math.random() * 10);
+    function generateLuhnForBrand(brand) {
+      let prefix = "4532";
+      let length = 16;
+
+      if (brand === "MASTERCARD") { prefix = "5241"; }
+      else if (brand === "AMEX") { prefix = "3782"; length = 15; }
+      else if (brand === "DISCOVER") { prefix = "6011"; }
+      else if (brand === "JCB") { prefix = "3528"; }
+      else if (brand === "UNIONPAY") { prefix = "6221"; }
+      else if (brand === "MAESTRO") { prefix = "6759"; }
+
+      let cc = prefix;
+      while (cc.length < length - 1) cc += Math.floor(Math.random() * 10);
       let sum = 0;
       for (let i = 0; i < cc.length; i++) {
         let digit = parseInt(cc.charAt(cc.length - 1 - i));
         if (i % 2 === 0) { digit *= 2; if (digit > 9) digit -= 9; }
         sum += digit;
       }
-      return cc + ((10 - (sum % 10)) % 10);
+      const checkDigit = (10 - (sum % 10)) % 10;
+      const fullNum = cc + checkDigit;
+
+      if (brand === "AMEX") return fullNum.replace(/(\d{4})(\d{6})(\d{5})/, '$1 $2 $3');
+      return fullNum.replace(/(.{4})/g, '$1 ').trim();
     }
 
     function getByteSize(str) { return new Blob([str]).size; }
@@ -669,11 +696,17 @@
       return pool[idx % pool.length];
     }
 
+    function getActiveCardBrand(code) {
+      const pool = REGIONAL_CARD_BRANDS[code] || ["VISA", "MASTERCARD", "AMEX", "DISCOVER"];
+      const idx = ocrNameIndex[code] || 0;
+      return pool[idx % pool.length];
+    }
+
     function rotateOcrSpecimenName() {
       const code = document.getElementById('countrySelect').value;
       ocrNameIndex[code] = (ocrNameIndex[code] || 0) + 1;
       updateCountryData();
-      log(`Rotated specimen name for jurisdiction ${code} to: "${getActiveSpecimenName(code)}"`);
+      log(`Rotated specimen name and card brand for jurisdiction ${code} to: "${getActiveSpecimenName(code)}" [${getActiveCardBrand(code)}]`);
     }
 
     function updateCountryData() {
@@ -684,6 +717,9 @@
       const passportTitle = labels.passport || c.passportTitle || 'PASSPORT';
       const dlTitle = labels.dl || c.dlTitle || 'DRIVER LICENSE';
       const idTitle = labels.id || 'NATIONAL ID CARD';
+
+      const activeBrand = getActiveCardBrand(code);
+      document.getElementById('ocr-cc-title').innerText = `${activeBrand} Card (PCI)`;
 
       document.getElementById('label-tax').innerText = `${c.taxLabel} Card`;
       document.getElementById('label-passport').innerText = `${passportTitle} Card`;
@@ -696,7 +732,7 @@
       const taxVal = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
       const passVal = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
       const dlVal = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
-      const cardVal = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
+      const cardVal = `${activeBrand}: ${generateLuhnForBrand(activeBrand)}`;
       const ibanVal = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
 
       document.getElementById('val-tax').innerText = taxVal;
@@ -708,7 +744,7 @@
       renderPassportCanvas(c.country, c.code, passVal, passportTitle);
       renderDlCanvas(c.country, c.code, dlVal, taxVal, dlTitle);
       renderIdCanvas(c.country, c.code, taxVal, idTitle);
-      renderCcCanvas(cardVal);
+      renderCcCanvas(c.code, cardVal);
     }
 
     function renderPassportCanvas(countryName, countryCode, passNum, passportTitle) {
@@ -805,30 +841,58 @@
       ctx.fillText(`ID999999999${countryCode}8412254F2810010<<<<<<<<<<01`, 10, 240);
     }
 
-    function renderCcCanvas(cardVal) {
+    function renderCcCanvas(countryCode, cardVal) {
       const canvas = document.getElementById('ccCanvas');
       const ctx = canvas.getContext('2d');
-      const grad = ctx.createLinearGradient(0, 0, 400, 260);
-      grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#311042');
+      const brand = getActiveCardBrand(countryCode);
+      const holderName = getActiveSpecimenName(countryCode);
+
+      let grad = ctx.createLinearGradient(0, 0, 400, 260);
+      if (brand === "AMEX") {
+        grad.addColorStop(0, '#1e3a8a'); grad.addColorStop(1, '#0284c7');
+      } else if (brand === "JCB") {
+        grad.addColorStop(0, '#065f46'); grad.addColorStop(1, '#0284c7');
+      } else if (brand === "UNIONPAY") {
+        grad.addColorStop(0, '#881337'); grad.addColorStop(1, '#1e3a8a');
+      } else {
+        grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#311042');
+      }
       ctx.fillStyle = grad; ctx.fillRect(0, 0, 400, 260);
 
+      // EMV Chip
       ctx.fillStyle = '#f59e0b'; ctx.fillRect(30, 60, 42, 32);
       ctx.strokeStyle = '#78350f'; ctx.strokeRect(30, 60, 42, 32);
 
+      // Contactless Wave
       ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
       for (let r = 8; r <= 18; r += 5) {
         ctx.beginPath(); ctx.arc(95, 76, r, -Math.PI / 4, Math.PI / 4); ctx.stroke();
       }
 
+      // Brand Logo
       ctx.fillStyle = '#ffffff'; ctx.font = 'italic bold 18px sans-serif';
-      ctx.fillText("VISA", 320, 45);
+      if (brand === "MASTERCARD") {
+        ctx.fillStyle = '#eb001b'; ctx.beginPath(); ctx.arc(330, 45, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#f79e1b'; ctx.beginPath(); ctx.arc(348, 45, 14, 0, Math.PI * 2); ctx.fill();
+      } else if (brand === "JCB") {
+        ctx.fillStyle = '#003780'; ctx.fillRect(310, 32, 16, 24);
+        ctx.fillStyle = '#e60012'; ctx.fillRect(328, 32, 16, 24);
+        ctx.fillStyle = '#00873c'; ctx.fillRect(346, 32, 16, 24);
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 11px sans-serif'; ctx.fillText("JCB", 318, 48);
+      } else if (brand === "UNIONPAY") {
+        ctx.fillStyle = '#e60012'; ctx.fillRect(310, 32, 22, 24);
+        ctx.fillStyle = '#003780'; ctx.fillRect(334, 32, 22, 24);
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 9px sans-serif'; ctx.fillText("UnionPay", 312, 47);
+      } else {
+        ctx.fillText(brand, 310, 45);
+      }
 
       ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 15px monospace';
-      ctx.fillText(cardVal, 30, 150);
+      ctx.fillText(cardVal.replace(/^[^:]+:\s*/, ''), 30, 150);
 
       ctx.font = '10px sans-serif'; ctx.fillStyle = '#94a3b8';
       ctx.fillText("VALID THRU: 12/28", 30, 185);
-      ctx.fillText("SPECIMEN CARD HOLDER", 30, 210);
+      ctx.fillText(holderName.toUpperCase(), 30, 210);
     }
 
     function generateSingleField(type) {
@@ -840,7 +904,10 @@
       if (type === 'tax') document.getElementById('val-tax').innerText = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
       else if (type === 'passport') document.getElementById('val-passport').innerText = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
       else if (type === 'dl') document.getElementById('val-dl').innerText = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
-      else if (type === 'card') document.getElementById('val-card').innerText = `Credit Card Number: ${generateLuhnCard().replace(/(.{4})/g, '$1 ').trim()}`;
+      else if (type === 'card') {
+        const brand = getActiveCardBrand(code);
+        document.getElementById('val-card').innerText = `${brand}: ${generateLuhnForBrand(brand)}`;
+      }
       else if (type === 'iban') document.getElementById('val-iban').innerText = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
       else if (type === 'secret') document.getElementById('val-secret').innerText = `AWS Secret Key: ${formatPattern('AKIAIOSFODNN7EXAMPLE')}`;
     }
