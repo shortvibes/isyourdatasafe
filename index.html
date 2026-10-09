@@ -1717,25 +1717,29 @@
     }
 
     // -------------------------------------------------------------------------
-    // 4. GOOGLE GEMINI HANDLERS (Direct API Target - CORS Readable Status 400)
+    // 4. GOOGLE GEMINI HANDLERS (Direct API Target - Structured JSON Payload)
     // -------------------------------------------------------------------------
     async function handleGeminiPrompt(engine, targetUrl, promptText) {
       try {
         const resp = await fetch(targetUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: promptText }]
+            }]
+          })
         });
 
         if (resp.status === 403 || resp.status === 503) {
           logAiBlock(engine.name, targetUrl, `Proxy returned HTTP ${resp.status}`);
-        } else if (resp.status === 400 || resp.status === 200) {
-          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status} (INVALID_ARGUMENT)`);
+        } else if (resp.status === 400 || resp.status === 200 || resp.status === 401) {
+          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status}`);
         } else {
           logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status}`);
         }
       } catch (err) {
-        logAiBlock(engine.name, targetUrl, 'Google API TCP connection dropped/reset');
+        logAiBlock(engine.name, targetUrl, 'TCP connection dropped/reset by DLP firewall');
       }
     }
 
