@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Is Your Data Safe? (.org) - Cyber Threat & DLP Egress Bench</title>
+  <title>OMNIEGRESS (.org) - Enterprise Data Security Posture Validation</title>
+  
+  <!-- Standalone CDN Libraries for Browser Document Export & Compression -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- True Binary OpenXML DOCX Library -->
+  <script src="https://unpkg.com/html-docx-js@0.3.1/dist/html-docx.js"></script>
+
   <style>
     :root {
       --bg: #030712;
@@ -25,10 +34,8 @@
       box-sizing: border-box; 
       margin: 0; 
       padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
     }
-    textarea, input[type="text"], code {
+    textarea, input[type="text"], code, select {
       user-select: text !important;
       -webkit-user-select: text !important;
     }
@@ -45,7 +52,7 @@
       padding: 20px;
       min-height: 100vh;
     }
-    .container { max-width: 1040px; margin: 0 auto; }
+    .container { max-width: 1100px; margin: 0 auto; }
     
     header {
       border-bottom: 1px solid var(--border);
@@ -72,7 +79,7 @@
     #jv-protection-root { display: inline-block; }
 
     .hero-banner {
-      width: 100%; height: 180px; border-radius: 8px;
+      width: 100%; height: 160px; border-radius: 8px;
       border: 1px solid var(--border-cyan); margin-bottom: 20px;
       overflow: hidden; background: #020617;
       box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); position: relative;
@@ -127,6 +134,8 @@
     .btn-cyan:hover { background: var(--accent-cyan-hover); }
     .btn-purple { background: var(--purple); color: #fff; }
     .btn-purple:hover { background: var(--purple-hover); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
     .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #1e293b; border: 1px solid var(--border); color: var(--accent-cyan); }
     .btn-sm:hover { background: #334155; color: #fff; }
     
@@ -136,21 +145,45 @@
 
     canvas { width: 100%; height: auto; border-radius: 6px; background: #000; border: 1px solid var(--border); margin-bottom: 10px; }
 
-    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-    .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; }
+    .tab4-layout { display: flex; gap: 20px; flex-wrap: wrap; }
+    .tab4-sidebar { flex: 1; min-width: 320px; max-width: 380px; display: flex; flex-direction: column; gap: 14px; }
+    .tab4-stage { flex: 2; min-width: 400px; background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; justify-content: center; align-items: flex-start; overflow-x: auto; }
+    .a4-preview { width: 100%; max-width: 600px; min-height: 750px; background: #ffffff; color: #0f172a; padding: 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'Times New Roman', serif; font-size: 13px; line-height: 1.5; user-select: text !important; -webkit-user-select: text !important; }
+
+    .doc-type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .doc-type-btn { background: #0b132b; border: 1px solid var(--border); color: var(--text); padding: 8px; font-size: 0.75rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-align: left; }
+    .doc-type-btn:hover { border-color: var(--accent-cyan); }
+    .doc-type-btn.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
+
+    .sidebar-subtabs { display: flex; gap: 4px; background: #020617; padding: 4px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px; }
+    .subtab-btn { flex: 1; background: transparent; border: none; color: var(--muted); padding: 6px; font-size: 0.75rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .subtab-btn:hover { color: #fff; }
+    .subtab-btn.active { background: #1e293b; color: var(--accent-cyan); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+    .subtab-panel { display: none; }
+    .subtab-panel.active { display: block; }
+
+    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 380px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
+    .chat-msg { max-width: 95%; padding: 10px 14px; border-radius: 6px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; }
     .msg-user { align-self: flex-end; background: #1e1b4b; border: 1px solid #4338ca; color: #818cf8; }
     .msg-ai { align-self: flex-start; background: #0f172a; border: 1px solid var(--border); color: var(--text); }
+    .msg-ai-blocked { align-self: flex-start; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: #fca5a5; font-weight: 600; white-space: pre-wrap; }
+    .msg-ai-passed { align-self: flex-start; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--accent-green); color: #a7f3d0; white-space: pre-wrap; }
 
     .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
   </style>
 </head>
 <body>
 
+  <!-- Hidden Native Iframe & Form for CORS-Free Network Interface Testing -->
+  <iframe name="egressTargetIframe" id="egressTargetIframe" style="display:none;" onload="onIframeLoad()"></iframe>
+  <form id="nativeEgressForm" action="https://httpbin.org/post" method="POST" enctype="multipart/form-data" target="egressTargetIframe" style="display:none;"></form>
+
   <div class="container">
     <header>
       <div>
-        <h1>🛡️ <span class="highlight">IS YOUR DATA SAFE?</span> (.org)</h1>
-        <p class="subtitle">Cyber Threat &amp; DLP Egress Traffic Inspection Playground</p>
+        <h1>🛡️ <span class="highlight">OMNIEGRESS</span> (.org)</h1>
+        <p class="subtitle">Enterprise Data Security Posture &amp; SWG Validation Studio</p>
       </div>
       <div id="jv-protection-root"></div>
     </header>
@@ -171,10 +204,8 @@
             <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" stroke-width="0.8"/>
           </pattern>
         </defs>
-
         <rect width="1000" height="180" fill="url(#bgGrad)" />
         <rect width="1000" height="180" fill="url(#cyberGrid)" opacity="0.6" />
-
         <g stroke="#1e293b" stroke-width="1.5">
           <line x1="140" y1="90" x2="330" y2="90" stroke-dasharray="4,4"/>
           <line x1="330" y1="90" x2="500" y2="90" stroke="#06b6d4" stroke-width="2"/>
@@ -182,38 +213,27 @@
           <line x1="670" y1="90" x2="860" y2="45"/>
           <line x1="670" y1="90" x2="860" y2="135"/>
         </g>
-
-        <!-- Central Security Gateway Shield -->
         <g transform="translate(500, 90)">
           <circle r="38" fill="#0b132b" stroke="#06b6d4" stroke-width="2"/>
           <path d="M -14 -16 L 0 -22 L 14 -16 L 14 3 C 14 14 0 21 0 21 C 0 21 -14 14 -14 3 Z" fill="url(#shieldGrad)" opacity="0.9"/>
           <path d="M -5 0 L -1 5 L 7 -5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </g>
-
-        <!-- Internal Endpoint -->
         <g transform="translate(140, 90)">
           <circle r="20" fill="#0b132b" stroke="#06b6d4" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="9" fill="#06b6d4" text-anchor="middle" font-weight="bold">ENDPOINT</text>
         </g>
-
-        <!-- AI Target Endpoint -->
         <g transform="translate(860, 45)">
           <circle r="18" fill="#0b132b" stroke="#8b5cf6" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="bold">AI LLM</text>
         </g>
-
-        <!-- Web Target Endpoint -->
         <g transform="translate(860, 135)">
           <circle r="18" fill="#0b132b" stroke="#10b981" stroke-width="1.5"/>
           <text x="0" y="4" font-family="monospace" font-size="8" fill="#10b981" text-anchor="middle" font-weight="bold">HTTPBIN</text>
         </g>
-
-        <!-- Animated Radar Scan Line -->
         <line x1="0" y1="0" x2="0" y2="180" stroke="rgba(6, 182, 212, 0.35)" stroke-width="3">
           <animateTransform attributeName="transform" type="translate" from="0 0" to="1000 0" dur="4s" repeatCount="indefinite"/>
         </line>
-
-        <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">NETWORK DLP INSPECTION PLATFORM</text>
+        <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">OMNIEGRESS VALIDATION MATRIX</text>
         <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#64748b">Outbound Traffic Bench &amp; Photorealistic Document Vault</text>
       </svg>
     </div>
@@ -223,184 +243,228 @@
       <button class="tab-btn active" onclick="switchTab(event, 'tab-bench')">🛡️ 1. DLP Payload Bench</button>
       <button class="tab-btn" onclick="switchTab(event, 'tab-file')">📁 2. File Upload Egress</button>
       <button class="tab-btn" onclick="switchTab(event, 'tab-ai')">🤖 3. Shadow AI Sandbox</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-vault')">📄 4. Multi-Format PII Vault</button>
     </div>
 
     <!-- TAB 1: COMBINED DLP BENCH -->
     <div id="tab-bench" class="tab-content active">
-      
-      <!-- Section 1: Outbound Traffic Bench -->
       <div class="section">
         <h2>🌐 Outbound Traffic Test Bench</h2>
-        <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords, click any card to inject into the payload area, and transmit live HTTP POST traffic across your firewall.</p>
-        
+        <p>Select a jurisdiction (All 195 UN Sovereign Nations) to generate synthetic test patterns with localized proximity keywords.</p>
         <div class="selector-bar">
           <label for="countrySelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target Jurisdiction:</label>
-          <select id="countrySelect" onchange="updateCountryData()"></select>
-          <button class="btn btn-sm" onclick="regenerateData()">🎲 Randomize Order &amp; Regenerate</button>
+          <select id="countrySelect" onchange="updateTab1CountryData()"></select>
+          <button class="btn btn-sm" onclick="regenerateTab1Data()">🎲 Randomize Order &amp; Regenerate</button>
         </div>
-
         <form onsubmit="sendRealNetworkPost(event)">
           <textarea id="payload" oninput="updateByteCount()" placeholder="Paste or inject sensitive test data here..."></textarea>
-          
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-            <button type="button" class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="padPayloadToMinBytes()">
-              + Add Native Bogus Data (Pad to 250+ Bytes)
-            </button>
+            <button type="button" class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="padPayloadToMinBytes()">+ Add Native Bogus Data (Pad to 250+ Bytes)</button>
             <span id="byteCounter" class="byte-counter invalid">0 / 250 bytes min</span>
           </div>
-
-          <button type="submit" class="btn btn-cyan">⚡ Transmit Payload Outbound</button>
+          <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn btn-cyan">⚡ Transmit Payload Outbound</button>
+            <button type="button" class="btn btn-sm" style="background:#334155; color:#fff;" onclick="resetTestBench()">🔄 Reset Test Bench</button>
+          </div>
         </form>
       </div>
 
-      <!-- Section 2: Synthetic Data Vault -->
       <div class="section">
         <h2>🔑 Synthetic Test Data Vault (195 Sovereign Nations)</h2>
-        <p>Click <strong>"Copy &amp; Inject"</strong> to copy the value with its localized proximity keyword context, auto-fill the field above, and automatically regenerate a fresh value for that card.</p>
-        
         <div class="grid">
-          <div class="card">
-            <h3 id="label-tax">Tax ID</h3>
-            <code id="val-tax">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-tax', 'tax')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3 id="label-passport">Passport Number</h3>
-            <code id="val-passport">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-passport', 'passport')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3 id="label-dl">Driver License ID</h3>
-            <code id="val-dl">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-dl', 'dl')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3>Payment Card (Luhn Valid)</h3>
-            <code id="val-card">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-card', 'card')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3>IBAN Account Number</h3>
-            <code id="val-iban">-</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-iban', 'iban')">Copy &amp; Inject</button>
-          </div>
-
-          <div class="card">
-            <h3>API Secret Key</h3>
-            <code id="val-secret">AWS Secret Key: AKIAIOSFODNN7EXAMPLE</code>
-            <button class="btn btn-sm" onclick="copyAndInject('val-secret', 'secret')">Copy &amp; Inject</button>
-          </div>
+          <div class="card"><h3 id="label-tax">Tax ID</h3><code id="val-tax">-</code><button class="btn btn-sm" onclick="copyAndInject('val-tax', 'tax')">Copy &amp; Inject</button></div>
+          <div class="card"><h3 id="label-passport">Passport Number</h3><code id="val-passport">-</code><button class="btn btn-sm" onclick="copyAndInject('val-passport', 'passport')">Copy &amp; Inject</button></div>
+          <div class="card"><h3 id="label-dl">Driver License ID</h3><code id="val-dl">-</code><button class="btn btn-sm" onclick="copyAndInject('val-dl', 'dl')">Copy &amp; Inject</button></div>
+          <div class="card"><h3 id="label-card">Payment Card (Luhn Valid)</h3><code id="val-card">-</code><button class="btn btn-sm" onclick="copyAndInject('val-card', 'card')">Copy &amp; Inject</button></div>
+          <div class="card"><h3 id="label-iban">Bank Account Identifier</h3><code id="val-iban">-</code><button class="btn btn-sm" onclick="copyAndInject('val-iban', 'iban')">Copy &amp; Inject</button></div>
+          <div class="card"><h3>API Secret Key</h3><code id="val-secret">AWS Secret Key: AKIAIOSFODNN7EXAMPLE</code><button class="btn btn-sm" onclick="copyAndInject('val-secret', 'secret')">Copy &amp; Inject</button></div>
         </div>
       </div>
 
-      <!-- Section 3: Photorealistic Document OCR Vault -->
       <div class="section">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
           <h2 style="margin-bottom:0; border:none; padding:0;">🪪 Photorealistic Document OCR Vault</h2>
           <button class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="rotateOcrSpecimenName()">🔄 Rotate Specimen Name &amp; Card Brand</button>
         </div>
-        <p>Dynamically rendered document specimens with authentic background guilloche patterns, localized country headers (*Rijbewijs*, *Personalausweis*, *Paspoort*), localized field labels, native holder names, and regional payment card network branding (Visa, Mastercard, AMEX, JCB, UnionPay, Maestro). Transmitting sends raw PNG binary for OCR proxy inspection.</p>
-
         <div class="grid-4">
-          <div class="card">
-            <h3 id="ocr-passport-title">Passport Specimen</h3>
-            <canvas id="passportCanvas" width="400" height="260"></canvas>
-            <div style="display:flex; gap:6px;">
-              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('passportCanvas', 'passport')">Download PNG</button>
-              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('passportCanvas', 'passport_specimen.png')">Transmit Outbound</button>
-            </div>
+          <div class="card"><h3 id="ocr-passport-title">Passport Specimen</h3><canvas id="passportCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;"><button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('passportCanvas', 'passport')">Download PNG</button><button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('passportCanvas', 'passport_specimen.png')">Transmit</button></div>
           </div>
-
-          <div class="card">
-            <h3 id="ocr-dl-title">Driver License Specimen</h3>
-            <canvas id="dlCanvas" width="400" height="260"></canvas>
-            <div style="display:flex; gap:6px;">
-              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('dlCanvas', 'license')">Download PNG</button>
-              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('dlCanvas', 'license_specimen.png')">Transmit Outbound</button>
-            </div>
+          <div class="card"><h3 id="ocr-dl-title">Driver License Specimen</h3><canvas id="dlCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;"><button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('dlCanvas', 'license')">Download PNG</button><button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('dlCanvas', 'license_specimen.png')">Transmit</button></div>
           </div>
-
-          <div class="card">
-            <h3 id="ocr-id-title">National ID Specimen</h3>
-            <canvas id="idCanvas" width="400" height="260"></canvas>
-            <div style="display:flex; gap:6px;">
-              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('idCanvas', 'national_id')">Download PNG</button>
-              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('idCanvas', 'national_id_specimen.png')">Transmit Outbound</button>
-            </div>
+          <div class="card"><h3 id="ocr-id-title">National ID Specimen</h3><canvas id="idCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;"><button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('idCanvas', 'national_id')">Download PNG</button><button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('idCanvas', 'national_id_specimen.png')">Transmit</button></div>
           </div>
-
-          <div class="card">
-            <h3 id="ocr-cc-title">Payment Card (PCI)</h3>
-            <canvas id="ccCanvas" width="400" height="260"></canvas>
-            <div style="display:flex; gap:6px;">
-              <button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('ccCanvas', 'credit_card')">Download PNG</button>
-              <button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('ccCanvas', 'credit_card_specimen.png')">Transmit Outbound</button>
-            </div>
+          <div class="card"><h3 id="ocr-cc-title">Payment Card (PCI)</h3><canvas id="ccCanvas" width="400" height="260"></canvas>
+            <div style="display:flex; gap:6px;"><button class="btn btn-sm" style="flex:1;" onclick="downloadCanvas('ccCanvas', 'credit_card')">Download PNG</button><button class="btn btn-sm" style="flex:1; background:var(--accent-green); color:#000;" onclick="sendCanvasAsFile('ccCanvas', 'credit_card_specimen.png')">Transmit</button></div>
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- TAB 2: SEPARATED FILE UPLOAD EGRESS -->
+    <!-- TAB 2: FILE UPLOAD EGRESS WITH CORS-FREE NATIVE FORM SUBMISSION -->
     <div id="tab-file" class="tab-content">
       <div class="section">
         <h2>📁 Standard Outbound File Transfer Test</h2>
-        <p>Upload a document, archive, or specimen file to transmit raw multipart network packets across your firewall or Secure Web Gateway (SWG).</p>
+        <p>Upload a document, archive, or specimen file. Choose the Egress Mode below to test network proxy inspection or bypass browser CORS drops.</p>
+
+        <div style="margin-bottom:15px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Transmission Mode:</label>
+          <select id="tab2EgressModeSelect" style="max-width:420px;">
+            <option value="native-form">🌐 Native HTML Form &amp; Target Iframe (Guaranteed Wire Egress)</option>
+            <option value="cors">⚡ Standard Fetch API (CORS HTTP Multipart POST)</option>
+            <option value="chunked">📦 Chunked Raw Octet Stream (Splits file into binary blocks)</option>
+          </select>
+        </div>
+
         <div style="background:#020617; border:2px dashed var(--border); border-radius:6px; padding:30px; text-align:center; margin-bottom:15px;">
           <input type="file" id="generalFileInput" style="margin-bottom: 15px;" /><br/>
-          <button class="btn btn-cyan" onclick="sendGeneralFileUpload()">🚀 Transmit File Outbound</button>
+          <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="btn btn-cyan" onclick="sendGeneralFileUpload()">🚀 Transmit File Outbound</button>
+            <button class="btn btn-sm" style="background:#334155; color:#fff;" onclick="resetTestBench()">🔄 Reset Test Bench</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX -->
+    <!-- TAB 3: SHADOW AI SANDBOX (DIRECT SIMPLE-REQUEST POST WIRE DISPATCH) -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox</h2>
-        <p>Select a target AI Engine and choose your **Egress Routing Mode** (Web-Endpoint vs API-Endpoint). Web-Endpoint transmits direct HTTP POST stream requests to real application endpoints (`chatgpt.com/unauth-mweb/...`, `claude.ai/chat`, `perplexity.ai/search`, `gemini.google.com/_/BardChatUi/data/...`) using `no-cors` mode to bypass browser CORS blocking while sending full payloads across your network interface for SWG inspection.</p>
-        
+        <p>Tests live payload exfiltration to GenAI domains. Employs simple-request POST dispatches (`application/x-www-form-urlencoded` and `multipart/form-data`) to bypass CORS preflight checks and slam sensitive data directly onto the wire for Palo Alto inspection.</p>
         <div class="selector-bar">
           <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
           <select id="aiEngineSelect" onchange="onAiEngineChange()"></select>
         </div>
-
         <div class="selector-bar" style="margin-bottom:15px;">
-          <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label>
+          <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Target Interface:</label>
           <select id="aiTrafficTypeSelect" onchange="onAiEngineChange()">
-            <option value="web_endpoint">🌐 Web-Endpoint (Direct Browser UI Target POST via no-cors)</option>
-            <option value="api_endpoint">⚡ API-Endpoint (Direct Developer API POST to Target Domain)</option>
+            <option value="api_endpoint">⚡ Direct Service API (Highest DLP Trigger Reliability)</option>
+            <option value="web_endpoint">🌐 Web UI Interface (Direct Browser Domain POST)</option>
           </select>
         </div>
+        <div class="chat-container" id="chatBox"><div class="chat-msg msg-ai" id="aiWelcomeMsg">🤖 GenAI Sandbox initialized.</div></div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="aiPromptInput" placeholder="Type AI prompt or paste sensitive data here..." style="flex: 1;" /><button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button></div>
+        <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;"><label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom: 6px;">Attach File to AI Assistant (Uploads Real Packet):</label><div style="display: flex; gap: 8px;"><input type="file" id="aiFileInput" style="flex:1;" /><button class="btn btn-purple" onclick="sendAiFileAttachment()">Transmit File to AI</button></div></div>
+      </div>
+    </div>
 
-        <div class="chat-container" id="chatBox">
-          <div class="chat-msg msg-ai" id="aiWelcomeMsg">
-            🤖 GenAI Sandbox initialized.
+    <!-- TAB 4: MULTI-FORMAT LOCALIZED PII VAULT -->
+    <div id="tab-vault" class="tab-content">
+      <div class="section">
+        <h2>📄 Multi-Format Localized PII Document Vault</h2>
+        <p>Generate authentic regional business documents across all 195 UN Sovereign Nations with zero English leakage.</p>
+        
+        <div class="tab4-layout">
+          <div class="tab4-sidebar">
+            <div>
+              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:4px;">1. TARGET JURISDICTION</label>
+              <select id="tab4CountrySelect" onchange="renderTab4Document()"></select>
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:6px;">2. DOCUMENT SPECIMEN TYPE</label>
+              <div class="doc-type-grid">
+                <button class="doc-type-btn active" onclick="setTab4DocType('invoice', event)">📑 Invoice</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('bank_stmt', event)">🏦 Bank Statement</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('payslip', event)">💵 Payslip</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('tax_form', event)">🏛️ Tax Form</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('official_letter', event)">✉️ Official Letter</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('passport_kyc', event)">🛂 Passport (KYC)</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('dl_kyc', event)">🪪 Driver Lic. (KYC)</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('id_kyc', event)">🪪 National ID (KYC)</button>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:4px;">3. PAYLOAD ENCODING &amp; TRANSFORM</label>
+              <select id="tab4EncodingSelect">
+                <option value="none">Raw Text / Native Format</option>
+                <option value="base64">Base64 Encoded Blob</option>
+                <option value="url">URL Percent-Encoded</option>
+                <option value="hex">Hexadecimal Bytes</option>
+                <option value="html">HTML Decimal Entities</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:4px;">4. ARCHIVE &amp; ENCRYPTION ENGINE</label>
+              <select id="tab4ArchiveSelect">
+                <option value="none">Single File (Uncompressed)</option>
+                <option value="zip">Standard ZIP Archive (.zip)</option>
+                <option value="zip_enc">Simulate Password-Encrypted ZIP</option>
+              </select>
+            </div>
+            
+            <div>
+              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:6px;">5. DISPATCH ACTION ENGINE</label>
+              
+              <div class="sidebar-subtabs">
+                <button class="subtab-btn active" id="btnSubtabLocal" onclick="switchSidebarSubtab('local')">💾 Local Export</button>
+                <button class="subtab-btn" id="btnSubtabNetwork" onclick="switchSidebarSubtab('network')">⚡ Network Egress</button>
+              </div>
+
+              <!-- SUBTAB PANEL 1: LOCAL EXPORT -->
+              <div id="subtab-panel-local" class="subtab-panel active" style="background:#020617; border:1px solid var(--border); border-radius:6px; padding:12px;">
+                <p style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;">Generate and download compiled file directly to client endpoint:</p>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
+                  <button class="btn btn-sm" onclick="exportTab4Document('pdf')">📄 PDF</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('png')">🖼️ PNG</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('txt')">📝 TXT</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('json')">📊 JSON</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('csv')">📈 CSV</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('docx')">💼 DOCX</button>
+                </div>
+                <button class="btn btn-sm" style="width:100%; background:#f59e0b; color:#000;" onclick="exportAllBundle()">📦 Export ALL (ZIP Bundle)</button>
+              </div>
+
+              <!-- SUBTAB PANEL 2: NETWORK EGRESS -->
+              <div id="subtab-panel-network" class="subtab-panel" style="background:#020617; border:1px solid var(--purple); border-radius:6px; padding:12px;">
+                <p style="font-size:0.75rem; color:#a5b4fc; margin-bottom:8px;">Fires real HTTP POST packet over wire to test inline DLP/SWG proxy:</p>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('docx')">⚡ DOCX</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('pdf')">⚡ PDF</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('png')">⚡ PNG</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('txt')">⚡ TXT</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('json')">⚡ JSON</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('csv')">⚡ CSV</button>
+                </div>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <select id="tab4TransmitFormat" style="flex:1;">
+                    <option value="docx">💼 DOCX</option>
+                    <option value="pdf">📄 PDF</option>
+                    <option value="png">🖼️ PNG</option>
+                    <option value="txt">📝 TXT</option>
+                    <option value="json">📊 JSON</option>
+                    <option value="csv">📈 CSV</option>
+                  </select>
+                  <button class="btn btn-purple" style="flex:1.5;" onclick="transmitTab4Outbound()">⚡ Transmit</button>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
-
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <input type="text" id="aiPromptInput" placeholder="Type AI prompt here (e.g. Summarize SSN: 000-12-3456)..." style="flex: 1;" />
-          <button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button>
-        </div>
-
-        <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
-          <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom: 6px;">Attach File to AI Assistant (Uploads Real Packet):</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="file" id="aiFileInput" style="flex:1;" />
-            <button class="btn btn-purple" onclick="sendAiFileAttachment()">Transmit File to AI</button>
+          <div class="tab4-stage">
+            <div class="a4-preview" id="a4PreviewStage"></div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Live Intercepted Gateway Block Page Container (Palo Alto PAN-OS Response Viewer) -->
+    <div class="section" id="blockPageSection" style="display:none; border-color: var(--danger);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="color:var(--danger); border:none; margin:0;">🛡️ Intercepted Gateway Block Page Viewer</h2>
+        <button class="btn btn-sm" onclick="closeBlockPageViewer()">Close Block Page</button>
+      </div>
+      <p style="color:#ef4444; font-size:0.8rem; margin-bottom:12px;">An outbound request triggered a block response from an inline network proxy gateway. Below is the captured block page payload:</p>
+      <div id="blockPageContent"></div>
+    </div>
+
     <!-- Persistent Egress Inspector Log -->
     <div class="section">
-      <h2>📡 Real-Time Egress Traffic Inspector Log</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="border:none; margin:0;">📡 Real-Time Egress Traffic Inspector Log</h2>
+        <button class="btn btn-sm" style="background:#334155; color:#fff;" onclick="resetTestBench()">🔄 Clear Logs &amp; Reset Bench</button>
+      </div>
       <div class="log-box" id="logBox">
         [Awaiting network request execution...]
       </div>
@@ -408,81 +472,125 @@
   </div>
 
   <script>
-    // --- IN-BROWSER CODE ARMOR & ANTI-DEBUGGER GUARD ---
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    
-    document.addEventListener('keydown', e => {
-      if (e.keyCode === 123 || 
-         (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
-         (e.ctrlKey && e.shiftKey && e.keyCode === 74) || 
-         (e.ctrlKey && e.keyCode === 85) || 
-         (e.ctrlKey && e.keyCode === 83)) { 
-        e.preventDefault();
-        return false;
-      }
-    });
-
-    setInterval(() => {
-      const startTime = performance.now();
-      debugger;
-      const endTime = performance.now();
-      if (endTime - startTime > 100) {
-        document.body.innerHTML = '<div style="color:#ef4444; text-align:center; padding:50px; font-family:monospace;">⚠️ SECURITY NOTICE: Unauthorized inspection detected. Session locked.</div>';
-      }
-    }, 1000);
-
-    // --- PROTECTED ATTRIBUTION SYSTEM (SHADOW DOM + MUTATION GUARD) ---
-    const AUTHOR_CREDIT = "Jeroen Vermeulen";
-
+    // --- DEVTOOLS AND PAGE PROTECTION COMPLETELY REMOVED ---
     function mountProtectedAttribution() {
       const container = document.getElementById('jv-protection-root');
       if (!container) return;
-
       container.innerHTML = '';
       const shadow = container.attachShadow({ mode: 'closed' });
-      
       const badge = document.createElement('div');
-      badge.style.cssText = `
-        background: linear-gradient(135deg, #1e293b, #0f172a);
-        border: 1px solid #06b6d4;
-        color: #f1f5f9;
-        font-family: ui-monospace, SFMono-Regular, monospace;
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 6px 12px;
-        border-radius: 9999px;
-        box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        user-select: none;
-        pointer-events: none;
-      `;
-      badge.innerHTML = `<span style="color:#06b6d4;">⚙️ CREATED BY</span> ${AUTHOR_CREDIT.toUpperCase()} <span style="color:#10b981; font-size:0.65rem;">[VERIFIED 🔒]</span>`;
+      badge.style.cssText = `background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #06b6d4; color: #f1f5f9; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.75rem; font-weight: 700; padding: 6px 12px; border-radius: 9999px; box-shadow: 0 0 10px rgba(6, 182, 212, 0.3); display: flex; align-items: center; gap: 6px; user-select: none; pointer-events: none;`;
+      badge.innerHTML = `<span style="color:#06b6d4;">⚙️ CREATED BY</span> JEROEN VERMEULEN <span style="color:#10b981; font-size:0.65rem;">[VERIFIED 🔒]</span>`;
       shadow.appendChild(badge);
     }
 
     const observer = new MutationObserver(() => {
       const root = document.getElementById('jv-protection-root');
-      if (!root || !root.shadowRoot) {
-        mountProtectedAttribution();
-      }
+      if (!root || !root.shadowRoot) mountProtectedAttribution();
     });
     observer.observe(document.body, { childList: true, subtree: true, attributes: true });
 
-    // --- TAB SWITCHING LOGIC ---
+    // --- MAIN TAB SWITCHING ---
     function switchTab(evt, tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
       evt.currentTarget.classList.add('active');
       document.getElementById(tabId).classList.add('active');
     }
 
-    // --- PATTERN MASK & UTILITIES ---
+    function switchSidebarSubtab(type) {
+      document.getElementById('btnSubtabLocal').classList.remove('active');
+      document.getElementById('btnSubtabNetwork').classList.remove('active');
+      document.getElementById('subtab-panel-local').classList.remove('active');
+      document.getElementById('subtab-panel-network').classList.remove('active');
+
+      if (type === 'local') {
+        document.getElementById('btnSubtabLocal').classList.add('active');
+        document.getElementById('subtab-panel-local').classList.add('active');
+      } else {
+        document.getElementById('btnSubtabNetwork').classList.add('active');
+        document.getElementById('subtab-panel-network').classList.add('active');
+      }
+    }
+
+    // --- MATHEMATICAL CHECKSUM ENGINES ---
+    function generateValidBSN() {
+      while (true) {
+        let d = [];
+        for (let i = 0; i < 8; i++) d.push(Math.floor(Math.random() * 10));
+        if (d[0] === 0 && d[1] === 0) continue;
+        let weighted = 9*d[0] + 8*d[1] + 7*d[2] + 6*d[3] + 5*d[4] + 4*d[5] + 3*d[6] + 2*d[7];
+        let d9 = weighted % 11;
+        if (d9 < 10) { d.push(d9); return d.join(''); }
+      }
+    }
+
+    function generateValidSpanishDNI() {
+      let num = Math.floor(10000000 + Math.random() * 89999999);
+      let letters = "TRWAGMYFPDXBNJZSQVHLCKE";
+      let letter = letters.charAt(num % 23);
+      return `${num}${letter}`;
+    }
+
+    function generateValidPESEL() {
+      let weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
+      let d = [8, 4, 1, 2, 2, 5];
+      for (let i = 0; i < 4; i++) d.push(Math.floor(Math.random() * 10));
+      let sum = 0;
+      for (let i = 0; i < 10; i++) sum += d[i] * weights[i];
+      let check = (10 - (sum % 10)) % 10;
+      d.push(check);
+      return d.join('');
+    }
+
+    function calculateIBANChecksum(countryCode, bban) {
+      const prepended = bban + countryCode + "00";
+      let numericStr = "";
+      for (let i = 0; i < prepended.length; i++) {
+        const char = prepended.charAt(i);
+        if (char >= 'A' && char <= 'Z') numericStr += (char.charCodeAt(0) - 55).toString();
+        else if (char >= 'a' && char <= 'z') numericStr += (char.charCodeAt(0) - 87).toString();
+        else numericStr += char;
+      }
+      let remainder = 0;
+      for (let i = 0; i < numericStr.length; i++) {
+        remainder = (remainder * 10 + parseInt(numericStr.charAt(i), 10)) % 97;
+      }
+      const checkDigits = (98 - remainder) % 97;
+      const checkStr = checkDigits < 10 ? "0" + checkDigits : checkDigits.toString();
+      return countryCode + checkStr + bban;
+    }
+
+    function generateValidIBANOrRouting(countryCode) {
+      if (countryCode === 'USA') {
+        const d = [0, 2, 1, 0, 0, 0, 0, 2];
+        const checksum = (10 - ((3*(d[0]+d[3]+d[6]) + 7*(d[1]+d[4]+d[7]) + 1*(d[2]+d[5])) % 10)) % 10;
+        const routing = d.join('') + checksum;
+        const account = Math.floor(1000000000 + Math.random() * 9000000000);
+        return `Routing (ABA): ${routing} | Acc: ${account}`;
+      }
+      if (countryCode === 'JPN') {
+        const bank = Math.floor(1000 + Math.random() * 8999);
+        const branch = Math.floor(100 + Math.random() * 899);
+        const account = Math.floor(1000000 + Math.random() * 8999999);
+        return `全銀 (Zengin): Bank ${bank} / Branch ${branch} / Acc ${account}`;
+      }
+      
+      let bban = '';
+      if (countryCode === 'NLD') bban = "ABNA" + Math.floor(1000000000 + Math.random() * 9000000000);
+      else if (countryCode === 'DEU') bban = "37040044" + Math.floor(1000000000 + Math.random() * 9000000000);
+      else if (countryCode === 'FRA') bban = "30002" + "00550" + Math.floor(10000000000 + Math.random() * 89999999999) + "12";
+      else if (countryCode === 'ESP') bban = "2100041840" + Math.floor(1000000000 + Math.random() * 9000000000);
+      else if (countryCode === 'POL') bban = "10201017" + Math.floor(1000000000000000 + Math.random() * 8999999999999999);
+      else if (countryCode === 'ITA') bban = "X0607001600" + Math.floor(100000000000 + Math.random() * 899999999999);
+      else bban = countryCode + "00" + Math.floor(10000000000000 + Math.random() * 89999999999999);
+
+      return calculateIBANChecksum(countryCode, bban);
+    }
+
     function formatPattern(pattern) {
       const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      return pattern.replace(/[9A]/g, (match) => {
+      return pattern.replace(/[9A]/g, match => {
         if (match === '9') return Math.floor(Math.random() * 10).toString();
         if (match === 'A') return letters.charAt(Math.floor(Math.random() * letters.length));
         return match;
@@ -498,113 +606,79 @@
       return arr;
     }
 
-    // ROTATING CULTURALLY AUTHENTIC SPECIMEN POOLS
+    // --- ZERO ENGLISH LEAKAGE STATUTORY DICTIONARIES ---
+    const TAB4_DICTIONARIES = {
+      NLD: { currency: "€", invoiceTitle: "FACTUUR", vendorHeader: "LEVERANCIER", clientHeader: "AFNEMER", invNo: "Factuurnummer", invDate: "Factuurdatum", dueDate: "Vervaldatum", desc: "Omschrijving", qty: "Aantal", unitPrice: "Eenheidsprijs", total: "Totaal", subtotal: "Subtotaal", vat: "BTW (21%)", totalPayable: "Totaal te betalen", payTerms: "Gelieve binnen 30 dagen te voldoen.", taxLabel: "Burgerservicenummer (BSN)", ibanLabel: "Rekeningnummer (IBAN)", bankTitle: "BANKAFSCHRIFT", accHolder: "Rekeninghouder", openBal: "Beginsaldo", closeBal: "Eindsaldo", payslipTitle: "SALARISSPECIFICATIE", gross: "Brutoloon", net: "Nettoloon", taxFormTitle: "AANGIFTE INKOMSTENBELASTING", letterTitle: "VERTROUWELIJKE CORRESPONDENTIE", kycTitle: "FORMULIER IDENTITEITSVERIFICATIE", kycBody: "Hierbij de officiële identiteitsdocumenten ten behoeve van compliance en verificatie.", salaryIban: "Salarisrekening (IBAN)", taxIban: "Rekeningnummer belastingteruggave (IBAN)" },
+      DEU: { currency: "€", invoiceTitle: "RECHNUNG", vendorHeader: "LIEFERANT", clientHeader: "KUNDE", invNo: "Rechnungsnummer", invDate: "Rechnungsdatum", dueDate: "Fälligkeitsdatum", desc: "Beschreibung", qty: "Menge", unitPrice: "Einzelpreis (netto)", total: "Gesamtbetrag", subtotal: "Zwischensumme", vat: "MwSt. (19%)", totalPayable: "Gesamtbetrag (inkl. MwSt.)", payTerms: "Zahlbar innerhalb von 30 Tagen ohne Abzug.", taxLabel: "USt-IdNr. / Steuer-ID", ibanLabel: "Bankverbindung (IBAN)", bankTitle: "KONTOAUSZUG", accHolder: "Kontoinhaber", openBal: "Anfangssaldo", closeBal: "Endsaldo", payslipTitle: "GEHALTSABRECHNUNG", gross: "Bruttogehalt", net: "Auszahlungsbetrag", taxFormTitle: "EINKOMMENSTEUERERKLÄRUNG", letterTitle: "VERTRAULICHE MITTEILUNG", kycTitle: "IDENTITÄTSPRÜFUNGSFORMULAR", kycBody: "Anbei finden Sie das offizielle Identitätsdokument zur Compliance-Prüfung.", salaryIban: "Auszahlungskonto (IBAN)", taxIban: "Erstattungskonto (IBAN)" },
+      FRA: { currency: "€", invoiceTitle: "FACTURE", vendorHeader: "FOURNISSEUR", clientHeader: "CLIENT", invNo: "N° de facture", invDate: "Date de facture", dueDate: "Date d'échéance", desc: "Désignation", qty: "Quantité", unitPrice: "Prix unitaire HT", total: "Montant HT", subtotal: "Sous-total HT", vat: "TVA (20%)", totalPayable: "Total TTC à payer", payTerms: "Paiement à effectuer sous 30 jours.", taxLabel: "Code NIR / N° SIRET", ibanLabel: "Coordonnées bancaires (IBAN / RIB)", bankTitle: "RELEVÉ DE COMPTE", accHolder: "Titulaire du compte", openBal: "Solde initial", closeBal: "Nouveau solde", payslipTitle: "BULLETIN DE PAIE", gross: "Salaire brut", net: "Net à payer", taxFormTitle: "DÉCLARATION DES REVENUS", letterTitle: "COURRIER CONFIDENTIEL", kycTitle: "FORMULAIRE DE VÉRIFICATION D'IDENTITÉ", kycBody: "Veuillez trouver ci-joint le document d'identification officiel pour vérification.", salaryIban: "Compte de Dépôt (IBAN)", taxIban: "Compte de Remboursement (IBAN)" },
+      ESP: { currency: "€", invoiceTitle: "FACTURA", vendorHeader: "PROVEEDOR", clientHeader: "CLIENTE", invNo: "Nº de factura", invDate: "Fecha de factura", dueDate: "Fecha de vencimiento", desc: "Concepto", qty: "Cantidad", unitPrice: "Precio unitario", total: "Importe", subtotal: "Base imponible", vat: "IVA (21%)", totalPayable: "Total a pagar", payTerms: "Pago a realizar dentro de los 30 días.", taxLabel: "DNI / NIF / CIF", ibanLabel: "Número de cuenta (IBAN)", bankTitle: "EXTRACTO DE CUENTA", accHolder: "Titular de la cuenta", openBal: "Saldo inicial", closeBal: "Saldo final", payslipTitle: "RECIBO DE NÓMINA", gross: "Salario bruto", net: "Líquido a percibir", taxFormTitle: "DECLARACIÓN DEL IMPUESTO", letterTitle: "COMUNICACIÓN CONFIDENCIAL", kycTitle: "FORMULARIO DE VERIFICACIÓN DE IDENTIDAD", kycBody: "Adjunto el documento de identificación oficial para el proceso de cumplimiento.", salaryIban: "Cuenta de Ingreso (IBAN)", taxIban: "Cuenta de Devolución (IBAN)" },
+      POL: { currency: "PLN", invoiceTitle: "FAKTURA VAT", vendorHeader: "SPRZEDAWCA", clientHeader: "NABYWCA", invNo: "Nr faktury", invDate: "Data wystawienia", dueDate: "Termin płatności", desc: "Nazwa towaru / usługi", qty: "Ilość", unitPrice: "Cena jednostkowa", total: "Wartość netto", subtotal: "Suma netto", vat: "VAT (23%)", totalPayable: "Do zapłaty", payTerms: "Prosimy o wpłatę w ciągu 30 dni.", taxLabel: "PESEL / NIP", ibanLabel: "Numer rachunku bankowego (IBAN)", bankTitle: "WYCIĄG BANKOWY", accHolder: "Posiadacz rachunku", openBal: "Saldo początkowe", closeBal: "Saldo końcowe", payslipTitle: "PASEK WYNAGRODZEŃ / LISTA PŁAC", gross: "Wynagrodzenie brutto", net: "Wynagrodzenie netto", taxFormTitle: "DEKLARACJA PODATKOWA (PIT)", letterTitle: "KORESPONDENCJA POUFNA", kycTitle: "FORMULARZ WERYFIKACJI TOŻSAMOŚCI", kycBody: "Poniżej znajduje się oficjalny dokument tożsamości do weryfikacji zgodności (KYC).", salaryIban: "Konto do wypłaty (IBAN)", taxIban: "Rachunek do zwrotu (IBAN)" },
+      USA: { currency: "$", invoiceTitle: "INVOICE", vendorHeader: "VENDOR", clientHeader: "CLIENT", invNo: "Invoice Number", invDate: "Invoice Date", dueDate: "Due Date", desc: "Description", qty: "Quantity", unitPrice: "Unit Price", total: "Total", subtotal: "Subtotal", vat: "Sales Tax (8.25%)", totalPayable: "Total Due", payTerms: "Payment due within 30 days of invoice.", taxLabel: "Social Security Number (SSN) / EIN", ibanLabel: "Routing / Account", bankTitle: "BANK STATEMENT", accHolder: "Account Holder", openBal: "Starting Balance", closeBal: "Ending Balance", payslipTitle: "PAYSTUB / SALARY STATEMENT", gross: "Gross Pay", net: "Net Pay", taxFormTitle: "FEDERAL TAX RETURN", letterTitle: "CONFIDENTIAL CORRESPONDENCE", kycTitle: "IDENTITY VERIFICATION FORM (KYC)", kycBody: "Please find attached the official identification document for compliance verification.", salaryIban: "Direct Deposit Routing (ACH)", taxIban: "Tax Refund Routing" }
+    };
+
     const LOCALIZED_NAMES_POOL = {
-      NLD: ["DE BRUIJN, EMMA LISANNE", "VAN DIJK, DAAN BERNARD", "BAKKER, SOPHIE MARIE", "JANSEN, LARS JOHANNES"],
-      DEU: ["MÜLLER, MAXIMILIAN", "SCHMIDT, HANNAH LENA", "SCHNEIDER, LUKAS PAUL", "FISCHER, EMILY SOPHIE"],
-      FRA: ["DUBOIS, CAMILLE SOPHIE", "MARTIN, LOUIS ANTOINE", "BERNARD, LÉA MARIE", "PETIT, THOMAS LAURENT"],
-      ESP: ["GARCÍA MARTÍNEZ, ALEJANDRO", "RODRÍGUEZ LÓPEZ, LUCÍA", "SÁNCHEZ GÓMEZ, MATEO", "FERNÁNDEZ PÉREZ, SOFÍA"],
-      ITA: ["ROSSI, EMMA MARIA", "RUSSO, MATTEO LUCA", "FERRARI, GIULIA ELENA", "ESPOSITO, LEONARDO"],
-      JPN: ["SATO, TARO (佐藤 太郎)", "SUZUKI, HANAKO (鈴木 花子)", "TAKAHASHI, KEN (高橋 健)", "TANAKA, YUI (田中 結衣)"],
-      CHN: ["ZHANG, WEI (张 伟)", "WANG, FANG (王 芳)", "LI, NA (李 娜)", "LIU, YANG (刘 洋)"],
-      USA: ["SPECIMEN, EMMA LISANNE", "SMITH, ALEXANDER JAMES", "JOHNSON, OLIVIA ROSE", "WILLIAMS, BENJAMIN ARTHUR"],
-      GBR: ["SPECIMEN, OLIVER JAMES", "BROWN, CHARLOTTE ELIZABETH", "HARRIS, HARRY WILLIAM", "TAYLOR, AMELIA GRACE"]
+      NLD: ["DE BRUIJN, EMMA LISANNE", "VAN DIJK, DAAN BERNARD", "BAKKER, SOPHIE MARIE"],
+      DEU: ["MÜLLER, MAXIMILIAN", "SCHMIDT, HANNAH LENA", "SCHNEIDER, LUKAS PAUL"],
+      FRA: ["DUBOIS, CAMILLE SOPHIE", "MARTIN, LOUIS ANTOINE", "BERNARD, LÉA MARIE"],
+      USA: ["SPECIMEN, EMMA LISANNE", "SMITH, ALEXANDER JAMES", "JOHNSON, OLIVIA ROSE"]
     };
 
     const LOCALIZED_LABELS = {
       NLD: { passport: "PASPOORT", dl: "RIJBEWIJS", id: "IDENTITEITSKAART", surname: "1. NAAM:", given: "2. VOORNAMEN:", dob: "3. GEBOORTEDATUM:", nat: "NATIONALITEIT: Nederlandse" },
-      DEU: { passport: "REISEPASS", dl: "FÜHRERSCHEIN", id: "PERSONALAUSWEIS", surname: "1. NAME:", given: "2. VORNAMEN:", dob: "3. GEBURTSDATUM:", nat: "STAATSANGEHÖRIGKEIT: Deutsch" },
-      FRA: { passport: "PASSEPORT", dl: "PERMIS DE CONDUIRE", id: "CARTE D'IDENTITÉ", surname: "1. NOM:", given: "2. PRÉNOMS:", dob: "3. DATE DE NAISS.:", nat: "NATIONALITÉ: Française" },
-      ESP: { passport: "PASAPORTE", dl: "PERMISO DE CONDUCCIÓN", id: "DOCUMENTO NACIONAL DE IDENTIDAD", surname: "1. APELLIDOS:", given: "2. NOMBRE:", dob: "3. FECHA DE NAC.:", nat: "NACIONALIDAD: Española" },
-      ITA: { passport: "PASSAPORTO", dl: "PATENTE DI GUIDA", id: "CARTA D'IDENTITÀ", surname: "1. COGNOME:", given: "2. NOME:", dob: "3. DATA DI NASCITA:", nat: "CITTADINANZA: Italiana" },
-      JPN: { passport: "RYOKAN (護照)", dl: "UNTEN MENKYO SHO", id: "MY NUMBER CARD", surname: "氏名:", given: "名:", dob: "生年月日:", nat: "国籍: 日本" },
-      CHN: { passport: "HUZHAO (护照)", dl: "JIASHIZHENG", id: "RESIDENT IDENTITY CARD", surname: "姓:", given: "名:", dob: "出生日期:", nat: "国籍: 中国" },
-      USA: { passport: "PASSPORT", dl: "DRIVER LICENSE", id: "NATIONAL IDENTIFICATION CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: USA" },
-      GBR: { passport: "PASSPORT", dl: "DRIVING LICENCE", id: "NATIONAL IDENTITY CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: British" }
+      USA: { passport: "PASSPORT", dl: "DRIVER LICENSE", id: "NATIONAL IDENTIFICATION CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: USA" }
     };
 
-    // REGIONAL CREDIT CARD BRANDS PER COUNTRY POOL
     const REGIONAL_CARD_BRANDS = {
-      JPN: ["JCB", "VISA", "MASTERCARD", "AMEX"],
-      CHN: ["UNIONPAY", "VISA", "MASTERCARD"],
       NLD: ["MAESTRO", "VISA", "MASTERCARD"],
-      DEU: ["MAESTRO", "MASTERCARD", "VISA"],
-      FRA: ["CB", "VISA", "MASTERCARD"],
-      USA: ["VISA", "MASTERCARD", "AMEX", "DISCOVER"],
-      GBR: ["VISA", "MASTERCARD", "AMEX"]
+      USA: ["VISA", "MASTERCARD", "AMEX", "DISCOVER"]
     };
+
+    function getFallbackDictionaryKey(isoCode) {
+      if (TAB4_DICTIONARIES[isoCode]) return isoCode;
+      return 'USA';
+    }
 
     let ocrNameIndex = {};
+    let activeTab4DocType = 'invoice';
+    let currentShuffledCountries = [];
 
     const UN_COUNTRIES_SEED = [
-      { code: "AFG", country: "Afghanistan", dlTitle: "PERMIT", passportTitle: "PASSPORT", taxLabel: "TIN", bogusText: "این یک سند آزمایشی محرمانه است که شامل اطلاعات شناسه دولتی است.", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999", iban: "AF99AAAA9999999999999999" } },
-      { code: "ALB", country: "Albania", dlTitle: "LEJE DREJTIMI", passportTitle: "PASAPORTË", taxLabel: "NIPT", bogusText: "Ky është një dokument konfidencial i testimit të sigurisë që përmban të dhëna.", formats: { taxNumber: "A99999999A", passport: "AL9999999", driverLicense: "DL-ALB-999999", iban: "AL9999999999999999999999" } },
-      { code: "DZA", country: "Algeria", dlTitle: "RUMHSAT QIADA", passportTitle: "PASSEPORT", taxLabel: "NIF", bogusText: "هذا مستند اختبار أمني سري يحتوي على بيانات تحديد الهوية الوطنية.", formats: { taxNumber: "099999999999999999", passport: "DZ9999999", driverLicense: "DL-DZA-999999", iban: "DZ9999999999999999999999" } },
-      { code: "AUT", country: "Austria", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "AT Abgabenkontonummer", bogusText: "Dies ist ein vertrauliches Sicherheitsprüfungsdokument mit staatlichen Identifikationsdaten.", formats: { taxNumber: "99-999/9999", passport: "U9999999", driverLicense: "DL-99999999", iban: "AT999999999999999999" } },
-      { code: "BEL", country: "Belgium", dlTitle: "PERMIS DE CONDUIRE / RIJBEWIJS", passportTitle: "PASSEPORT / PASPOORT", taxLabel: "BE Rijksregister", bogusText: "Dit is een vertrouwelijk veiligheidstestdocument dat officiële identificatiegegevens bevat.", formats: { taxNumber: "99.99.99-999.99", passport: "TA999999", driverLicense: "DL-99999999", iban: "BE99999999999999" } },
-      { code: "BRA", country: "Brazil", dlTitle: "CARTEIRA DE HABILITAÇÃO", passportTitle: "PASSAPORTE", taxLabel: "BR CPF", bogusText: "Este é um documento confidencial de teste de segurança contendo dados oficiais.", formats: { taxNumber: "999.999.999-99", passport: "GN999999", driverLicense: "DL-99999999999", iban: "BR9999999999999999999999999AA" } },
-      { code: "CAN", country: "Canada", dlTitle: "DRIVER LICENSE / PERMIS DE CONDUIRE", passportTitle: "PASSPORT / PASSEPORT", taxLabel: "CA SIN", bogusText: "This is a confidential security benchmark test payload containing official identification records.", formats: { taxNumber: "999-999-999", passport: "ZE999999", driverLicense: "A9999-99999-99999", iban: "CA99AAAA99999999999999" } },
-      { code: "CHN", country: "China", dlTitle: "JIASHIZHENG", passportTitle: "HUZHAO", taxLabel: "USCI", bogusText: "这是一份包含国家身份识别数据的机密安全测试文档。请確保您的网络DLP策略已正确配置。", formats: { taxNumber: "919999999999999999", passport: "G99999999", driverLicense: "DL-999999999", iban: "CN99AAAA99999999999999" } },
-      { code: "FRA", country: "France", dlTitle: "PERMIS DE CONDUIRE", passportTitle: "PASSEPORT", taxLabel: "FR SPI / NIR", bogusText: "Ceci est un document confidentiel de test de sécurité contenant des données d'identification officielles.", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999", iban: "FR9999999999999999999999999" } },
-      { code: "DEU", country: "Germany", dlTitle: "FÜHRERSCHEIN", passportTitle: "REISEPASS", taxLabel: "DE Steuer-ID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999", iban: "DE99999999999999999999" } },
-      { code: "IND", country: "India", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "IN PAN", bogusText: "This is a confidential security testing document containing state identification numbers.", formats: { taxNumber: "AAAAA9999A", passport: "Z9999999", driverLicense: "DL-99999999999999", iban: "IN99AAAA99999999999999" } },
-      { code: "ITA", country: "Italy", dlTitle: "PATENTE DI GUIDA", passportTitle: "PASSAPORTO", taxLabel: "IT Codice Fiscale", bogusText: "Questo è un documento di test di sicurezza riservato contenente dati identificativi statali.", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999", iban: "IT99A9999999999999999999999" } },
-      { code: "JPN", country: "Japan", dlTitle: "UNTEN MENKYO SHO", passportTitle: "RYOKAN", taxLabel: "JP My Number", bogusText: "これは国家識別データを含む機密のセキュリティテスト用テキストです。DLPルールを確認してください。", formats: { taxNumber: "9999 9999 9999", passport: "TR999999", driverLicense: "DL-99999999", iban: "JP99AAAA99999999999999" } },
-      { code: "NLD", country: "Netherlands", dlTitle: "RIJBEWIJS", passportTitle: "PASPOORT", taxLabel: "NL BSN", bogusText: "Dit is een vertrouwelijk beveiligingstestdocument dat officiële identificatiegegevens van de overheid bevat.", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999", iban: "NL99AAAA9999999999" } },
-      { code: "NOR", country: "Norway", dlTitle: "FØRERKORT", passportTitle: "PASS", taxLabel: "Fødselsnummer", bogusText: "Dette er et konfidensielt sikkerhetstestdokument som inneholder offisielle identifikasjonsdata.", formats: { taxNumber: "999999 99999", passport: "NO9999999", driverLicense: "DL-NOR-999999", iban: "NO99999999999" } },
-      { code: "POL", country: "Poland", dlTitle: "PRAWO JAZDY", passportTitle: "PASZPORT", taxLabel: "PL PESEL", bogusText: "To jest poufny dokument testowy bezpieczeństwa zawierający państwowe dane identyfikacyjne.", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999", iban: "PL999999999999999999999999" } },
-      { code: "ESP", country: "Spain", dlTitle: "PERMISO DE CONDUCCIÓN", passportTitle: "PASAPORTE", taxLabel: "ES DNI / NIE", bogusText: "Este es un documento confidencial de prueba de seguridad operacional que contiene datos de identificación nacional.", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999", iban: "ES9999999999999999999999" } },
-      { code: "SWE", country: "Sweden", dlTitle: "KÖRKORT", passportTitle: "PASS", taxLabel: "SE Personnummer", bogusText: "Detta är ett konfidentiellt säkerhetstestdokument som innehåller officiella identitetsuppgifter.", formats: { taxNumber: "999999-9999", passport: "80999999", driverLicense: "DL-99999999", iban: "SE99999999999999999999" } },
-      { code: "CHE", country: "Switzerland", dlTitle: "PERMIS DE CONDUIRE / FÜHRERSCHEIN", passportTitle: "PASSEPORT / PASSPORT", taxLabel: "CH AHV / UID", bogusText: "Dies ist ein vertrauliches Prüfdokument zur Überprüfung von Datenverlustpräventionssystemen.", formats: { taxNumber: "756.9999.9999.99", passport: "CH9999999", driverLicense: "DL-CHE-999999", iban: "CH9999999999999999999" } },
-      { code: "GBR", country: "United Kingdom", dlTitle: "DRIVING LICENCE", passportTitle: "PASSPORT", taxLabel: "UK NINO", bogusText: "This is a confidential benchmark test payload containing official state identification and tax records.", formats: { taxNumber: "AA 99 99 99 A", passport: "999999999", driverLicense: "AAAAA999999AA9AA", iban: "GB99AAAA99999999999999" } },
-      { code: "USA", country: "United States", dlTitle: "DRIVER LICENSE", passportTitle: "PASSPORT", taxLabel: "US SSN", bogusText: "This document contains confidential benchmark testing information and simulated state identification numbers.", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999", iban: "US99AAAA99999999999999" } }
+      { code: "AFG", formats: { taxNumber: "09999999999", passport: "AF9999999", driverLicense: "DL-AFG-999999" } },
+      { code: "DEU", formats: { taxNumber: "99 999 999 999", passport: "C9AA999AA", driverLicense: "B9999999999" } },
+      { code: "ESP", formats: { taxNumber: "99999999A", passport: "PAB999999", driverLicense: "DL-99999999" } },
+      { code: "FRA", formats: { taxNumber: "1 99 99 99 999 999", passport: "99AA99999", driverLicense: "DL-15AA99999" } },
+      { code: "ITA", formats: { taxNumber: "AAAAAA99A99A999A", passport: "YA9999999", driverLicense: "DL-U9999999" } },
+      { code: "JPN", formats: { taxNumber: "T9999999999999", passport: "TR999999", driverLicense: "DL-99999999" } },
+      { code: "NLD", formats: { taxNumber: "999999999", passport: "AA9999999", driverLicense: "9999999999" } },
+      { code: "POL", formats: { taxNumber: "99999999999", passport: "PL9999999", driverLicense: "DL-POL-999999" } },
+      { code: "USA", formats: { taxNumber: "999-99-9999", passport: "A99999999", driverLicense: "A9999999" } }
     ];
 
     const ALL_195_ISO_CODES = ["AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE","BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH","BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF","TCD","CHL","CHN","COL","COM","COG","COD","CRI","CIV","HRV","CUB","CYP","CZE","DNK","DJI","DMA","DOM","ECU","EGY","SLV","GNQ","ERI","EST","SWZ","ETH","FJI","FIN","FRA","GAB","GMB","GEO","DEU","GHA","GRC","GRD","GTM","GIN","GNB","GUY","HTI","HND","HUN","ISL","IND","IDN","IRN","IRQ","IRL","ISR","ITA","JAM","JPN","JOR","KAZ","KEN","KIR","PRK","KOR","KWT","KGZ","LAO","LVA","LBN","LSO","LBR","LBY","LIE","LTU","LUX","MDG","MWI","MYS","MDV","MLI","MLT","MHL","MRT","MUS","MEX","FSM","MDA","MCO","MNG","MNE","MAR","MOZ","MMR","NAM","NRU","NPL","NLD","NZL","NIC","NER","NGA","MKD","NOR","OMN","PAK","PLW","PSE","PAN","PNG","PRY","PER","PHL","POL","PRT","QAT","ROU","RUS","RWA","KNA","LCA","VCT","WSM","SMR","STP","SAU","SEN","SRB","SYC","SLE","SGP","SVK","SVN","SLB","SOM","ZAF","SSD","ESP","LKA","SDN","SUR","SWE","CHE","SYR","TWN","TJK","TZA","THA","TLS","TGO","TON","TTO","TUN","TUR","TKM","TUV","UGA","UKR","ARE","GBR","USA","URY","UZB","VUT","VAT","VEN","VNM","YEM","ZMB","ZWE"];
-
-    const COUNTRY_NAMES_MAP = {
-      AFG:"Afghanistan", ALB:"Albania", DZA:"Algeria", AND:"Andorra", AGO:"Angola", ATG:"Antigua and Barbuda", ARG:"Argentina", ARM:"Armenia", AUS:"Australia", AUT:"Austria", AZE:"Azerbaijan", BHS:"Bahamas", BHR:"Bahrain", BGD:"Bangladesh", BRB:"Barbados", BLR:"Belarus", BEL:"Belgium", BLZ:"Belize", BEN:"Benin", BTN:"Bhutan", BOL:"Bolivia", BIH:"Bosnia and Herzegovina", BWA:"Botswana", BRA:"Brazil", BRN:"Brunei", BGR:"Bulgaria", BFA:"Burkina Faso", BDI:"Burundi", CPV:"Cabo Verde", KHM:"Cambodia", CMR:"Cameroon", CAN:"Canada", CAF:"Central African Republic", TCD:"Chad", CHL:"Chile", CHN:"China", COL:"Colombia", COM:"Comoros", COG:"Congo", COD:"Congo (DRC)", CRI:"Costa Rica", CIV:"Côte d'Ivoire", HRV:"Croatia", CUB:"Cuba", CYP:"Cyprus", CZE:"Czech Republic", DNK:"Denmark", DJI:"Djibouti", DMA:"Dominica", DOM:"Dominican Republic", ECU:"Ecuador", EGY:"Egypt", SLV:"El Salvador", GNQ:"Equatorial Guinea", ERI:"Eritrea", EST:"Estonia", SWZ:"Eswatini", ETH:"Ethiopia", FJI:"Fiji", FIN:"Finland", FRA:"France", GAB:"Gabon", GMB:"Gambia", GEO:"Georgia", DEU:"Germany", GHA:"Ghana", GRC:"Greece", GRD:"Grenada", GTM:"Guatemala", GIN:"Guinea", GNB:"Guinea-Bissau", GUY:"Guyana", HTI:"Haiti", HND:"Honduras", HUN:"Hungary", ISL:"Iceland", IND:"India", IDN:"Indonesia", IRN:"Iran", IRQ:"Iraq", IRL:"Ireland", ISR:"Israel", ITA:"Italy", JAM:"Jamaica", JPN:"Japan", JOR:"Jordan", KAZ:"Kazakhstan", KEN:"Kenya", KIR:"Kiribati", PRK:"North Korea", KOR:"South Korea", KWT:"Kuwait", KGZ:"Kyrgyzstan", LAO:"Laos", LVA:"Latvia", LBN:"Lebanon", LSO:"Lesotho", LBR:"Liberia", LBY:"Libya", LIE:"Liechtenstein", LTU:"Lithuania", LUX:"Luxembourg", MDG:"Madagascar", MWI:"Malawi", MYS:"Malaysia", MDV:"Maldives", MLI:"Mali", MLT:"Malta", MHL:"Marshall Islands", MRT:"Mauritania", MUS:"Mauritius", MEX:"Mexico", FSM:"Micronesia", MDA:"Moldova", MCO:"Monaco", MNG:"Mongolia", MNE:"Montenegro", MAR:"Morocco", MOZ:"Mozambique", MMR:"Myanmar", NAM:"Namibia", NRU:"Nauru", NPL:"Nepal", NLD:"Netherlands", NZL:"New Zealand", NIC:"Nicaragua", NER:"Niger", NGA:"Nigeria", MKD:"North Macedonia", NOR:"Norway", OMN:"Oman", PAK:"Pakistan", PLW:"Palau", PSE:"Palestine", PAN:"Panama", PNG:"Papua New Guinea", PRY:"Paraguay", PER:"Peru", PHL:"Philippines", POL:"Poland", PRT:"Portugal", QAT:"Qatar", ROU:"Romania", RUS:"Russia", RWA:"Rwanda", KNA:"Saint Kitts and Nevis", LCA:"Saint Lucia", VCT:"Saint Vincent", WSM:"Samoa", SMR:"San Marino", STP:"Sao Tome and Principe", SAU:"Saudi Arabia", SEN:"Senegal", SRB:"Serbia", SYC:"Seychelles", SLE:"Sierra Leone", SGP:"Singapore", SVK:"Slovakia", SVN:"Slovenia", SLB:"Solomon Islands", SOM:"Somalia", ZAF:"South Africa", SSD:"South Sudan", ESP:"Spain", LKA:"Sri Lanka", SDN:"Sudan", SUR:"Suriname", SWE:"Sweden", CHE:"Switzerland", SYR:"Syria", TWN:"Taiwan", TJK:"Tajikistan", TZA:"Tanzania", THA:"Thailand", TLS:"Timor-Leste", TGO:"Togo", TON:"Tonga", TTO:"Trinidad and Tobago", TUN:"Tunisia", TUR:"Turkey", TKM:"Turkmenistan", TUV:"Tuvalu", UGA:"Uganda", UKR:"Ukraine", ARE:"United Arab Emirates", GBR:"United Kingdom", USA:"United States", URY:"Uruguay", UZB:"Uzbekistan", VUT:"Vanuatu", VAT:"Vatican City", VEN:"Venezuela", VNM:"Vietnam", YEM:"Yemen", ZMB:"Zambia", ZWE:"Zimbabwe"
-    };
+    
+    const COUNTRY_NAMES_MAP = { AFG:"Afghanistan", DEU:"Germany", FRA:"France", NLD:"Netherlands", USA:"United States" };
 
     const COUNTRY_DEFINITIONS = ALL_195_ISO_CODES.map(code => {
       const found = UN_COUNTRIES_SEED.find(item => item.code === code);
       const name = COUNTRY_NAMES_MAP[code] || code;
       if (found) return { ...found, country: name };
-      return {
-        code: code,
-        country: name,
-        dlTitle: "DRIVER LICENSE",
-        passportTitle: "PASSPORT",
-        taxLabel: `${code} Tax ID`,
-        bogusText: `This is a confidential security benchmark test payload containing official state identification records for jurisdiction ${name}.`,
-        formats: {
-          taxNumber: `${code}-99999999`,
-          passport: `${code.substring(0,2)}9999999`,
-          driverLicense: `DL-${code}-999999`,
-          iban: `${code.substring(0,2)}99AAAA999999999999`
-        }
-      };
+      return { code: code, country: name, formats: { taxNumber: `${code}-99999999`, passport: `${code.substring(0,2)}9999999`, driverLicense: `DL-${code}-999999` } };
     });
 
+    // --- TAB 3 AI ENGINES: DIRECT SIMPLE-REQUEST WIRE TARGETS ---
     const AI_ENGINES = {
       openai: { name: "OpenAI ChatGPT (GPT-4o)", webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
       anthropic: { name: "Anthropic Claude (Claude 3.5 Sonnet)", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet" },
-      perplexity: { name: "Perplexity AI (Sonar Reasoning)", webEndpoint: "https://www.perplexity.ai/search", apiEndpoint: "https://api.perplexity.ai/search", model: "sonar-reasoning" },
       gemini: { name: "Google Gemini (Gemini 1.5 Pro)", webEndpoint: "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?hl=nl&rt=c", apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", model: "gemini-1.5-pro" },
-      copilot: { name: "Microsoft Copilot (Enterprise)", webEndpoint: "https://copilot.microsoft.com/sydney/ChatHub", apiEndpoint: "https://sydney.bing.com/sydney/ChatHub", model: "copilot-enterprise" },
-      mistral: { name: "Mistral AI (Mistral Large)", webEndpoint: "https://chat.mistral.ai/api/chat", apiEndpoint: "https://api.mistral.ai/v1/chat/completions", model: "mistral-large" },
-      ollama: { name: "Ollama (Llama 3 Local / Open-WebUI)", webEndpoint: "http://localhost:3000/api/chat", apiEndpoint: "http://localhost:11434/api/generate", model: "llama3" }
+      perplexity: { name: "Perplexity AI (Sonar Reasoning)", webEndpoint: "https://www.perplexity.ai/search", apiEndpoint: "https://api.perplexity.ai/chat/completions", model: "sonar-reasoning" },
+      copilot: { name: "Microsoft Copilot (GPT-4 Turbo)", webEndpoint: "https://copilot.microsoft.com/turing/conversation/create", apiEndpoint: "https://models.inference.ai.azure.com/chat/completions", model: "gpt-4o" },
+      meta: { name: "Meta AI / Groq (Llama 3.3 70B)", webEndpoint: "https://www.meta.ai/api/graphql/", apiEndpoint: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile" }
     };
-
-    let currentShuffledCountries = [];
 
     function populateAiSelect() {
       const select = document.getElementById('aiEngineSelect');
       if (!select) return;
-      select.innerHTML = Object.keys(AI_ENGINES).map(key => {
-        const e = AI_ENGINES[key];
-        return `<option value="${key}">${e.name}</option>`;
-      }).join('');
+      select.innerHTML = Object.keys(AI_ENGINES).map(key => `<option value="${key}">${AI_ENGINES[key].name}</option>`).join('');
       onAiEngineChange();
     }
 
@@ -612,34 +686,23 @@
       const engineKey = document.getElementById('aiEngineSelect').value;
       const trafficType = document.getElementById('aiTrafficTypeSelect').value;
       const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai;
-      
-      let targetUrl = "https://httpbin.org/post";
-      if (trafficType === 'web_endpoint') {
-        targetUrl = engine.webEndpoint;
-      } else if (trafficType === 'api_endpoint') {
-        targetUrl = engine.apiEndpoint;
-      }
-
-      return { engine, trafficType, targetUrl };
+      return { engine, trafficType, targetUrl: trafficType === 'web_endpoint' ? engine.webEndpoint : engine.apiEndpoint };
     }
 
     function onAiEngineChange() {
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
       const welcome = document.getElementById('aiWelcomeMsg');
-      welcome.innerText = `🤖 Sandbox active for ${engine.name} [Routing: ${trafficType === 'web_endpoint' ? 'Web-Endpoint' : 'API-Endpoint'}]. Target: ${targetUrl}`;
+      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Model: ${engine.model}]. Target: ${targetUrl}`;
       log(`Switched AI Engine target to ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
     }
 
     function generateLuhnForBrand(brand) {
-      let prefix = "4532";
-      let length = 16;
-
-      if (brand === "MASTERCARD") { prefix = "5241"; }
+      let prefix = "4532", length = 16;
+      if (brand === "MASTERCARD") prefix = "5241";
       else if (brand === "AMEX") { prefix = "3782"; length = 15; }
-      else if (brand === "DISCOVER") { prefix = "6011"; }
-      else if (brand === "JCB") { prefix = "3528"; }
-      else if (brand === "UNIONPAY") { prefix = "6221"; }
-      else if (brand === "MAESTRO") { prefix = "6759"; }
+      else if (brand === "DISCOVER") prefix = "6011";
+      else if (brand === "JCB") prefix = "3528";
+      else if (brand === "UNIONPAY") prefix = "6221";
 
       let cc = prefix;
       while (cc.length < length - 1) cc += Math.floor(Math.random() * 10);
@@ -651,114 +714,139 @@
       }
       const checkDigit = (10 - (sum % 10)) % 10;
       const fullNum = cc + checkDigit;
-
       if (brand === "AMEX") return fullNum.replace(/(\d{4})(\d{6})(\d{5})/, '$1 $2 $3');
       return fullNum.replace(/(.{4})/g, '$1 ').trim();
     }
 
     function getByteSize(str) { return new Blob([str]).size; }
-
     function updateByteCount() {
       const val = document.getElementById('payload').value;
-      const bytes = getByteSize(val);
       const counter = document.getElementById('byteCounter');
+      if (!counter) return;
+      const bytes = getByteSize(val);
       counter.innerText = `${bytes} / 250 bytes min`;
       counter.className = bytes >= 250 ? "byte-counter valid" : "byte-counter invalid";
     }
 
     function padPayloadToMinBytes() {
       const code = document.getElementById('countrySelect').value;
-      const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
       const payloadBox = document.getElementById('payload');
-      
       let text = payloadBox.value.trim();
-      const filler = c.bogusText || "This document contains confidential security benchmark testing information.";
-
-      while (getByteSize(text) < 250) {
-        text += (text ? "\n\n" : "") + filler;
-      }
-
+      const filler = `This document contains confidential security benchmark testing information for jurisdiction ${code}.`;
+      while (getByteSize(text) < 250) { text += (text ? "\n\n" : "") + filler; }
       payloadBox.value = text;
       updateByteCount();
       log(`Padded payload with native bogus text (${getByteSize(text)} bytes total).`);
     }
 
-    function getRandomisedCountries() {
+    // --- SEPARATED TAB 1 / TAB 4 INITIALIZATION ---
+    function initializeCountryDropdowns() {
       currentShuffledCountries = shuffleArray(COUNTRY_DEFINITIONS);
-      const select = document.getElementById('countrySelect');
-      select.innerHTML = currentShuffledCountries.map(c => `<option value="${c.code}">${c.country} (${c.code})</option>`).join('');
-      updateCountryData();
+      const select1 = document.getElementById('countrySelect');
+      const select4 = document.getElementById('tab4CountrySelect');
+      const optionsHtml = currentShuffledCountries.map(c => `<option value="${c.code}">${c.country} (${c.code})</option>`).join('');
+      if (select1) select1.innerHTML = optionsHtml;
+      if (select4) select4.innerHTML = optionsHtml;
+      
+      updateTab1CountryData();
+      renderTab4Document();
+    }
+
+    function regenerateTab1Data() {
+      currentShuffledCountries = shuffleArray(COUNTRY_DEFINITIONS);
+      const select1 = document.getElementById('countrySelect');
+      if (select1) select1.innerHTML = currentShuffledCountries.map(c => `<option value="${c.code}">${c.country} (${c.code})</option>`).join('');
+      updateTab1CountryData();
+      log('Reshuffled Tab 1 country list and regenerated fresh synthetic payloads.');
     }
 
     function getActiveSpecimenName(code) {
-      const pool = LOCALIZED_NAMES_POOL[code] || LOCALIZED_NAMES_POOL.USA;
-      const idx = ocrNameIndex[code] || 0;
-      return pool[idx % pool.length];
+      const dKey = getFallbackDictionaryKey(code);
+      const pool = LOCALIZED_NAMES_POOL[dKey] || LOCALIZED_NAMES_POOL.USA;
+      return pool[(ocrNameIndex[code] || 0) % pool.length];
     }
 
     function getActiveCardBrand(code) {
-      const pool = REGIONAL_CARD_BRANDS[code] || ["VISA", "MASTERCARD", "AMEX", "DISCOVER"];
-      const idx = ocrNameIndex[code] || 0;
-      return pool[idx % pool.length];
+      const dKey = getFallbackDictionaryKey(code);
+      const pool = REGIONAL_CARD_BRANDS[dKey] || ["VISA", "MASTERCARD", "AMEX"];
+      return pool[(ocrNameIndex[code] || 0) % pool.length];
     }
 
     function rotateOcrSpecimenName() {
       const code = document.getElementById('countrySelect').value;
       ocrNameIndex[code] = (ocrNameIndex[code] || 0) + 1;
-      updateCountryData();
-      log(`Rotated specimen name and card brand for jurisdiction ${code} to: "${getActiveSpecimenName(code)}" [${getActiveCardBrand(code)}]`);
+      updateTab1CountryData();
+      log(`Rotated specimen name and card brand for ${code} to: "${getActiveSpecimenName(code)}" [${getActiveCardBrand(code)}]`);
     }
 
-    function updateCountryData() {
-      const code = document.getElementById('countrySelect').value;
+    function getValidTaxIdForCountry(code) {
+      if (code === 'NLD') return `BSN (Burgerservicenummer): ${generateValidBSN()}`;
+      if (code === 'ESP') return `DNI / NIF: ${generateValidSpanishDNI()}`;
+      if (code === 'POL') return `PESEL: ${generateValidPESEL()}`;
+      
       const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
-      
-      const labels = LOCALIZED_LABELS[code] || LOCALIZED_LABELS.USA;
-      const passportTitle = labels.passport || c.passportTitle || 'PASSPORT';
-      const dlTitle = labels.dl || c.dlTitle || 'DRIVER LICENSE';
-      const idTitle = labels.id || 'NATIONAL ID CARD';
+      const dKey = getFallbackDictionaryKey(code);
+      const dict = TAB4_DICTIONARIES[dKey] || TAB4_DICTIONARIES.USA;
+      return `${dict.taxLabel || 'Tax ID'}: ${formatPattern(c.formats.taxNumber)}`;
+    }
 
-      const activeBrand = getActiveCardBrand(code);
-      document.getElementById('ocr-cc-title').innerText = `${activeBrand} Card (PCI)`;
+    function updateTab1CountryData() {
+      try {
+        const codeSelect = document.getElementById('countrySelect');
+        if (!codeSelect) return;
+        const code = codeSelect.value;
+        const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
+        
+        const dKey = getFallbackDictionaryKey(code);
+        const labels = LOCALIZED_LABELS[dKey] || LOCALIZED_LABELS.USA;
+        const dict = TAB4_DICTIONARIES[dKey] || TAB4_DICTIONARIES.USA;
 
-      document.getElementById('label-tax').innerText = `${c.taxLabel} Card`;
-      document.getElementById('label-passport').innerText = `${passportTitle} Card`;
-      document.getElementById('label-dl').innerText = `${dlTitle} Card`;
-      
-      document.getElementById('ocr-passport-title').innerText = `${passportTitle} Specimen`;
-      document.getElementById('ocr-dl-title').innerText = `${dlTitle} Specimen`;
-      document.getElementById('ocr-id-title').innerText = `${idTitle} Specimen`;
+        const passportTitle = labels.passport || 'PASSPORT';
+        const dlTitle = labels.dl || 'DRIVER LICENSE';
+        const idTitle = labels.id || 'NATIONAL ID CARD';
 
-      const taxVal = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
-      const passVal = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
-      const dlVal = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
-      const cardVal = `${activeBrand}: ${generateLuhnForBrand(activeBrand)}`;
-      const ibanVal = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
+        const activeBrand = getActiveCardBrand(code);
+        const ocrCcTitle = document.getElementById('ocr-cc-title');
+        if (ocrCcTitle) ocrCcTitle.innerText = `${activeBrand} Card (PCI)`;
 
-      document.getElementById('val-tax').innerText = taxVal;
-      document.getElementById('val-passport').innerText = passVal;
-      document.getElementById('val-dl').innerText = dlVal;
-      document.getElementById('val-card').innerText = cardVal;
-      document.getElementById('val-iban').innerText = ibanVal;
+        document.getElementById('label-tax').innerText = `${dict.taxLabel || 'Tax ID'}`;
+        document.getElementById('label-passport').innerText = `${passportTitle} Number`;
+        document.getElementById('label-dl').innerText = `${dlTitle} ID`;
+        
+        document.getElementById('ocr-passport-title').innerText = `${passportTitle} Specimen`;
+        document.getElementById('ocr-dl-title').innerText = `${dlTitle} Specimen`;
+        document.getElementById('ocr-id-title').innerText = `${idTitle} Specimen`;
 
-      renderPassportCanvas(c.country, c.code, passVal, passportTitle);
-      renderDlCanvas(c.country, c.code, dlVal, taxVal, dlTitle);
-      renderIdCanvas(c.country, c.code, taxVal, idTitle);
-      renderCcCanvas(c.code, cardVal);
+        const taxVal = getValidTaxIdForCountry(code);
+        const passVal = `${passportTitle} No: ${formatPattern(c.formats.passport)}`;
+        const dlVal = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
+        const cardVal = `${activeBrand}: ${generateLuhnForBrand(activeBrand)}`;
+        const ibanVal = generateValidIBANOrRouting(code);
+
+        document.getElementById('val-tax').innerText = taxVal;
+        document.getElementById('val-passport').innerText = passVal;
+        document.getElementById('val-dl').innerText = dlVal;
+        document.getElementById('val-card').innerText = cardVal;
+        document.getElementById('val-iban').innerText = ibanVal;
+
+        renderPassportCanvas(c.country, c.code, passVal, passportTitle);
+        renderDlCanvas(c.country, c.code, dlVal, taxVal, dlTitle);
+        renderIdCanvas(c.country, c.code, taxVal, idTitle);
+        renderCcCanvas(c.code, cardVal);
+      } catch (err) { console.error("updateTab1CountryData error:", err); }
     }
 
     function renderPassportCanvas(countryName, countryCode, passNum, passportTitle) {
       const canvas = document.getElementById('passportCanvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      const labels = LOCALIZED_LABELS[countryCode] || LOCALIZED_LABELS.USA;
+      const dKey = getFallbackDictionaryKey(countryCode);
+      const labels = LOCALIZED_LABELS[dKey] || LOCALIZED_LABELS.USA;
       const holderName = getActiveSpecimenName(countryCode);
 
       ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, 400, 260);
-
       ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.5;
-      for (let i = 0; i < 260; i += 8) {
-        ctx.beginPath(); ctx.moveTo(0, i); ctx.bezierCurveTo(100, i + 10, 200, i - 10, 400, i); ctx.stroke();
-      }
+      for (let i = 0; i < 260; i += 8) { ctx.beginPath(); ctx.moveTo(0, i); ctx.bezierCurveTo(100, i + 10, 200, i - 10, 400, i); ctx.stroke(); }
 
       ctx.fillStyle = '#0284c7'; ctx.fillRect(0, 0, 400, 40);
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
@@ -772,7 +860,7 @@
       ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
       ctx.fillText(`${labels.surname} ${holderName.split(',')[0] || 'SPECIMEN'}`, 120, 75);
       ctx.fillText(`${labels.given} ${holderName.split(',')[1] || 'EMMA LISANNE'}`, 120, 95);
-      ctx.fillText(labels.nat, 120, 115);
+      ctx.fillText(labels.nat || 'NATIONALITY', 120, 115);
       ctx.fillText(passNum, 120, 135);
 
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 185, 400, 75);
@@ -784,12 +872,13 @@
 
     function renderDlCanvas(countryName, countryCode, dlVal, taxVal, dlTitle) {
       const canvas = document.getElementById('dlCanvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      const labels = LOCALIZED_LABELS[countryCode] || LOCALIZED_LABELS.USA;
+      const dKey = getFallbackDictionaryKey(countryCode);
+      const labels = LOCALIZED_LABELS[dKey] || LOCALIZED_LABELS.USA;
       const holderName = getActiveSpecimenName(countryCode);
 
       ctx.fillStyle = '#e2e8f0'; ctx.fillRect(0, 0, 400, 260);
-
       ctx.fillStyle = '#1e3a8a'; ctx.fillRect(0, 0, 400, 40);
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
       ctx.fillText(`${dlTitle} - ${countryCode}`, 15, 24);
@@ -801,25 +890,20 @@
 
       ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
       ctx.fillText(`${labels.surname} ${holderName}`, 120, 75);
-      ctx.fillText(labels.dob || "3. GEBOORTEDATUM: 25.12.1984", 120, 95);
-      ctx.fillText(`3. ${dlVal}`, 120, 120);
-      ctx.fillText(`4. ${taxVal}`, 120, 145);
-
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 200, 400, 60);
-      ctx.fillStyle = '#000000';
-      for (let x = 15; x < 385; x += Math.floor(Math.random() * 5 + 2)) {
-        ctx.fillRect(x, 210, Math.floor(Math.random() * 3 + 1), 40);
-      }
+      ctx.fillText(labels.dob || "DOB: 25.12.1984", 120, 95);
+      ctx.fillText(`${dlVal}`, 120, 120);
+      ctx.fillText(`${taxVal}`, 120, 145);
     }
 
     function renderIdCanvas(countryName, countryCode, taxVal, idTitle) {
       const canvas = document.getElementById('idCanvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      const labels = LOCALIZED_LABELS[countryCode] || LOCALIZED_LABELS.USA;
+      const dKey = getFallbackDictionaryKey(countryCode);
+      const labels = LOCALIZED_LABELS[dKey] || LOCALIZED_LABELS.USA;
       const holderName = getActiveSpecimenName(countryCode);
 
       ctx.fillStyle = '#f1f5f9'; ctx.fillRect(0, 0, 400, 260);
-
       ctx.fillStyle = '#0f766e'; ctx.fillRect(0, 0, 400, 40);
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
       ctx.fillText(`${idTitle} - ${countryCode}`, 15, 24);
@@ -832,60 +916,32 @@
       ctx.fillStyle = '#0f172a'; ctx.font = 'bold 11px sans-serif';
       ctx.fillText(`${labels.surname} ${holderName}`, 120, 75);
       ctx.fillText(labels.dob || "DOB: 25.12.1984", 120, 95);
-      ctx.fillText(labels.nat, 120, 120);
-      ctx.fillText(`ID / ${taxVal}`, 120, 145);
-
-      ctx.fillStyle = '#0f766e'; ctx.fillRect(0, 190, 400, 70);
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px monospace';
-      ctx.fillText(`I<${countryCode}SPECIMEN<<${holderName.replace(/[^A-Z]/g, '<')}<<<<<<<<`, 10, 215);
-      ctx.fillText(`ID999999999${countryCode}8412254F2810010<<<<<<<<<<01`, 10, 240);
+      ctx.fillText(labels.nat || 'NATIONALITY', 120, 120);
+      ctx.fillText(`ID / ${taxVal.split(':')[1] || taxVal}`, 120, 145);
     }
 
     function renderCcCanvas(countryCode, cardVal) {
       const canvas = document.getElementById('ccCanvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const brand = getActiveCardBrand(countryCode);
       const holderName = getActiveSpecimenName(countryCode);
 
       let grad = ctx.createLinearGradient(0, 0, 400, 260);
-      if (brand === "AMEX") {
-        grad.addColorStop(0, '#1e3a8a'); grad.addColorStop(1, '#0284c7');
-      } else if (brand === "JCB") {
-        grad.addColorStop(0, '#065f46'); grad.addColorStop(1, '#0284c7');
-      } else if (brand === "UNIONPAY") {
-        grad.addColorStop(0, '#881337'); grad.addColorStop(1, '#1e3a8a');
-      } else {
-        grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#311042');
-      }
+      if (brand === "AMEX") { grad.addColorStop(0, '#1e3a8a'); grad.addColorStop(1, '#0284c7'); } 
+      else if (brand === "JCB") { grad.addColorStop(0, '#065f46'); grad.addColorStop(1, '#0284c7'); } 
+      else if (brand === "UNIONPAY") { grad.addColorStop(0, '#881337'); grad.addColorStop(1, '#1e3a8a'); } 
+      else { grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#311042'); }
       ctx.fillStyle = grad; ctx.fillRect(0, 0, 400, 260);
 
-      // EMV Chip
       ctx.fillStyle = '#f59e0b'; ctx.fillRect(30, 60, 42, 32);
       ctx.strokeStyle = '#78350f'; ctx.strokeRect(30, 60, 42, 32);
 
-      // Contactless Wave
       ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
-      for (let r = 8; r <= 18; r += 5) {
-        ctx.beginPath(); ctx.arc(95, 76, r, -Math.PI / 4, Math.PI / 4); ctx.stroke();
-      }
+      for (let r = 8; r <= 18; r += 5) { ctx.beginPath(); ctx.arc(95, 76, r, -Math.PI / 4, Math.PI / 4); ctx.stroke(); }
 
-      // Brand Logo
       ctx.fillStyle = '#ffffff'; ctx.font = 'italic bold 18px sans-serif';
-      if (brand === "MASTERCARD") {
-        ctx.fillStyle = '#eb001b'; ctx.beginPath(); ctx.arc(330, 45, 14, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#f79e1b'; ctx.beginPath(); ctx.arc(348, 45, 14, 0, Math.PI * 2); ctx.fill();
-      } else if (brand === "JCB") {
-        ctx.fillStyle = '#003780'; ctx.fillRect(310, 32, 16, 24);
-        ctx.fillStyle = '#e60012'; ctx.fillRect(328, 32, 16, 24);
-        ctx.fillStyle = '#00873c'; ctx.fillRect(346, 32, 16, 24);
-        ctx.fillStyle = '#fff'; ctx.font = 'bold 11px sans-serif'; ctx.fillText("JCB", 318, 48);
-      } else if (brand === "UNIONPAY") {
-        ctx.fillStyle = '#e60012'; ctx.fillRect(310, 32, 22, 24);
-        ctx.fillStyle = '#003780'; ctx.fillRect(334, 32, 22, 24);
-        ctx.fillStyle = '#fff'; ctx.font = 'bold 9px sans-serif'; ctx.fillText("UnionPay", 312, 47);
-      } else {
-        ctx.fillText(brand, 310, 45);
-      }
+      ctx.fillText(brand, 310, 45);
 
       ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 15px monospace';
       ctx.fillText(cardVal.replace(/^[^:]+:\s*/, ''), 30, 150);
@@ -895,36 +951,185 @@
       ctx.fillText(holderName.toUpperCase(), 30, 210);
     }
 
-    function generateSingleField(type) {
-      const code = document.getElementById('countrySelect').value;
-      const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
-      const passportTitle = c.passportTitle || 'PASSPORT';
-      const dlTitle = c.dlTitle || 'DRIVER LICENSE';
-
-      if (type === 'tax') document.getElementById('val-tax').innerText = `${c.taxLabel}: ${formatPattern(c.formats.taxNumber)}`;
-      else if (type === 'passport') document.getElementById('val-passport').innerText = `${passportTitle} Number: ${formatPattern(c.formats.passport)}`;
-      else if (type === 'dl') document.getElementById('val-dl').innerText = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
-      else if (type === 'card') {
-        const brand = getActiveCardBrand(code);
-        document.getElementById('val-card').innerText = `${brand}: ${generateLuhnForBrand(brand)}`;
-      }
-      else if (type === 'iban') document.getElementById('val-iban').innerText = `IBAN: ${formatPattern(c.formats.iban || (c.code.substring(0,2) + '99AAAA999999999999'))}`;
-      else if (type === 'secret') document.getElementById('val-secret').innerText = `AWS Secret Key: ${formatPattern('AKIAIOSFODNN7EXAMPLE')}`;
+    // --- TAB 4 DECOUPLED INDEPENDENT LOCALIZED RENDERER ---
+    function setTab4DocType(type, evt) {
+      activeTab4DocType = type;
+      document.querySelectorAll('.doc-type-btn').forEach(btn => btn.classList.remove('active'));
+      if (evt && evt.target) evt.target.classList.add('active');
+      renderTab4Document();
     }
 
-    function regenerateData() {
-      getRandomisedCountries();
-      log('Reshuffled country list and generated fresh randomized payloads with localized proximity context.');
+    function getCanvasDataURL(id) {
+      const cvs = document.getElementById(id);
+      return cvs ? cvs.toDataURL('image/png') : '';
     }
 
-    function copyAndInject(elementId, fieldType) {
-      const text = document.getElementById(elementId).innerText;
-      navigator.clipboard.writeText(text);
-      const payloadBox = document.getElementById('payload');
-      payloadBox.value = payloadBox.value ? payloadBox.value + "\n" + text : text;
-      updateByteCount();
-      log(`Copied and injected into payload area: ${text}`);
-      generateSingleField(fieldType);
+    function renderTab4Document() {
+      try {
+        const stage = document.getElementById('a4PreviewStage');
+        if (!stage) return;
+
+        const select = document.getElementById('tab4CountrySelect');
+        const code = select ? select.value : 'NLD';
+        const dKey = getFallbackDictionaryKey(code);
+        const dict = TAB4_DICTIONARIES[dKey] || TAB4_DICTIONARIES.USA;
+        const name = getActiveSpecimenName(code);
+        
+        const taxVal = getValidTaxIdForCountry(code);
+        const ibanVal = generateValidIBANOrRouting(code);
+
+        let html = '';
+
+        if (activeTab4DocType === 'invoice') {
+          html = `
+            <table style="width:100%; border-bottom: 2px solid #06b6d4; margin-bottom: 20px;">
+              <tr>
+                <td style="vertical-align:top; width:50%;">
+                  <h1 style="font-size:22px; color:#0f172a; margin:0;">${dict.invoiceTitle}</h1>
+                  <p style="color:#64748b; margin:0;">Ref: INV-${Math.floor(Math.random()*89999+10000)}</p>
+                </td>
+                <td style="vertical-align:top; width:50%; text-align:right;">
+                  <p style="margin:0; font-weight:bold;">${dict.vendorHeader}: CYBER EGRESS B.V.</p>
+                  <p style="margin:0;">${taxVal}</p>
+                </td>
+              </tr>
+            </table>
+            <table style="width:100%; margin-bottom:20px;">
+              <tr>
+                <td style="vertical-align:top; width:50%;">
+                  <p style="margin:0; font-weight:bold;">${dict.clientHeader}:</p>
+                  <p style="margin:0;">${name}</p>
+                </td>
+                <td style="vertical-align:top; width:50%; text-align:right;">
+                  <p style="margin:0;">${dict.invDate}: ${new Date().toLocaleDateString()}</p>
+                  <p style="margin:0;">${dict.dueDate}: 30 Days Net</p>
+                </td>
+              </tr>
+            </table>
+            <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+              <thead>
+                <tr style="background:#f1f5f9; text-align:left;">
+                  <th style="padding:8px; border-bottom:1px solid #cbd5e1;">${dict.desc}</th>
+                  <th style="padding:8px; border-bottom:1px solid #cbd5e1;">${dict.qty}</th>
+                  <th style="padding:8px; border-bottom:1px solid #cbd5e1;">${dict.unitPrice}</th>
+                  <th style="padding:8px; border-bottom:1px solid #cbd5e1;">${dict.total}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">Security DLP License &amp; Inspection Audit</td>
+                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">1</td>
+                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">${dict.currency} 1,250.00</td>
+                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">${dict.currency} 1,250.00</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="text-align:right; margin-bottom:30px;">
+              <p style="margin:0;">${dict.subtotal}: ${dict.currency} 1,250.00</p>
+              <p style="margin:0;">${dict.vat}: ${dict.currency} 262.50</p>
+              <h3 style="margin:5px 0 0 0; color:#0f172a;">${dict.totalPayable}: ${dict.currency} 1,512.50</h3>
+            </div>
+          `;
+        } else if (activeTab4DocType === 'bank_stmt') {
+          html = `
+            <div style="border-bottom: 2px solid #0f766e; padding-bottom: 12px; margin-bottom: 20px;">
+              <h1 style="font-size:20px; color:#0f172a; margin:0;">${dict.bankTitle}</h1>
+              <p style="color:#64748b; margin:0;">${dict.accHolder}: ${name}</p>
+              <p style="color:#64748b; margin:0;">${dict.ibanLabel}: ${ibanVal}</p>
+            </div>
+            <table style="width:100%; margin-bottom:20px; background:#f8fafc; border-collapse:collapse;">
+              <tr>
+                <td style="padding:10px; width:50%;">${dict.openBal}: <strong>${dict.currency} 4,820.50</strong></td>
+                <td style="padding:10px; width:50%; text-align:right;">${dict.closeBal}: <strong>${dict.currency} 6,333.00</strong></td>
+              </tr>
+            </table>
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="background:#f1f5f9; text-align:left;">
+                  <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Date</th>
+                  <th style="padding:8px; border-bottom:1px solid #cbd5e1;">${dict.desc}</th>
+                  <th style="padding:8px; border-bottom:1px solid #cbd5e1;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">01/10/2026</td>
+                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">Salary Transfer Corp B.V.</td>
+                  <td style="padding:8px; border-bottom:1px solid #e2e8f0; color:#10b981;">+${dict.currency} 2,452.50</td>
+                </tr>
+              </tbody>
+            </table>
+          `;
+        } else if (activeTab4DocType === 'payslip') {
+          html = `
+            <div style="border-bottom: 2px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px;">
+              <h1 style="font-size:20px; color:#0f172a; margin:0;">${dict.payslipTitle}</h1>
+              <p style="color:#64748b; margin:0;">Period: October 2026</p>
+            </div>
+            <table style="width:100%; margin-bottom:20px;">
+              <tr>
+                <td style="vertical-align:top; width:50%;">
+                  <p style="margin:0; font-weight:bold;">Employee:</p><p style="margin:0;">${name}</p><p style="margin:0;">${taxVal}</p>
+                </td>
+                <td style="vertical-align:top; width:50%; text-align:right;">
+                  <p style="margin:0; font-weight:bold;">${dict.salaryIban}:</p><p style="margin:0;">${ibanVal}</p>
+                </td>
+              </tr>
+            </table>
+            <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+              <tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${dict.gross}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0; text-align:right;">${dict.currency} 3,500.00</td></tr>
+              <tr><td style="padding:8px; border-bottom:1px solid #e2e8f0; color:#ef4444;">Taxes & Deductions</td><td style="padding:8px; border-bottom:1px solid #e2e8f0; text-align:right; color:#ef4444;">-${dict.currency} 1,047.50</td></tr>
+              <tr style="font-weight:bold;"><td style="padding:8px;">${dict.net}</td><td style="padding:8px; text-align:right;">${dict.currency} 2,452.50</td></tr>
+            </table>
+          `;
+        } else if (activeTab4DocType === 'tax_form') {
+          html = `
+            <div style="border-bottom: 2px solid #ef4444; padding-bottom: 12px; margin-bottom: 20px;">
+              <h1 style="font-size:20px; color:#0f172a; margin:0;">${dict.taxFormTitle}</h1>
+              <p style="color:#64748b; margin:0;">Fiscal Year: 2026 | Jurisdiction: ${code}</p>
+            </div>
+            <div style="margin-bottom:20px;">
+              <p style="margin:0; font-weight:bold;">Taxpayer Details:</p>
+              <p style="margin:0;">${name}</p>
+              <p style="margin:0; color:#ef4444; font-weight:bold;">${taxVal}</p>
+            </div>
+            <div style="background:#f1f5f9; padding:15px; border-radius:4px; margin-bottom:20px;">
+              <p style="margin:0 0 10px 0; font-weight:bold;">${dict.taxIban}:</p>
+              <p style="margin:0; font-family:monospace; font-size:14px;">${ibanVal}</p>
+            </div>
+          `;
+        } else if (activeTab4DocType === 'official_letter') {
+          html = `
+            <div style="border-bottom: 2px solid #8b5cf6; padding-bottom: 12px; margin-bottom: 20px;">
+              <h1 style="font-size:20px; color:#0f172a; margin:0;">${dict.letterTitle}</h1>
+              <p style="color:#64748b; margin:0;">Jurisdiction Target: ${code}</p>
+            </div>
+            <p>Dear ${name},</p>
+            <p>This document contains confidential security benchmark testing records generated specifically for compliance validation.</p>
+            <p><strong>RECORDS ATTACHED:</strong></p>
+            <ul><li>${taxVal}</li><li>${dict.ibanLabel}: ${ibanVal}</li></ul>
+          `;
+        } else if (activeTab4DocType.includes('kyc')) {
+          let imgSrc = '';
+          if (activeTab4DocType === 'passport_kyc') imgSrc = getCanvasDataURL('passportCanvas');
+          if (activeTab4DocType === 'dl_kyc') imgSrc = getCanvasDataURL('dlCanvas');
+          if (activeTab4DocType === 'id_kyc') imgSrc = getCanvasDataURL('idCanvas');
+          
+          html = `
+            <div style="border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 20px;">
+              <h1 style="font-size:20px; color:#0f172a; margin:0;">${dict.kycTitle}</h1>
+              <p style="color:#64748b; margin:0;">Jurisdiction: ${code} | Applicant: ${name}</p>
+            </div>
+            <p>${dict.kycBody}</p>
+            <div style="margin: 20px 0; text-align:center;">
+              ${imgSrc ? `<img src="${imgSrc}" style="max-width:100%; border:1px solid #cbd5e1; border-radius:6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" />` : '<p>Specimen rendering...</p>'}
+            </div>
+            <p style="font-size:10px; color:#64748b;">${taxVal} | Generated by Network DLP Bench</p>
+          `;
+        }
+
+        stage.innerHTML = html;
+      } catch (err) { console.error("renderTab4Document error:", err); }
     }
 
     function downloadCanvas(canvasId, filenamePrefix) {
@@ -945,26 +1150,264 @@
         log(`Initiating OCR specimen transfer: ${filename} (${(blob.size / 1024).toFixed(1)} KB)...`);
         try {
           const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
-          if (response.ok) log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
-        } catch (err) {
-          log(`TRAFFIC BLOCKED: OCR Document specimen intercepted/dropped by DLP proxy! (${err.message})`, true);
+          if (response.ok) {
+            log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
+          } else {
+            triggerAutomaticBlockPage(true, filename);
+            log(`TRAFFIC BLOCKED: OCR Document specimen intercepted by DLP proxy (HTTP ${response.status})!`, true);
+          }
+        } catch (err) { 
+          triggerAutomaticBlockPage(true, filename);
+          log(`TRAFFIC BLOCKED: OCR Document specimen dropped by DLP firewall!`, true); 
         }
       }, 'image/png');
     }
 
+    // --- AUTOMATIC BLOCK PAGE ENGINE (RAW PALO ALTO PAN-OS VARIABLE TAGS) ---
+    function triggerAutomaticBlockPage(isFilePayload, payloadName, customReason) {
+      const blockSection = document.getElementById('blockPageSection');
+      const blockContent = document.getElementById('blockPageContent');
+      if (!blockSection || !blockContent) return;
+
+      let html = '';
+
+      if (isFilePayload) {
+        html = `
+          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
+              <span style="font-size:24px;">📁</span>
+              <div>
+                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">File Transfer Blocked</h2>
+                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Next-Generation Firewall</p>
+              </div>
+            </div>
+            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">Access blocked because access to the file is blocked by security policy.</p>
+            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">File Name:</td><td style="padding:8px; color:#2d3748; font-family:monospace; font-weight:bold;">&lt;file-name&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">URL / Target:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">&lt;url&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">File Blocking Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;file-blocking-profile&gt;</td></tr>
+              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;action&gt;</td></tr>
+            </table>
+          </div>
+        `;
+      } else {
+        html = `
+          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
+              <span style="font-size:24px;">🚫</span>
+              <div>
+                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">Data Filtering Violation</h2>
+                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Enterprise Security Gateway</p>
+              </div>
+            </div>
+            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">Content was matched against a data filtering profile and blocked because sensitive information was detected.</p>
+            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">URL / Host:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">&lt;url&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Application:</td><td style="padding:8px; color:#2d3748;">&lt;appname&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Data Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;data-profile&gt;</td></tr>
+              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;action&gt;</td></tr>
+            </table>
+          </div>
+        `;
+      }
+
+      blockContent.innerHTML = html;
+      blockSection.style.display = 'block';
+      blockSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeBlockPageViewer() {
+      const section = document.getElementById('blockPageSection');
+      if (section) section.style.display = 'none';
+    }
+
+    function onIframeLoad() {
+      try {
+        const iframe = document.getElementById('egressTargetIframe');
+        if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
+          const bodyHtml = iframe.contentDocument.body.innerHTML;
+          if (bodyHtml && bodyHtml.trim().length > 0) {
+            triggerAutomaticBlockPage(true, "native_form_upload.bin");
+            log(`CAPTURER: Intercepted response payload from target iframe.`);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // --- RESET TEST BENCH FUNCTION ---
+    function resetTestBench() {
+      const payloadBox = document.getElementById('payload');
+      if (payloadBox) payloadBox.value = '';
+      updateByteCount();
+
+      const aiInput = document.getElementById('aiPromptInput');
+      if (aiInput) aiInput.value = '';
+
+      const fileInput = document.getElementById('generalFileInput');
+      if (fileInput) fileInput.value = '';
+
+      closeBlockPageViewer();
+
+      const logBox = document.getElementById('logBox');
+      if (logBox) logBox.innerHTML = '[Awaiting network request execution...]';
+
+      updateTab1CountryData();
+      renderTab4Document();
+      log('🔄 Test bench, input fields, block page viewer, and inspection logs have been reset.');
+    }
+
+    // --- TAB 4 EXPORT PIPELINE WITH TRUE DOCX GENERATOR ---
+    function transformPayload(text, encoding) {
+      if (encoding === 'base64') return btoa(unescape(encodeURIComponent(text)));
+      if (encoding === 'url') return encodeURIComponent(text);
+      if (encoding === 'hex') return Array.from(text).map(c => '0x' + c.charCodeAt(0).toString(16)).join(' ');
+      if (encoding === 'html') return Array.from(text).map(c => '&#' + c.charCodeAt(0) + ';').join('');
+      return text;
+    }
+
+    async function exportTab4Document(fmt, returnBlob = false) {
+      const stage = document.getElementById('a4PreviewStage');
+      if (!stage) return null;
+      
+      const code = document.getElementById('tab4CountrySelect').value;
+      const encodingSelect = document.getElementById('tab4EncodingSelect');
+      const archiveSelect = document.getElementById('tab4ArchiveSelect');
+      
+      const encoding = encodingSelect ? encodingSelect.value : 'none';
+      const archive = archiveSelect ? archiveSelect.value : 'none';
+      
+      let filename = `${activeTab4DocType}_${code.toLowerCase()}`;
+      let finalBlob = null;
+
+      if (fmt === 'txt' || fmt === 'csv' || fmt === 'json') {
+        let text = stage.innerText;
+        if (fmt === 'json') text = JSON.stringify({ document_type: activeTab4DocType, jurisdiction: code, extracted_text: text }, null, 2);
+        if (fmt === 'csv') text = `type,jurisdiction,content\n"${activeTab4DocType}","${code}","${text.replace(/"/g, '""')}"`;
+        text = transformPayload(text, encoding);
+        finalBlob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        filename += `.${fmt}`;
+      } 
+      else if (fmt === 'pdf' && window.jspdf && window.html2canvas) {
+        const { jsPDF } = window.jspdf;
+        const canvas = await html2canvas(stage, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        finalBlob = pdf.output('blob');
+        filename += '.pdf';
+      }
+      else if (fmt === 'png' && window.html2canvas) {
+        const canvas = await html2canvas(stage, { scale: 2 });
+        finalBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        filename += '.png';
+      }
+      else if (fmt === 'docx' && window.htmlDocx) {
+        const htmlStr = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${stage.innerHTML}</body></html>`;
+        finalBlob = htmlDocx.asBlob(htmlStr);
+        filename += '.docx';
+      }
+
+      if (archive !== 'none' && window.JSZip && finalBlob) {
+        const zip = new JSZip();
+        zip.file(filename, finalBlob);
+        finalBlob = await zip.generateAsync({ type: "blob" });
+        filename += (archive === 'zip_enc') ? '_encrypted.zip' : '.zip';
+      }
+
+      if (returnBlob) return { blob: finalBlob, filename };
+
+      if (finalBlob) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(finalBlob);
+        a.download = filename;
+        a.click();
+        log(`Exported file: ${filename}`);
+      }
+    }
+
+    async function exportAllBundle() {
+      if (!window.JSZip) return;
+      log('Compiling Export ALL Bundle...');
+      const zip = new JSZip();
+      const formats = ['pdf', 'png', 'txt', 'json', 'csv', 'docx'];
+      for (let fmt of formats) {
+        const res = await exportTab4Document(fmt, true);
+        if (res && res.blob) zip.file(res.filename, res.blob);
+      }
+      const bundleBlob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(bundleBlob);
+      a.download = `DLP_Benchmark_Bundle_${document.getElementById('tab4CountrySelect').value}.zip`;
+      a.click();
+    }
+
+    async function transmitTab4OutboundDirect(fmt) {
+      const formatSelect = document.getElementById('tab4TransmitFormat');
+      if (formatSelect) formatSelect.value = fmt;
+      await transmitTab4Outbound();
+    }
+
+    async function transmitTab4Outbound() {
+      const formatSelect = document.getElementById('tab4TransmitFormat');
+      const fmt = formatSelect ? formatSelect.value : 'txt';
+      
+      log(`Compiling ${fmt.toUpperCase()} document payload for outbound network transmission...`);
+      const exportData = await exportTab4Document(fmt, true);
+      if (!exportData || !exportData.blob) return;
+      
+      const { blob, filename } = exportData;
+      log(`Transmitting dynamic document payload outbound (${(blob.size / 1024).toFixed(1)} KB)...`);
+      
+      const formData = new FormData();
+      formData.append('dlp_document_payload', blob, filename);
+
+      try {
+        const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
+        if (response.ok) {
+          log(`TRAFFIC PASSED: Document payload (${filename}) transmitted across network (200 OK).`);
+        } else {
+          triggerAutomaticBlockPage(true, filename);
+          log(`TRAFFIC BLOCKED: Outbound document rejected by proxy (HTTP ${response.status})!`, true);
+        }
+      } catch (err) { 
+        triggerAutomaticBlockPage(true, filename);
+        log(`TRAFFIC BLOCKED: Outbound document blocked by network firewall!`, true); 
+      }
+    }
+
     function log(msg, isError = false) {
       const box = document.getElementById('logBox');
+      if (!box) return;
       const time = new Date().toLocaleTimeString();
       box.innerHTML = `<span style="color:${isError ? '#ff7b72' : '#10b981'}">[${time}] ${msg}</span><br/>` + box.innerHTML;
     }
 
-    function appendChatMessage(sender, text, isUser = false) {
-      const chatBox = document.getElementById('chatBox');
-      const div = document.createElement('div');
-      div.className = `chat-msg ${isUser ? 'msg-user' : 'msg-ai'}`;
-      div.innerText = `${sender}: ${text}`;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
+    function copyAndInject(elementId, fieldType) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text);
+      const payloadBox = document.getElementById('payload');
+      payloadBox.value = payloadBox.value ? payloadBox.value + "\n" + text : text;
+      updateByteCount();
+      log(`Copied and injected into payload area: ${text}`);
+      
+      const code = document.getElementById('countrySelect').value;
+      const c = currentShuffledCountries.find(item => item.code === code) || currentShuffledCountries[0];
+      const dKey = getFallbackDictionaryKey(code);
+      const dict = TAB4_DICTIONARIES[dKey] || TAB4_DICTIONARIES.USA;
+      const passportTitle = c.passportTitle || 'PASSPORT';
+      const dlTitle = c.dlTitle || 'DRIVER LICENSE';
+
+      if (fieldType === 'tax') document.getElementById('val-tax').innerText = getValidTaxIdForCountry(code);
+      else if (fieldType === 'passport') document.getElementById('val-passport').innerText = `${passportTitle} No: ${formatPattern(c.formats.passport)}`;
+      else if (fieldType === 'dl') document.getElementById('val-dl').innerText = `${dlTitle} ID: ${formatPattern(c.formats.driverLicense)}`;
+      else if (fieldType === 'card') {
+        const brand = getActiveCardBrand(code);
+        document.getElementById('val-card').innerText = `${brand}: ${generateLuhnForBrand(brand)}`;
+      }
+      else if (fieldType === 'iban') document.getElementById('val-iban').innerText = generateValidIBANOrRouting(code);
+      else if (fieldType === 'secret') document.getElementById('val-secret').innerText = `AWS Secret Key: ${formatPattern('AKIAIOSFODNN7EXAMPLE')}`;
     }
 
     async function sendRealNetworkPost(e) {
@@ -978,109 +1421,181 @@
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ dlp_test_payload: val })
         });
-        if (response.ok) log(`TRAFFIC PASSED: Outbound HTTP POST reached external destination (200 OK). Proxy allowed payload.`);
-        else log(`TRAFFIC ALTERED: Response code ${response.status}`, true);
+        if (response.ok) {
+          log(`TRAFFIC PASSED: Outbound HTTP POST reached external destination (200 OK). Proxy allowed payload.`);
+        } else {
+          triggerAutomaticBlockPage(false, null, "Synthetic Data / PII String");
+          log(`TRAFFIC BLOCKED: Outbound request rejected by inline proxy (HTTP ${response.status})!`, true);
+        }
       } catch (err) {
-        log(`TRAFFIC BLOCKED: Connection dropped/reset by network DLP layer! (${err.message})`, true);
+        triggerAutomaticBlockPage(false, null, "Synthetic Data / PII String");
+        log(`TRAFFIC BLOCKED: Connection dropped or reset by network firewall/DLP layer!`, true);
       }
     }
 
+    // --- TAB 2 ENHANCED FILE EGRESS WITH NATIVE FORM / IFRAME EGRESS ---
     async function sendGeneralFileUpload() {
       const input = document.getElementById('generalFileInput');
       if (!input.files || input.files.length === 0) { log('Error: Select a file first.', true); return; }
       const file = input.files[0];
+      const mode = document.getElementById('tab2EgressModeSelect').value;
+
+      log(`Initiating file transfer [Mode: ${mode.toUpperCase()}]: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
+
+      if (mode === 'native-form') {
+        const form = document.getElementById('nativeEgressForm');
+        form.innerHTML = '';
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.name = 'document_file';
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        form.appendChild(fileInput);
+        form.submit();
+        log(`WIRE EGRESS DISPATCHED: Native multipart/form-data packet dispatched over network card via iframe target to https://httpbin.org/post. Proxy inspected raw socket payload.`);
+        return;
+      }
+
+      if (mode === 'chunked') {
+        const chunkSize = 1024 * 64; 
+        let offset = 0;
+        let chunkIndex = 0;
+        while (offset < file.size) {
+          const chunk = file.slice(offset, offset + chunkSize);
+          const formData = new FormData();
+          formData.append('chunk_index', chunkIndex);
+          formData.append('chunk_data', chunk, `${file.name}.part${chunkIndex}`);
+          try {
+            const resp = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
+            if (resp.status === 403 || resp.status === 401) {
+              triggerAutomaticBlockPage(true, `${file.name}.part${chunkIndex}`);
+              log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${resp.status})! Network gateway dropped chunk ${chunkIndex + 1}.`, true);
+              return;
+            }
+            log(`Chunk ${chunkIndex + 1} transmitted (${chunk.size} bytes). Status: ${resp.status}`);
+          } catch (e) {
+            triggerAutomaticBlockPage(true, `${file.name}.part${chunkIndex}`);
+            log(`Chunk ${chunkIndex + 1} intercepted/dropped by DLP network reset!`, true);
+            return;
+          }
+          offset += chunkSize;
+          chunkIndex++;
+        }
+        log(`CHUNKED STREAM COMPLETED: All ${chunkIndex} binary blocks passed through network interface.`);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('document_file', file);
-      log(`Initiating multipart file upload: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`);
+
       try {
         const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
-        if (response.ok) log(`TRAFFIC PASSED: Standard file transfer succeeded (200 OK). Proxy allowed upload.`);
+        if (response.status === 403 || response.status === 401) {
+          triggerAutomaticBlockPage(true, file.name);
+          log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${response.status})! Network proxy rejected the file upload.`, true);
+        } else if (response.ok) {
+          log(`FILE TRAFFIC PASSED: Standard multipart upload permitted (200 OK).`);
+        } else {
+          log(`FILE TRAFFIC ALTERED: Response code ${response.status}`, true);
+        }
       } catch (err) {
-        log(`TRAFFIC BLOCKED: Standard file transfer dropped or reset by network DLP layer! (${err.message})`, true);
+        triggerAutomaticBlockPage(true, file.name);
+        log(`FILE TRAFFIC INTERCEPTED / DROPPED: File upload packet was dropped or reset by network DLP layer! (${err.message})`, true);
       }
+    }
+
+    // --- TAB 3 SHADOW AI HANDLERS: SIMPLE-REQUEST WIRE DISPATCH ---
+    function appendChatMessage(sender, text, msgClass = 'msg-ai') {
+      const chatBox = document.getElementById('chatBox');
+      if (!chatBox) return;
+      const div = document.createElement('div');
+      div.className = `chat-msg ${msgClass}`;
+      div.innerText = `${sender}: ${text}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     async function sendAiPrompt() {
       const input = document.getElementById('aiPromptInput');
       const promptText = input.value.trim();
       if (!promptText) { log('Error: AI prompt field is empty.', true); return; }
-
+      
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
-
-      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, true);
+      const isWeb = trafficType === 'web_endpoint';
+      
+      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, 'msg-user');
       input.value = '';
-      log(`Transmitting AI prompt outbound (${trafficType.toUpperCase()} mode) to target: ${targetUrl}...`);
-
+      log(`Transmitting AI prompt outbound to target: ${targetUrl}...`);
+      
       try {
-        const isWebEndpoint = (trafficType === 'web_endpoint');
+        // Use CORS Simple Requests (x-www-form-urlencoded) to slam payloads directly onto the wire without OPTIONS preflights
         const fetchOptions = {
-          method: 'POST',
-          mode: isWebEndpoint ? 'no-cors' : 'cors',
-          headers: { 'Content-Type': isWebEndpoint ? 'application/x-www-form-urlencoded' : 'application/json' },
-          body: isWebEndpoint ? new URLSearchParams({ f_req: promptText, prompt: promptText, query: promptText }) : JSON.stringify({ engine: engine.name, traffic_type: trafficType, simulated_endpoint: targetUrl, model: engine.model, prompt: promptText })
+          method: 'POST', 
+          mode: isWeb ? 'no-cors' : 'cors',
+          headers: isWeb ? { 'Content-Type': 'application/x-www-form-urlencoded' } : { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText, query: promptText })
         };
-
-        if (trafficType === 'mirror') fetchOptions.headers['X-Simulated-Target'] = targetUrl;
         
         const response = await fetch(targetUrl, fetchOptions);
         
-        if (isWebEndpoint) {
-          log(`AI DIRECT TRAFFIC DISPATCHED: Opaque HTTP POST packet transmitted over network card to ${targetUrl}. Firewall / SWG inspected wire payload.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Direct TCP/TLS packet dispatched to ${targetUrl}. Inline SWG/DLP inspected the outbound wire traffic.`);
-        } else if (response.ok) {
-          log(`AI TRAFFIC PASSED: Prompt payload delivered to ${engine.name} target (${targetUrl}). Status: ${response.status}`);
-          appendChatMessage(`🤖 ${engine.name}`, `Prompt transmitted to ${targetUrl}. Outbound packet permitted.`);
+        if (isWeb) {
+          log(`🚨 EXFILTRATION SUCCESSFUL: Payload dispatched over wire to ${targetUrl}`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked over Web Interface to ${engine.name}.\n\nThe inline DLP firewall ALLOWED the TCP connection. Payload was transmitted across the network to the external domain.`, 'msg-ai-passed');
         } else {
-          log(`AI TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Connection established.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Packet reached target domain (${targetUrl}). Response code: ${response.status}.`);
+          // API Endpoint handling with sanitized output
+          if (response.status === 401 || response.status === 400 || response.status === 403 || response.ok) {
+            log(`🚨 EXFILTRATION SUCCESSFUL: Payload reached API infrastructure (HTTP ${response.status}).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. Data successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
+          } else {
+            appendChatMessage(`🤖 ${engine.name}`, `Server response status: HTTP ${response.status}`, 'msg-ai-passed');
+          }
         }
       } catch (err) {
-        log(`AI TRAFFIC INTERCEPTED / BLOCKED: Outbound request to ${targetUrl} was dropped or reset by network DLP/CORS rules! (${err.message})`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [Connection Intercepted: Outbound prompt packet to ${targetUrl} was dropped or blocked by network DLP/firewall layer.]`);
+        // TCP Reset or Socket Drop by Palo Alto NGFW
+        log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG layer.`, true);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nNetwork connection to ${targetUrl} was forcibly reset or intercepted by the inline security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
+        // Standard chat notification only — standalone block page intentionally omitted for Tab 3
       }
     }
 
     async function sendAiFileAttachment() {
       const input = document.getElementById('aiFileInput');
       if (!input.files || input.files.length === 0) { log('Error: Select a file to upload to AI first.', true); return; }
+      
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
+      const isWeb = trafficType === 'web_endpoint';
       const file = input.files[0];
       const formData = new FormData();
-      formData.append('ai_engine', engine.name);
-      formData.append('traffic_type', trafficType);
-      formData.append('simulated_endpoint', targetUrl);
       formData.append('ai_document_attachment', file);
-      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()}) File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]`, true);
-      log(`Transmitting AI file attachment outbound (${trafficType.toUpperCase()} mode) to ${targetUrl}...`);
-
+      
+      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] Uploading File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'msg-user');
+      log(`Transmitting AI file attachment outbound to ${targetUrl}...`);
+      
       try {
-        const isWebEndpoint = (trafficType === 'web_endpoint');
-        const response = await fetch(targetUrl, { 
-          method: 'POST', 
-          mode: isWebEndpoint ? 'no-cors' : 'cors',
-          body: formData 
-        });
+        const response = await fetch(targetUrl, { method: 'POST', mode: isWeb ? 'no-cors' : 'cors', body: formData });
         
-        if (isWebEndpoint) {
-          log(`AI DIRECT FILE UPLOAD DISPATCHED: Multipart attachment packet transmitted over network card to ${targetUrl}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Direct multipart file upload transmitted to ${targetUrl}.`);
-        } else if (response.ok) {
-          log(`AI FILE TRAFFIC PASSED: File upload permitted to ${targetUrl}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `File ${file.name} uploaded to ${targetUrl}.`);
+        if (isWeb) {
+          log(`🚨 EXFILTRATION SUCCESSFUL: File attachment '${file.name}' reached external AI infrastructure.`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Attachment Leaked:\nFile '${file.name}' (${(file.size / 1024).toFixed(1)} KB) transmitted over wire to ${engine.name}. Outbound packet permitted by inline firewall.`, 'msg-ai-passed');
         } else {
-          log(`AI FILE TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Connection established.`);
-          appendChatMessage(`🤖 ${engine.name}`, `File packet reached ${targetUrl} (Status ${response.status}).`);
+          if (response.status === 401 || response.status === 400 || response.status === 403 || response.ok) {
+            log(`🚨 EXFILTRATION SUCCESSFUL: File reached API infrastructure (HTTP ${response.status}).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. File successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
+          }
         }
       } catch (err) {
-        log(`AI FILE TRAFFIC BLOCKED: Multipart attachment request to ${targetUrl} intercepted or reset by inline DLP proxy! (${err.message})`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP.]`);
+        log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' to ${targetUrl} was reset or intercepted by inline security rules.`, 'msg-ai-blocked');
       }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      mountProtectedAttribution();
-      populateAiSelect();
-      getRandomisedCountries();
+      try {
+        mountProtectedAttribution();
+        populateAiSelect();
+        initializeCountryDropdowns();
+      } catch (e) { console.error("DOM Init Error:", e); }
     });
   </script>
 </body>
