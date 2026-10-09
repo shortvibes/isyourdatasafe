@@ -691,7 +691,7 @@
       gemini: { 
         name: "Google Gemini (Gemini 1.5 Pro)", 
         webEndpoint: "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?hl=nl&rt=c", 
-        apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", 
+        apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=AIzaSyDUMMY_KEY_FOR_DLP_TESTING_12345", 
         model: "gemini-1.5-pro",
         preferredMode: "api_endpoint"
       },
@@ -1731,12 +1731,12 @@
           })
         });
 
-        if (resp.status === 403 || resp.status === 503) {
-          logAiBlock(engine.name, targetUrl, `Proxy returned HTTP ${resp.status}`);
-        } else if (resp.status === 400 || resp.status === 200 || resp.status === 401) {
-          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status}`);
+        if (resp.status === 400 || resp.status === 401 || resp.status === 403 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
+        } else if (resp.status === 503) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted request (HTTP ${resp.status})`);
         } else {
-          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status}`);
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
         }
       } catch (err) {
         logAiBlock(engine.name, targetUrl, 'TCP connection dropped/reset by DLP firewall');
@@ -1748,10 +1748,12 @@
       formData.append('file', file);
       try {
         const resp = await fetch(targetUrl, { method: 'POST', body: formData });
-        if (resp.status === 403 || resp.status === 503) {
-          logAiBlock(engine.name, targetUrl, `Proxy returned HTTP ${resp.status}`);
+        if (resp.status === 400 || resp.status === 401 || resp.status === 403 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
+        } else if (resp.status === 503) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted request (HTTP ${resp.status})`);
         } else {
-          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status}`);
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
         }
       } catch (err) {
         logAiBlock(engine.name, targetUrl, 'Google API file upload connection reset');
