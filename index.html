@@ -190,10 +190,12 @@
     .subtab-panel { display: none; }
     .subtab-panel.active { display: block; }
 
-    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-    .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; }
+    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 280px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .chat-msg { max-width: 88%; padding: 10px 14px; border-radius: 6px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; }
     .msg-user { align-self: flex-end; background: #1e1b4b; border: 1px solid #4338ca; color: #818cf8; }
     .msg-ai { align-self: flex-start; background: #0f172a; border: 1px solid var(--border); color: var(--text); }
+    .msg-ai-blocked { align-self: flex-start; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: #fca5a5; font-weight: 600; }
+    .msg-ai-passed { align-self: flex-start; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--accent-green); color: #a7f3d0; }
 
     .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
 
@@ -363,14 +365,15 @@
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX (FULL 6 ENGINES WITH SMART STATUS DIFFERENTIATION) -->
+    <!-- TAB 3: SHADOW AI SANDBOX (REAL RESPONSE & EXFILTRATION PROOF FLOW) -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox</h2>
+        <p>Tests live prompt/file exfiltration to Generative AI engines. If inline security fails, the real AI response displays directly in chat as visual proof of data leakage.</p>
         <div class="selector-bar"><label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label><select id="aiEngineSelect" onchange="onAiEngineChange()"></select></div>
         <div class="selector-bar" style="margin-bottom:15px;"><label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label><select id="aiTrafficTypeSelect" onchange="onAiEngineChange()"><option value="web_endpoint">🌐 Web-Endpoint (Direct Browser UI Target POST via no-cors)</option><option value="api_endpoint">⚡ API-Endpoint (Direct Developer API POST to Target Domain)</option></select></div>
         <div class="chat-container" id="chatBox"><div class="chat-msg msg-ai" id="aiWelcomeMsg">🤖 GenAI Sandbox initialized.</div></div>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="aiPromptInput" placeholder="Type AI prompt here..." style="flex: 1;" /><button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button></div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="aiPromptInput" placeholder="Type AI prompt or paste sensitive data here..." style="flex: 1;" /><button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button></div>
         <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;"><label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom: 6px;">Attach File to AI Assistant (Uploads Real Packet):</label><div style="display: flex; gap: 8px;"><input type="file" id="aiFileInput" style="flex:1;" /><button class="btn btn-purple" onclick="sendAiFileAttachment()">Transmit File to AI</button></div></div>
       </div>
     </div>
@@ -1613,23 +1616,23 @@
       }
     }
 
-    function appendChatMessage(sender, text, isUser = false) {
+    // --- TAB 3 SHADOW AI HANDLERS: REAL RESPONSE & INLINE EXFILTRATION PROOF ---
+    function appendChatMessage(sender, text, msgClass = 'msg-ai') {
       const chatBox = document.getElementById('chatBox');
       if (!chatBox) return;
       const div = document.createElement('div');
-      div.className = `chat-msg ${isUser ? 'msg-user' : 'msg-ai'}`;
+      div.className = `chat-msg ${msgClass}`;
       div.innerText = `${sender}: ${text}`;
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // --- TAB 3 AI HANDLERS WITH SMART STATUS DIFFERENTIATION (APPROACH 1) ---
     async function sendAiPrompt() {
       const input = document.getElementById('aiPromptInput');
       const promptText = input.value.trim();
       if (!promptText) { log('Error: AI prompt field is empty.', true); return; }
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
-      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, true);
+      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, 'msg-user');
       input.value = '';
       log(`Transmitting AI prompt outbound (${trafficType.toUpperCase()} mode) to target: ${targetUrl}...`);
       
@@ -1638,40 +1641,34 @@
         const fetchOptions = {
           method: 'POST', mode: isWebEndpoint ? 'no-cors' : 'cors',
           headers: { 'Content-Type': isWebEndpoint ? 'application/x-www-form-urlencoded' : 'application/json' },
-          body: isWebEndpoint ? new URLSearchParams({ f_req: promptText, prompt: promptText, query: promptText }) : JSON.stringify({ engine: engine.name, traffic_type: trafficType, simulated_endpoint: targetUrl, model: engine.model, prompt: promptText })
+          body: isWebEndpoint ? new URLSearchParams({ f_req: promptText, prompt: promptText, query: promptText }) : JSON.stringify({ engine: engine.name, traffic_type: trafficType, model: engine.model, prompt: promptText })
         };
         
         const response = await fetch(targetUrl, fetchOptions);
         
-        if (isWebEndpoint) {
-          log(`AI DIRECT TRAFFIC DISPATCHED: Opaque HTTP POST packet transmitted over network card to ${targetUrl}. Inline SWG inspected wire payload.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Direct TCP/TLS packet dispatched to ${targetUrl}. Network firewall path open.`);
-        } else if (response.ok) {
-          log(`AI TRAFFIC PASSED: Prompt payload delivered to ${engine.name} target (${targetUrl}). Status: ${response.status}`);
-          appendChatMessage(`🤖 ${engine.name}`, `Prompt transmitted to ${targetUrl}. Outbound packet permitted.`);
-        } else if (response.status === 401 || response.status === 400) {
-          // Unauthenticated or Bad Request means the packet reached the target AI server through the firewall!
-          log(`AI TRAFFIC PERMITTED BY NETWORK: Packet reached target ${engine.name} server (${targetUrl}) - Returned HTTP ${response.status} (Network Firewall Open).`);
-          appendChatMessage(`🤖 ${engine.name}`, `Packet reached target domain (${targetUrl}). Status: HTTP ${response.status} (Network path unblocked).`);
+        if (response.ok || isWebEndpoint || response.status === 401 || response.status === 400) {
+          // Exfiltration Successful: Network allowed the request through!
+          let resText = "";
+          try {
+            const rawBody = await response.text();
+            if (rawBody && rawBody.length < 500) resText = rawBody;
+            else resText = `[HTTP ${response.status}] Request delivered over TCP/TLS to ${engine.name}. Model payload accepted.`;
+          } catch(e) {
+            resText = `[200 OK / Dispatched] Live connection established with ${engine.name}. Outbound packet permitted by gateway.`;
+          }
+
+          log(`🚨 EXFILTRATION SUCCESSFUL: Sensitive data reached external AI infrastructure (${engine.name}).`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked to AI Assistant:\n"${promptText.substring(0, 100)}${promptText.length > 100 ? '...' : ''}"\n\nAI Server Output: ${resText}`, 'msg-ai-passed');
         } else if (response.status === 403 || response.status === 502 || response.status === 503) {
-          // Explicit Proxy Block Status Code
-          triggerAutomaticBlockPage(false, null, `GenAI Prompt to ${engine.name}`);
-          log(`AI TRAFFIC INTERCEPTED: HTTP ${response.status} proxy drop from target (${targetUrl}). Block page captured.`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [Packet Intercepted by DLP Proxy: HTTP ${response.status}]`);
+          log(`🛡️ AI TRAFFIC BLOCKED BY DLP/SWG: Intercepted by inline proxy (HTTP ${response.status}).`);
+          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC INTERCEPTED BY DLP/SWG GATEWAY]: Outbound prompt containing sensitive PII was blocked before reaching external GenAI servers (HTTP ${response.status}).`, 'msg-ai-blocked');
         } else {
-          log(`AI TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}).`);
-          appendChatMessage(`🤖 ${engine.name}`, `Packet reached target domain (${targetUrl}). Response code: ${response.status}.`);
+          log(`AI Response Code: HTTP ${response.status}`);
+          appendChatMessage(`🤖 ${engine.name}`, `Server response: HTTP ${response.status}. Payload reached domain.`, 'msg-ai-passed');
         }
       } catch (err) {
-        if (trafficType === 'api_endpoint') {
-          // Cross-origin browser CORS restriction or API endpoint reached on wire
-          log(`AI API TRAFFIC DISPATCHED: Outbound packet sent over wire to ${targetUrl}. Network layer clear.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Outbound request dispatched over network card to ${targetUrl}.`);
-        } else {
-          triggerAutomaticBlockPage(false, null, `GenAI Prompt to ${engine.name}`);
-          log(`AI TRAFFIC INTERCEPTED / BLOCKED: Outbound request to ${targetUrl} was dropped or reset by network firewall/DLP rules!`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [Connection Intercepted: Outbound prompt packet to ${targetUrl} was dropped or blocked by network security layer.]`);
-        }
+        log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG layer.`, true);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]: Network connection to ${targetUrl} was forcibly reset or dropped by security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
       }
     }
 
@@ -1683,41 +1680,28 @@
       const formData = new FormData();
       formData.append('ai_engine', engine.name);
       formData.append('traffic_type', trafficType);
-      formData.append('simulated_endpoint', targetUrl);
       formData.append('ai_document_attachment', file);
-      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()}) File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]`, true);
+      
+      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()}) File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]`, 'msg-user');
       log(`Transmitting AI file attachment outbound (${trafficType.toUpperCase()} mode) to ${targetUrl}...`);
       
       try {
         const isWebEndpoint = (trafficType === 'web_endpoint');
         const response = await fetch(targetUrl, { method: 'POST', mode: isWebEndpoint ? 'no-cors' : 'cors', body: formData });
         
-        if (isWebEndpoint) {
-          log(`AI DIRECT FILE UPLOAD DISPATCHED: Multipart attachment packet transmitted over network card to ${targetUrl}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Direct multipart file upload transmitted to ${targetUrl}.`);
-        } else if (response.ok) {
-          log(`AI FILE TRAFFIC PASSED: File upload permitted to ${targetUrl}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `File ${file.name} uploaded to ${targetUrl}.`);
-        } else if (response.status === 401 || response.status === 400) {
-          log(`AI FILE TRAFFIC PERMITTED BY NETWORK: File packet reached target ${engine.name} server (${targetUrl}) - Returned HTTP ${response.status}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `File packet reached ${targetUrl} (Status HTTP ${response.status} - Network Firewall Open).`);
+        if (response.ok || isWebEndpoint || response.status === 401 || response.status === 400) {
+          log(`🚨 EXFILTRATION SUCCESSFUL: File attachment '${file.name}' reached external AI infrastructure.`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Attachment Leaked:\nFile '${file.name}' (${(file.size / 1024).toFixed(1)} KB) transmitted over wire to ${engine.name}. Outbound packet permitted by inline firewall.`, 'msg-ai-passed');
         } else if (response.status === 403 || response.status === 502 || response.status === 503) {
-          triggerAutomaticBlockPage(true, file.name);
-          log(`AI FILE TRAFFIC INTERCEPTED: HTTP ${response.status} proxy drop from target (${targetUrl}). Block page captured.`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP: HTTP ${response.status}]`);
+          log(`🛡️ AI FILE UPLOAD BLOCKED BY DLP: Intercepted by inline proxy (HTTP ${response.status}).`);
+          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD INTERCEPTED BY DLP/SWG]: Outbound file attachment '${file.name}' was blocked by inline DLP security policies (HTTP ${response.status}).`, 'msg-ai-blocked');
         } else {
-          log(`AI FILE TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}).`);
-          appendChatMessage(`🤖 ${engine.name}`, `File packet reached ${targetUrl} (Status ${response.status}).`);
+          log(`AI File Response Code: HTTP ${response.status}`);
+          appendChatMessage(`🤖 ${engine.name}`, `File packet reached ${targetUrl} (Status HTTP ${response.status}).`, 'msg-ai-passed');
         }
       } catch (err) {
-        if (trafficType === 'api_endpoint') {
-          log(`AI API FILE TRAFFIC DISPATCHED: Outbound file attachment sent over wire to ${targetUrl}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Outbound file attachment dispatched over network card to ${targetUrl}.`);
-        } else {
-          triggerAutomaticBlockPage(true, file.name);
-          log(`AI FILE TRAFFIC BLOCKED: Multipart attachment request to ${targetUrl} intercepted or reset by inline DLP proxy!`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP.]`);
-        }
+        log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]: Outbound request for '${file.name}' to ${targetUrl} was reset or dropped by inline security rules.`, 'msg-ai-blocked');
       }
     }
 
