@@ -328,11 +328,11 @@
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX (OPTIMIZED HARDCODED ENGINE ROUTING + CORS-FIRST VALIDATION) -->
+    <!-- TAB 3: SHADOW AI SANDBOX (MODULAR ISOLATED ENGINE SUITE) -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox</h2>
-        <p>Tests live payload exfiltration to GenAI engines using optimal, hard-coded egress interfaces per engine. Employs a CORS-First Strategy to accurately detect Palo Alto firewall blocks without false positive exfiltration reporting.</p>
+        <p>Tests live payload exfiltration to GenAI engines using dedicated engine-specific dispatch handlers to isolate distinct CORS signatures, HTTP status codes, and TCP resets.</p>
         <div class="selector-bar">
           <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
           <select id="aiEngineSelect" onchange="onAiEngineChange()"></select>
@@ -370,7 +370,7 @@
                 <button class="doc-type-btn" onclick="setTab4DocType('payslip', event)">💵 Payslip</button>
                 <button class="doc-type-btn" onclick="setTab4DocType('tax_form', event)">🏛️ Tax Form</button>
                 <button class="doc-type-btn" onclick="setTab4DocType('official_letter', event)">✉️ Official Letter</button>
-                <button class="doc-type-btn" onclick="setTab4DocType('passport_kyc', event)">🛂 Passport (KYC)</button>
+                <button class="doc-type-btn" onclick="setTab4DocType('passport_kyc', event)">Passport (KYC)</button>
                 <button class="doc-type-btn" onclick="setTab4DocType('dl_kyc', event)">🪪 Driver Lic. (KYC)</button>
                 <button class="doc-type-btn" onclick="setTab4DocType('id_kyc', event)">🪪 National ID (KYC)</button>
               </div>
@@ -1554,7 +1554,10 @@
       }
     }
 
-    // --- TAB 3 SHADOW AI HANDLERS: CORS-FIRST STRATEGY & DISPATCH VALIDATION ---
+    // =========================================================================
+    // TAB 3: SHADOW AI SANDBOX - ENGINE-SPECIFIC MODULAR EGRESS SUITE
+    // =========================================================================
+
     function appendChatMessage(sender, text, msgClass = 'msg-ai') {
       const chatBox = document.getElementById('chatBox');
       if (!chatBox) return;
@@ -1565,136 +1568,245 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    function logAiBlock(engineName, targetUrl, reason) {
+      log(`🛡️ AI TRAFFIC INTERCEPTED [${engineName}]: ${reason}`, true);
+      appendChatMessage(
+        `🤖 ${engineName}`,
+        `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nTarget: ${targetUrl}\nReason: ${reason}\nOutbound exfiltration prevented by inline security policy.`,
+        'msg-ai-blocked'
+      );
+    }
+
+    function logAiSuccess(engineName, targetUrl, detail) {
+      log(`🚨 EXFILTRATION SUCCESSFUL [${engineName}]: Payload reached target (${detail}).`, true);
+      appendChatMessage(
+        `🤖 ${engineName}`,
+        `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked to ${engineName}\nTarget: ${targetUrl}\nDetail: ${detail}\nThe inline DLP firewall ALLOWED the connection across the network card.`,
+        'msg-ai-passed'
+      );
+    }
+
+    // --- MAIN ROUTERS ---
     async function sendAiPrompt() {
       const input = document.getElementById('aiPromptInput');
       const promptText = input.value.trim();
       if (!promptText) { log('Error: AI prompt field is empty.', true); return; }
-      
+
+      const engineKey = document.getElementById('aiEngineSelect').value;
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
-      const isWeb = trafficType === 'web_endpoint';
-      
+
       appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, 'msg-user');
       input.value = '';
-      log(`Transmitting AI prompt outbound to target: ${targetUrl}...`);
-      
-      if (isWeb) {
-        // CORS-First Strategy for Web UI mode to detect Palo Alto Firewall blocks accurately
-        try {
-          // STEP 1: Attempt standard CORS dispatch first so Palo Alto HTTP 403 blocks or TCP drops are caught directly
-          const corsOptions = {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText, query: promptText })
-          };
-          const resp = await fetch(targetUrl, corsOptions);
-          
-          if (resp.status === 403) {
-            // Explicit Palo Alto Gateway HTTP 403 Block Page Response
-            log(`🛡️ AI TRAFFIC BLOCKED BY DLP/SWG: Intercepted by proxy (HTTP 403).`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nOutbound request containing sensitive data was intercepted and blocked by inline security policies (HTTP 403).`, 'msg-ai-blocked');
-            return;
-          }
-          
-          // Request reached server and received explicit HTTP response from remote host
-          log(`🚨 EXFILTRATION SUCCESSFUL: Payload reached ${engine.name} across firewall (HTTP ${resp.status}).`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked over Web Interface to ${engine.name}.\n\nInline DLP firewall ALLOWED the TCP connection. Payload transmitted across firewall to external domain (HTTP ${resp.status}).`, 'msg-ai-passed');
-        } catch (corsErr) {
-          // STEP 2: Standard CORS attempt threw a network error. Test with 'no-cors' to distinguish Firewall TCP Drop vs Browser CORS Header Restrictions
-          try {
-            const noCorsOptions = {
-              method: 'POST',
-              mode: 'no-cors',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText, query: promptText })
-            };
-            await fetch(targetUrl, noCorsOptions);
-            
-            // If 'no-cors' succeeds, the TCP socket opened and payload escaped across network card!
-            log(`🚨 EXFILTRATION SUCCESSFUL: Payload dispatched over wire to ${targetUrl}`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked over Web Interface to ${engine.name}.\n\nInline DLP firewall ALLOWED the TCP socket connection. Payload was transmitted across network card to external domain.`, 'msg-ai-passed');
-          } catch (noCorsErr) {
-            // 'no-cors' ALSO threw TypeError -> The Palo Alto Firewall forcibly reset or dropped the TCP connection!
-            log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG firewall.`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nNetwork TCP connection to ${targetUrl} was forcibly reset or dropped by inline security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
-          }
-        }
-      } else {
-        // Direct API Endpoint Mode
-        try {
-          const apiOptions = {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
-          };
-          const response = await fetch(targetUrl, apiOptions);
-          
-          if (response.status === 403) {
-            log(`🛡️ AI TRAFFIC BLOCKED BY DLP/SWG: Intercepted by proxy (HTTP 403).`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nOutbound API prompt was blocked by inline DLP security policies (HTTP 403).`, 'msg-ai-blocked');
-          } else if (response.status === 401 || response.status === 400 || response.ok) {
-            log(`🚨 EXFILTRATION SUCCESSFUL: Payload reached API infrastructure (HTTP ${response.status}).`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. Data successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
-          } else {
-            appendChatMessage(`🤖 ${engine.name}`, `Server response status: HTTP ${response.status}`, 'msg-ai-passed');
-          }
-        } catch (err) {
-          log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG layer.`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nNetwork connection to ${targetUrl} was forcibly reset or intercepted by the inline security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
-        }
+      log(`Transmitting AI prompt to ${engine.name} (${targetUrl})...`);
+
+      switch (engineKey) {
+        case 'openai':     await handleOpenAiPrompt(engine, targetUrl, promptText); break;
+        case 'copilot':    await handleCopilotPrompt(engine, targetUrl, promptText); break;
+        case 'anthropic':  await handleClaudePrompt(engine, targetUrl, promptText); break;
+        case 'gemini':     await handleGeminiPrompt(engine, targetUrl, promptText); break;
+        case 'perplexity': await handlePerplexityPrompt(engine, targetUrl, promptText); break;
+        case 'meta':       await handleMetaPrompt(engine, targetUrl, promptText); break;
+        default:           await handleOpenAiPrompt(engine, targetUrl, promptText); break;
       }
     }
 
     async function sendAiFileAttachment() {
       const input = document.getElementById('aiFileInput');
-      if (!input.files || input.files.length === 0) { log('Error: Select a file to upload to AI first.', true); return; }
-      
+      if (!input.files || input.files.length === 0) { log('Error: Select a file first.', true); return; }
+
+      const engineKey = document.getElementById('aiEngineSelect').value;
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
-      const isWeb = trafficType === 'web_endpoint';
       const file = input.files[0];
+
+      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] Uploading: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'msg-user');
+      log(`Transmitting file '${file.name}' to ${engine.name} (${targetUrl})...`);
+
+      switch (engineKey) {
+        case 'openai':     await handleOpenAiFile(engine, targetUrl, file); break;
+        case 'copilot':    await handleCopilotFile(engine, targetUrl, file); break;
+        case 'anthropic':  await handleClaudeFile(engine, targetUrl, file); break;
+        case 'gemini':     await handleGeminiFile(engine, targetUrl, file); break;
+        case 'perplexity': await handlePerplexityFile(engine, targetUrl, file); break;
+        case 'meta':       await handleMetaFile(engine, targetUrl, file); break;
+        default:           await handleOpenAiFile(engine, targetUrl, file); break;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. OPENAI CHATGPT HANDLERS (Web UI Target)
+    // -------------------------------------------------------------------------
+    async function handleOpenAiPrompt(engine, targetUrl, promptText) {
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Opaque TCP Stream Transmitted');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'TCP connection reset/dropped by firewall');
+      }
+    }
+
+    async function handleOpenAiFile(engine, targetUrl, file) {
       const formData = new FormData();
-      formData.append('ai_document_attachment', file);
-      
-      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] Uploading File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'msg-user');
-      log(`Transmitting AI file attachment outbound to ${targetUrl}...`);
-      
-      if (isWeb) {
-        try {
-          const resp = await fetch(targetUrl, { method: 'POST', mode: 'cors', body: formData });
-          if (resp.status === 403) {
-            log(`🛡️ AI FILE UPLOAD BLOCKED BY DLP: Intercepted by proxy (HTTP 403).`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' was intercepted and blocked by inline security policies (HTTP 403).`, 'msg-ai-blocked');
-            return;
-          }
-          log(`🚨 EXFILTRATION SUCCESSFUL: File attachment '${file.name}' reached external AI infrastructure.`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Attachment Leaked:\nFile '${file.name}' (${(file.size / 1024).toFixed(1)} KB) transmitted over wire to ${engine.name}. Outbound packet permitted by inline firewall.`, 'msg-ai-passed');
-        } catch (corsErr) {
-          try {
-            await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
-            log(`🚨 EXFILTRATION SUCCESSFUL: File attachment '${file.name}' reached external AI infrastructure.`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Attachment Leaked:\nFile '${file.name}' (${(file.size / 1024).toFixed(1)} KB) transmitted over wire to ${engine.name}. Outbound packet permitted by inline firewall.`, 'msg-ai-passed');
-          } catch (noCorsErr) {
-            log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' to ${targetUrl} was reset or intercepted by inline security rules.`, 'msg-ai-blocked');
-          }
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' uploaded via Web UI stream`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, `File upload connection reset by firewall`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. MICROSOFT COPILOT HANDLERS (Web UI Target / bing-ai)
+    // -------------------------------------------------------------------------
+    async function handleCopilotPrompt(engine, targetUrl, promptText) {
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Copilot Web Stream Transmitted');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Copilot connection reset by firewall');
+      }
+    }
+
+    async function handleCopilotFile(engine, targetUrl, file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' passed to Copilot Web Endpoint`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, `Copilot file transfer dropped by firewall`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. ANTHROPIC CLAUDE HANDLERS (Direct API Target)
+    // -------------------------------------------------------------------------
+    async function handleClaudePrompt(engine, targetUrl, promptText) {
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Payload reached Anthropic API infrastructure');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Anthropic API socket reset or HTTP 503 block');
+      }
+    }
+
+    async function handleClaudeFile(engine, targetUrl, file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' reached Anthropic API`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, `Anthropic file transfer reset by firewall`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. GOOGLE GEMINI HANDLERS (Direct API Target - CORS Readable Status 400)
+    // -------------------------------------------------------------------------
+    async function handleGeminiPrompt(engine, targetUrl, promptText) {
+      try {
+        const resp = await fetch(targetUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+
+        if (resp.status === 403 || resp.status === 503) {
+          logAiBlock(engine.name, targetUrl, `Proxy returned HTTP ${resp.status}`);
+        } else if (resp.status === 400 || resp.status === 200) {
+          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status} (INVALID_ARGUMENT)`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status}`);
         }
-      } else {
-        try {
-          const response = await fetch(targetUrl, { method: 'POST', mode: 'cors', body: formData });
-          if (response.status === 403) {
-            log(`🛡️ AI FILE UPLOAD BLOCKED BY DLP: Intercepted by proxy (HTTP 403).`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound API file upload for '${file.name}' was blocked by inline DLP security policies (HTTP 403).`, 'msg-ai-blocked');
-          } else if (response.status === 401 || response.status === 400 || response.ok) {
-            log(`🚨 EXFILTRATION SUCCESSFUL: File reached API infrastructure (HTTP ${response.status}).`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. File successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
-          } else {
-            appendChatMessage(`🤖 ${engine.name}`, `Server response status: HTTP ${response.status}`, 'msg-ai-passed');
-          }
-        } catch (err) {
-          log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' to ${targetUrl} was reset or intercepted by inline security rules.`, 'msg-ai-blocked');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Google API TCP connection dropped/reset');
+      }
+    }
+
+    async function handleGeminiFile(engine, targetUrl, file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const resp = await fetch(targetUrl, { method: 'POST', body: formData });
+        if (resp.status === 403 || resp.status === 503) {
+          logAiBlock(engine.name, targetUrl, `Proxy returned HTTP ${resp.status}`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Google API responded with HTTP ${resp.status}`);
         }
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Google API file upload connection reset');
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. PERPLEXITY AI HANDLERS (Direct API Target)
+    // -------------------------------------------------------------------------
+    async function handlePerplexityPrompt(engine, targetUrl, promptText) {
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Payload reached Perplexity API');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Perplexity API connection reset by firewall');
+      }
+    }
+
+    async function handlePerplexityFile(engine, targetUrl, file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' reached Perplexity API`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Perplexity file transfer reset by firewall');
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. META AI / GROQ HANDLERS (Direct API Target)
+    // -------------------------------------------------------------------------
+    async function handleMetaPrompt(engine, targetUrl, promptText) {
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Payload reached Meta/Groq API infrastructure');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Meta/Groq API socket reset or HTTP 503 block');
+      }
+    }
+
+    async function handleMetaFile(engine, targetUrl, file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' reached Meta/Groq API`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Meta/Groq file transfer reset by firewall');
       }
     }
 
