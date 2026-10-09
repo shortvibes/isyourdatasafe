@@ -452,7 +452,7 @@
     <!-- Live Intercepted Gateway Block Page Container (Palo Alto PAN-OS Response Viewer) -->
     <div class="section" id="blockPageSection" style="display:none; border-color: var(--danger);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h2 style="color:var(--danger); border:none; margin:0;">🛡️ Intercepted Gateway Block Page Viewer</h2>
+        <h2 style="color:var(--danger); border:none; margin:0;">🛡️ Intercepted DLP Block Page Viewer</h2>
         <button class="btn btn-sm" onclick="closeBlockPageViewer()">Close Block Page</button>
       </div>
       <p style="color:#ef4444; font-size:0.8rem; margin-bottom:12px;">An outbound request triggered a block response from an inline network proxy gateway. Below is the captured block page payload:</p>
@@ -1212,53 +1212,34 @@
       }, 'image/png');
     }
 
-    // --- AUTOMATIC BLOCK PAGE ENGINE (RAW PALO ALTO PAN-OS VARIABLE TAGS) ---
+    // --- AUTOMATIC BLOCK PAGE ENGINE (RESTORED SWG LIGHT-GREY TEMPLATE) ---
     function triggerAutomaticBlockPage(isFilePayload, payloadName, customReason) {
       const blockSection = document.getElementById('blockPageSection');
       const blockContent = document.getElementById('blockPageContent');
       if (!blockSection || !blockContent) return;
 
-      let html = '';
+      const title = isFilePayload ? "File Blocked" : "Data Payload Blocked";
+      const fileNameStr = payloadName || "invoice_usa.txt";
+      const reasonStr = customReason || "Non-file payload exfiltration attempt (Synthetic PII String) detected and intercepted.";
 
-      if (isFilePayload) {
-        html = `
-          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
-              <span style="font-size:24px;">📁</span>
-              <div>
-                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">File Transfer Blocked</h2>
-                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Next-Generation Firewall</p>
-              </div>
-            </div>
-            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">Access blocked because access to the file is blocked by security policy.</p>
-            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
-              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">File Name:</td><td style="padding:8px; color:#2d3748; font-family:monospace; font-weight:bold;">&lt;file-name&gt;</td></tr>
-              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">URL / Target:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">&lt;url&gt;</td></tr>
-              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">File Blocking Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;file-blocking-profile&gt;</td></tr>
-              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;action&gt;</td></tr>
-            </table>
+      const detailLine = isFilePayload 
+        ? `<p style="margin: 12px 0 0 0; font-size: 14px; color: #111827;"><b>File name:</b> ${fileNameStr}</p>` 
+        : `<p style="margin: 12px 0 0 0; font-size: 14px; color: #111827;"><b>Reason:</b> ${reasonStr}</p>`;
+
+      const bodyText = isFilePayload
+        ? "The file you are trying to download or upload has been blocked in accordance with company policy. Please contact your system administrator if you believe this is an error."
+        : "The outbound text or data payload has been blocked in accordance with company policy. Please contact your system administrator if you believe this is an error.";
+
+      const html = `
+        <div style="background-color: #e7e8e9; border-radius: 8px; padding: 30px; font-family: Tahoma, Helvetica, Arial, sans-serif; color: #111827; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <h2 style="font-size: 26px; font-weight: normal; margin: 0 0 12px 0; color: #111827; border: none; padding: 0;">${title}</h2>
+          <hr style="border: none; border-top: 1px solid #94a3b8; margin: 0 0 25px 0;" />
+          <div style="background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; max-width: 580px; margin: 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+            <p style="font-size: 14px; color: #334155; margin: 0; line-height: 1.5;">${bodyText}</p>
+            ${detailLine}
           </div>
-        `;
-      } else {
-        html = `
-          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
-              <span style="font-size:24px;">🚫</span>
-              <div>
-                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">Data Filtering Violation</h2>
-                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Enterprise Security Gateway</p>
-              </div>
-            </div>
-            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">Content was matched against a data filtering profile and blocked because sensitive information was detected.</p>
-            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
-              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">URL / Host:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">&lt;url&gt;</td></tr>
-              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Application:</td><td style="padding:8px; color:#2d3748;">&lt;appname&gt;</td></tr>
-              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Data Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;data-profile&gt;</td></tr>
-              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;action&gt;</td></tr>
-            </table>
-          </div>
-        `;
-      }
+        </div>
+      `;
 
       blockContent.innerHTML = html;
       blockSection.style.display = 'block';
