@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Is Your Data Safe? (.org) - Cyber Threat & DLP Egress Bench</title>
+  <title>OMNIEGRESS (.org) - Enterprise Data Security Posture Validation</title>
   
-  <!-- Standalone CDN Libraries for Browser Document Export & Compression -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/html-docx-js@0.3.1/dist/html-docx.js"></script>
 
   <style>
     :root {
@@ -27,150 +27,85 @@
       --purple: #8b5cf6;
       --purple-hover: #7c3aed;
     }
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    textarea, input[type="text"], code, select {
-      user-select: text !important;
-      -webkit-user-select: text !important;
-    }
-    body {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      background-color: var(--bg);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 75%),
-        linear-gradient(rgba(30, 41, 59, 0.2) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(30, 41, 59, 0.2) 1px, transparent 1px);
-      background-size: 100% 100%, 20px 20px, 20px 20px;
-      color: var(--text);
-      line-height: 1.5;
-      padding: 20px;
-      min-height: 100vh;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    textarea, input[type="text"], code, select { user-select: text !important; -webkit-user-select: text !important; }
+    body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background-color: var(--bg); background-image: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 75%), linear-gradient(rgba(30, 41, 59, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(30, 41, 59, 0.2) 1px, transparent 1px); background-size: 100% 100%, 20px 20px, 20px 20px; color: var(--text); line-height: 1.5; padding: 20px; min-height: 100vh; }
     .container { max-width: 1100px; margin: 0 auto; }
-    
-    header {
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 15px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    h1 {
-      font-size: 1.6rem;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      letter-spacing: -0.02em;
-      font-weight: 700;
-    }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+    h1 { font-size: 1.6rem; color: #fff; display: flex; align-items: center; gap: 8px; letter-spacing: -0.02em; font-weight: 700; }
     h1 span.highlight { color: var(--accent-cyan); text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
     .subtitle { color: var(--muted); font-size: 0.85rem; }
-
     #jv-protection-root { display: inline-block; }
-
-    .hero-banner {
-      width: 100%; height: 160px; border-radius: 8px;
-      border: 1px solid var(--border-cyan); margin-bottom: 20px;
-      overflow: hidden; background: #020617;
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); position: relative;
-    }
+    .hero-banner { width: 100%; height: 160px; border-radius: 8px; border: 1px solid var(--border-cyan); margin-bottom: 20px; overflow: hidden; background: #020617; box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); position: relative; }
     .hero-banner svg { width: 100%; height: 100%; display: block; }
-
     .nav-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
-    .tab-btn {
-      background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); border-bottom: none;
-      color: var(--muted); padding: 10px 18px; font-size: 0.85rem; font-weight: 700;
-      border-top-left-radius: 6px; border-top-right-radius: 6px; cursor: pointer; transition: all 0.2s;
-    }
+    .tab-btn { background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); border-bottom: none; color: var(--muted); padding: 10px 18px; font-size: 0.85rem; font-weight: 700; border-top-left-radius: 6px; border-top-right-radius: 6px; cursor: pointer; transition: all 0.2s; }
     .tab-btn:hover { color: #fff; border-color: var(--accent-cyan); }
-    .tab-btn.active {
-      background: #0f172a; color: var(--accent-cyan); border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3); text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
-    }
-
+    .tab-btn.active { background: #0f172a; color: var(--accent-cyan); border-color: var(--accent-cyan); box-shadow: 0 0 12px rgba(6, 182, 212, 0.3); text-shadow: 0 0 8px rgba(6, 182, 212, 0.6); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
-    .section {
-      background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px;
-      padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px); position: relative;
-    }
-    .section::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-    }
+    .section { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); position: relative; }
+    .section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent); }
     h2 { font-size: 1.1rem; color: #fff; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     p { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 12px; }
-    
     .selector-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap; }
-    select, textarea, input[type="text"] {
-      font-family: inherit; font-size: 0.85rem; background: #020617; border: 1px solid var(--border);
-      color: var(--text); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, box-shadow 0.2s;
-    }
+    select, textarea, input[type="text"] { font-family: inherit; font-size: 0.85rem; background: #020617; border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, box-shadow 0.2s; }
     select:focus, textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
     select { cursor: pointer; flex-grow: 1; }
     textarea { width: 100%; height: 110px; resize: vertical; margin-bottom: 10px; }
-    
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 15px; }
     .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
     .card h3 { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
     code { background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(6, 182, 212, 0.2); padding: 6px 8px; border-radius: 4px; color: var(--accent-green); font-size: 0.8rem; word-break: break-all; margin-bottom: 10px; display: block; font-family: inherit; }
-    
     .btn { background: var(--accent-green); color: #000; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: background 0.2s, transform 0.1s; }
     .btn:hover { background: var(--accent-green-hover); transform: translateY(-1px); }
     .btn-cyan { background: var(--accent-cyan); color: #000; }
     .btn-cyan:hover { background: var(--accent-cyan-hover); }
     .btn-purple { background: var(--purple); color: #fff; }
     .btn-purple:hover { background: var(--purple-hover); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
     .btn-sm { padding: 4px 8px; font-size: 0.75rem; background: #1e293b; border: 1px solid var(--border); color: var(--accent-cyan); }
     .btn-sm:hover { background: #334155; color: #fff; }
-    
     .byte-counter { font-size: 0.8rem; font-weight: 700; margin-left: auto; }
     .byte-counter.valid { color: var(--accent-green); }
     .byte-counter.invalid { color: var(--danger); }
-
     canvas { width: 100%; height: auto; border-radius: 6px; background: #000; border: 1px solid var(--border); margin-bottom: 10px; }
-
     .tab4-layout { display: flex; gap: 20px; flex-wrap: wrap; }
     .tab4-sidebar { flex: 1; min-width: 320px; max-width: 380px; display: flex; flex-direction: column; gap: 14px; }
     .tab4-stage { flex: 2; min-width: 400px; background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; justify-content: center; align-items: flex-start; overflow-x: auto; }
     .a4-preview { width: 100%; max-width: 600px; min-height: 750px; background: #ffffff; color: #0f172a; padding: 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'Times New Roman', serif; font-size: 13px; line-height: 1.5; user-select: text !important; -webkit-user-select: text !important; }
-
     .doc-type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
     .doc-type-btn { background: #0b132b; border: 1px solid var(--border); color: var(--text); padding: 8px; font-size: 0.75rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-align: left; }
     .doc-type-btn:hover { border-color: var(--accent-cyan); }
     .doc-type-btn.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
-
-    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-    .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; }
+    .sidebar-subtabs { display: flex; gap: 4px; background: #020617; padding: 4px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px; }
+    .subtab-btn { flex: 1; background: transparent; border: none; color: var(--muted); padding: 6px; font-size: 0.75rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .subtab-btn:hover { color: #fff; }
+    .subtab-btn.active { background: #1e293b; color: var(--accent-cyan); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    .subtab-panel { display: none; }
+    .subtab-panel.active { display: block; }
+    .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 380px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px; }
+    .chat-msg { max-width: 95%; padding: 10px 14px; border-radius: 6px; font-size: 0.82rem; line-height: 1.45; word-break: break-word; }
     .msg-user { align-self: flex-end; background: #1e1b4b; border: 1px solid #4338ca; color: #818cf8; }
     .msg-ai { align-self: flex-start; background: #0f172a; border: 1px solid var(--border); color: var(--text); }
-
+    .msg-ai-blocked { align-self: flex-start; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: #fca5a5; font-weight: 600; white-space: pre-wrap; }
+    .msg-ai-passed { align-self: flex-start; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--accent-green); color: #a7f3d0; white-space: pre-wrap; }
     .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
   </style>
 </head>
 <body>
 
   <!-- Hidden Native Iframe & Form for CORS-Free Network Interface Testing -->
-  <iframe name="egressTargetIframe" id="egressTargetIframe" style="display:none;"></iframe>
+  <iframe name="egressTargetIframe" id="egressTargetIframe" style="display:none;" onload="onIframeLoad()"></iframe>
   <form id="nativeEgressForm" action="https://httpbin.org/post" method="POST" enctype="multipart/form-data" target="egressTargetIframe" style="display:none;"></form>
 
   <div class="container">
     <header>
       <div>
-        <h1>🛡️ <span class="highlight">IS YOUR DATA SAFE?</span> (.org)</h1>
-        <p class="subtitle">Cyber Threat &amp; DLP Egress Traffic Inspection Playground</p>
+        <h1>🛡️ <span class="highlight">OMNIEGRESS</span> (.org)</h1>
+        <p class="subtitle">Enterprise Data Security Posture & SWG Validation Studio</p>
       </div>
       <div id="jv-protection-root"></div>
     </header>
@@ -220,7 +155,7 @@
         <line x1="0" y1="0" x2="0" y2="180" stroke="rgba(6, 182, 212, 0.35)" stroke-width="3">
           <animateTransform attributeName="transform" type="translate" from="0 0" to="1000 0" dur="4s" repeatCount="indefinite"/>
         </line>
-        <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">NETWORK DLP INSPECTION PLATFORM</text>
+        <text x="30" y="35" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" letter-spacing="1">OMNIEGRESS VALIDATION MATRIX</text>
         <text x="30" y="52" font-family="sans-serif" font-size="10" fill="#64748b">Outbound Traffic Bench &amp; Photorealistic Document Vault</text>
       </svg>
     </div>
@@ -249,7 +184,10 @@
             <button type="button" class="btn btn-sm" style="background:#1e293b; color:var(--accent-cyan);" onclick="padPayloadToMinBytes()">+ Add Native Bogus Data (Pad to 250+ Bytes)</button>
             <span id="byteCounter" class="byte-counter invalid">0 / 250 bytes min</span>
           </div>
-          <button type="submit" class="btn btn-cyan">⚡ Transmit Payload Outbound</button>
+          <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn btn-cyan">⚡ Transmit Payload Outbound</button>
+            <button type="button" class="btn btn-sm" style="background:#334155; color:#fff;" onclick="resetTestBench()">🔄 Reset Test Bench</button>
+          </div>
         </form>
       </div>
 
@@ -304,19 +242,32 @@
 
         <div style="background:#020617; border:2px dashed var(--border); border-radius:6px; padding:30px; text-align:center; margin-bottom:15px;">
           <input type="file" id="generalFileInput" style="margin-bottom: 15px;" /><br/>
-          <button class="btn btn-cyan" onclick="sendGeneralFileUpload()">🚀 Transmit File Outbound</button>
+          <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="btn btn-cyan" onclick="sendGeneralFileUpload()">🚀 Transmit File Outbound</button>
+            <button class="btn btn-sm" style="background:#334155; color:#fff;" onclick="resetTestBench()">🔄 Reset Test Bench</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX (FULL 6 ENGINES) -->
+    <!-- TAB 3: SHADOW AI SANDBOX (RESTORED API RELIABILITY + SANITIZED UI) -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox</h2>
-        <div class="selector-bar"><label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label><select id="aiEngineSelect" onchange="onAiEngineChange()"></select></div>
-        <div class="selector-bar" style="margin-bottom:15px;"><label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label><select id="aiTrafficTypeSelect" onchange="onAiEngineChange()"><option value="web_endpoint">🌐 Web-Endpoint (Direct Browser UI Target POST via no-cors)</option><option value="api_endpoint">⚡ API-Endpoint (Direct Developer API POST to Target Domain)</option></select></div>
+        <p>Tests live payload exfiltration to GenAI domains. Uses standard Fetch APIs to reliably trigger your Palo Alto firewall. If traffic passes, raw token errors are sanitized into a clean executive proof card.</p>
+        <div class="selector-bar">
+          <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
+          <select id="aiEngineSelect" onchange="onAiEngineChange()"></select>
+        </div>
+        <div class="selector-bar" style="margin-bottom:15px;">
+          <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Routing Mode:</label>
+          <select id="aiTrafficTypeSelect" onchange="onAiEngineChange()">
+            <option value="api_endpoint">⚡ API-Endpoint (Most Reliable DLP Trigger - Catches 403 & Drops)</option>
+            <option value="web_endpoint">🌐 Web-Endpoint (Direct Browser Domain POST via no-cors)</option>
+          </select>
+        </div>
         <div class="chat-container" id="chatBox"><div class="chat-msg msg-ai" id="aiWelcomeMsg">🤖 GenAI Sandbox initialized.</div></div>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="aiPromptInput" placeholder="Type AI prompt here..." style="flex: 1;" /><button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button></div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="aiPromptInput" placeholder="Type AI prompt or paste sensitive data here..." style="flex: 1;" /><button class="btn btn-purple" onclick="sendAiPrompt()">Transmit AI Prompt</button></div>
         <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;"><label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom: 6px;">Attach File to AI Assistant (Uploads Real Packet):</label><div style="display: flex; gap: 8px;"><input type="file" id="aiFileInput" style="flex:1;" /><button class="btn btn-purple" onclick="sendAiFileAttachment()">Transmit File to AI</button></div></div>
       </div>
     </div>
@@ -364,19 +315,55 @@
                 <option value="zip_enc">Simulate Password-Encrypted ZIP</option>
               </select>
             </div>
+            
+            <!-- STEP 5 & 6: NESTED SUB-TABS FOR SEPARATING LOCAL EXPORT & NETWORK EGRESS -->
             <div>
-              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:6px;">5. EXPORT &amp; EGRESS TRANSMIT</label>
-              <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
-                <button class="btn btn-sm" onclick="exportTab4Document('pdf')">📄 PDF</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('png')">🖼️ PNG</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('txt')">📝 TXT</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('json')">📊 JSON</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('csv')">📈 CSV</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('docx')">💼 DOCX</button>
+              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:6px;">5. DISPATCH ACTION ENGINE</label>
+              
+              <div class="sidebar-subtabs">
+                <button class="subtab-btn active" id="btnSubtabLocal" onclick="switchSidebarSubtab('local')">💾 Local Export</button>
+                <button class="subtab-btn" id="btnSubtabNetwork" onclick="switchSidebarSubtab('network')">⚡ Network Egress</button>
               </div>
-              <button class="btn btn-sm" style="width:100%; margin-bottom:8px; background:#f59e0b; color:#000;" onclick="exportAllBundle()">📦 Export ALL (ZIP Bundle)</button>
-              <button class="btn btn-purple" style="width:100%;" onclick="transmitTab4Outbound()">⚡ Transmit Document Outbound</button>
+
+              <!-- SUBTAB PANEL 1: LOCAL EXPORT -->
+              <div id="subtab-panel-local" class="subtab-panel active" style="background:#020617; border:1px solid var(--border); border-radius:6px; padding:12px;">
+                <p style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;">Generate and download compiled file directly to client endpoint:</p>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
+                  <button class="btn btn-sm" onclick="exportTab4Document('pdf')">📄 PDF</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('png')">🖼️ PNG</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('txt')">📝 TXT</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('json')">📊 JSON</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('csv')">📈 CSV</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('docx')">💼 DOCX</button>
+                </div>
+                <button class="btn btn-sm" style="width:100%; background:#f59e0b; color:#000;" onclick="exportAllBundle()">📦 Export ALL (ZIP Bundle)</button>
+              </div>
+
+              <!-- SUBTAB PANEL 2: NETWORK EGRESS -->
+              <div id="subtab-panel-network" class="subtab-panel" style="background:#020617; border:1px solid var(--purple); border-radius:6px; padding:12px;">
+                <p style="font-size:0.75rem; color:#a5b4fc; margin-bottom:8px;">Fires real HTTP POST packet over wire to test inline DLP/SWG proxy:</p>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('docx')">⚡ DOCX</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('pdf')">⚡ PDF</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('png')">⚡ PNG</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('txt')">⚡ TXT</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('json')">⚡ JSON</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('csv')">⚡ CSV</button>
+                </div>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <select id="tab4TransmitFormat" style="flex:1;">
+                    <option value="docx">💼 DOCX</option>
+                    <option value="pdf">📄 PDF</option>
+                    <option value="png">🖼️ PNG</option>
+                    <option value="txt">📝 TXT</option>
+                    <option value="json">📊 JSON</option>
+                    <option value="csv">📈 CSV</option>
+                  </select>
+                  <button class="btn btn-purple" style="flex:1.5;" onclick="transmitTab4Outbound()">⚡ Transmit</button>
+                </div>
+              </div>
             </div>
+
           </div>
           <div class="tab4-stage">
             <div class="a4-preview" id="a4PreviewStage"></div>
@@ -385,9 +372,22 @@
       </div>
     </div>
 
+    <!-- Live Intercepted Gateway Block Page Container (Palo Alto PAN-OS Response Viewer) -->
+    <div class="section" id="blockPageSection" style="display:none; border-color: var(--danger);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="color:var(--danger); border:none; margin:0;">🛡️ Intercepted Gateway Block Page Viewer</h2>
+        <button class="btn btn-sm" onclick="closeBlockPageViewer()">Close Block Page</button>
+      </div>
+      <p style="color:#ef4444; font-size:0.8rem; margin-bottom:12px;">An outbound request triggered a block response from an inline network proxy gateway. Below is the captured block page payload:</p>
+      <div id="blockPageContent"></div>
+    </div>
+
     <!-- Persistent Egress Inspector Log -->
     <div class="section">
-      <h2>📡 Real-Time Egress Traffic Inspector Log</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="border:none; margin:0;">📡 Real-Time Egress Traffic Inspector Log</h2>
+        <button class="btn btn-sm" style="background:#334155; color:#fff;" onclick="resetTestBench()">🔄 Clear Logs &amp; Reset Bench</button>
+      </div>
       <div class="log-box" id="logBox">
         [Awaiting network request execution...]
       </div>
@@ -429,7 +429,7 @@
     });
     observer.observe(document.body, { childList: true, subtree: true, attributes: true });
 
-    // --- TAB SWITCHING ---
+    // --- MAIN TAB SWITCHING ---
     function switchTab(evt, tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -437,9 +437,22 @@
       document.getElementById(tabId).classList.add('active');
     }
 
+    function switchSidebarSubtab(type) {
+      document.getElementById('btnSubtabLocal').classList.remove('active');
+      document.getElementById('btnSubtabNetwork').classList.remove('active');
+      document.getElementById('subtab-panel-local').classList.remove('active');
+      document.getElementById('subtab-panel-network').classList.remove('active');
+
+      if (type === 'local') {
+        document.getElementById('btnSubtabLocal').classList.add('active');
+        document.getElementById('subtab-panel-local').classList.add('active');
+      } else {
+        document.getElementById('btnSubtabNetwork').classList.add('active');
+        document.getElementById('subtab-panel-network').classList.add('active');
+      }
+    }
+
     // --- MATHEMATICAL CHECKSUM ENGINES ---
-    
-    // 1. Dutch BSN (11-proef) Checksum Generator
     function generateValidBSN() {
       while (true) {
         let d = [];
@@ -447,14 +460,10 @@
         if (d[0] === 0 && d[1] === 0) continue;
         let weighted = 9*d[0] + 8*d[1] + 7*d[2] + 6*d[3] + 5*d[4] + 4*d[5] + 3*d[6] + 2*d[7];
         let d9 = weighted % 11;
-        if (d9 < 10) {
-          d.push(d9);
-          return d.join('');
-        }
+        if (d9 < 10) { d.push(d9); return d.join(''); }
       }
     }
 
-    // 2. Spanish DNI Checksum Generator
     function generateValidSpanishDNI() {
       let num = Math.floor(10000000 + Math.random() * 89999999);
       let letters = "TRWAGMYFPDXBNJZSQVHLCKE";
@@ -462,7 +471,6 @@
       return `${num}${letter}`;
     }
 
-    // 3. Polish PESEL Checksum Generator
     function generateValidPESEL() {
       let weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
       let d = [8, 4, 1, 2, 2, 5]; // Year 1984, Dec 25
@@ -474,7 +482,6 @@
       return d.join('');
     }
 
-    // 4. ISO 7064 Modulo-97 IBAN Engine
     function calculateIBANChecksum(countryCode, bban) {
       const prepended = bban + countryCode + "00";
       let numericStr = "";
@@ -545,10 +552,6 @@
       FRA: { currency: "€", invoiceTitle: "FACTURE", vendorHeader: "FOURNISSEUR", clientHeader: "CLIENT", invNo: "N° de facture", invDate: "Date de facture", dueDate: "Date d'échéance", desc: "Désignation", qty: "Quantité", unitPrice: "Prix unitaire HT", total: "Montant HT", subtotal: "Sous-total HT", vat: "TVA (20%)", totalPayable: "Total TTC à payer", payTerms: "Paiement à effectuer sous 30 jours.", taxLabel: "Code NIR / N° SIRET", ibanLabel: "Coordonnées bancaires (IBAN / RIB)", bankTitle: "RELEVÉ DE COMPTE", accHolder: "Titulaire du compte", openBal: "Solde initial", closeBal: "Nouveau solde", payslipTitle: "BULLETIN DE PAIE", gross: "Salaire brut", net: "Net à payer", taxFormTitle: "DÉCLARATION DES REVENUS", letterTitle: "COURRIER CONFIDENTIEL", kycTitle: "FORMULAIRE DE VÉRIFICATION D'IDENTITÉ", kycBody: "Veuillez trouver ci-joint le document d'identification officiel pour vérification.", salaryIban: "Compte de Dépôt (IBAN)", taxIban: "Compte de Remboursement (IBAN)" },
       ESP: { currency: "€", invoiceTitle: "FACTURA", vendorHeader: "PROVEEDOR", clientHeader: "CLIENTE", invNo: "Nº de factura", invDate: "Fecha de factura", dueDate: "Fecha de vencimiento", desc: "Concepto", qty: "Cantidad", unitPrice: "Precio unitario", total: "Importe", subtotal: "Base imponible", vat: "IVA (21%)", totalPayable: "Total a pagar", payTerms: "Pago a realizar dentro de los 30 días.", taxLabel: "DNI / NIF / CIF", ibanLabel: "Número de cuenta (IBAN)", bankTitle: "EXTRACTO DE CUENTA", accHolder: "Titular de la cuenta", openBal: "Saldo inicial", closeBal: "Saldo final", payslipTitle: "RECIBO DE NÓMINA", gross: "Salario bruto", net: "Líquido a percibir", taxFormTitle: "DECLARACIÓN DEL IMPUESTO", letterTitle: "COMUNICACIÓN CONFIDENCIAL", kycTitle: "FORMULARIO DE VERIFICACIÓN DE IDENTIDAD", kycBody: "Adjunto el documento de identificación oficial para el proceso de cumplimiento.", salaryIban: "Cuenta de Ingreso (IBAN)", taxIban: "Cuenta de Devolución (IBAN)" },
       POL: { currency: "PLN", invoiceTitle: "FAKTURA VAT", vendorHeader: "SPRZEDAWCA", clientHeader: "NABYWCA", invNo: "Nr faktury", invDate: "Data wystawienia", dueDate: "Termin płatności", desc: "Nazwa towaru / usługi", qty: "Ilość", unitPrice: "Cena jednostkowa", total: "Wartość netto", subtotal: "Suma netto", vat: "VAT (23%)", totalPayable: "Do zapłaty", payTerms: "Prosimy o wpłatę w ciągu 30 dni.", taxLabel: "PESEL / NIP", ibanLabel: "Numer rachunku bankowego (IBAN)", bankTitle: "WYCIĄG BANKOWY", accHolder: "Posiadacz rachunku", openBal: "Saldo początkowe", closeBal: "Saldo końcowe", payslipTitle: "PASEK WYNAGRODZEŃ / LISTA PŁAC", gross: "Wynagrodzenie brutto", net: "Wynagrodzenie netto", taxFormTitle: "DEKLARACJA PODATKOWA (PIT)", letterTitle: "KORESPONDENCJA POUFNA", kycTitle: "FORMULARZ WERYFIKACJI TOŻSAMOŚCI", kycBody: "Poniżej znajduje się oficjalny dokument tożsamości do weryfikacji zgodności (KYC).", salaryIban: "Konto do wypłaty (IBAN)", taxIban: "Rachunek do zwrotu (IBAN)" },
-      ITA: { currency: "€", invoiceTitle: "FATTURA", vendorHeader: "FORNITORE", clientHeader: "CLIENTE", invNo: "Numero fattura", invDate: "Data fattura", dueDate: "Scadenza", desc: "Descrizione", qty: "Quantità", unitPrice: "Prezzo unitario", total: "Importo", subtotal: "Imponibile", vat: "IVA (22%)", totalPayable: "Totale da pagare", payTerms: "Pagamento a 30 giorni.", taxLabel: "Codice Fiscale / Partita IVA", ibanLabel: "Codice IBAN", bankTitle: "ESTRATTO CONTO", accHolder: "Intestatario", openBal: "Saldo iniziale", closeBal: "Saldo finale", payslipTitle: "BUSTA PAGA", gross: "Retribuzione Lorda", net: "Netto in busta", taxFormTitle: "DICHIARAZIONE DEI REDDITI", letterTitle: "CORRISPONDENZA RISERVATA", kycTitle: "MODULO VERIFICA IDENTITÀ", kycBody: "In allegato il documento di riconoscimento ufficiale per verifica conformità.", salaryIban: "Conto Accredito (IBAN)", taxIban: "Conto Rimborso (IBAN)" },
-      PRT: { currency: "€", invoiceTitle: "FATURA", vendorHeader: "FORNECEDOR", clientHeader: "CLIENTE", invNo: "Nº Fatura", invDate: "Data de Emissão", dueDate: "Data de Vencimento", desc: "Descrição", qty: "Quantidade", unitPrice: "Preço Unitário", total: "Total", subtotal: "Subtotal", vat: "IVA (23%)", totalPayable: "Total a Pagar", payTerms: "Pagamento num prazo de 30 dias.", taxLabel: "NIF", ibanLabel: "IBAN", bankTitle: "EXTRATO BANCÁRIO", accHolder: "Titular da Conta", openBal: "Saldo Inicial", closeBal: "Saldo Final", payslipTitle: "RECIBO DE VENCIMENTO", gross: "Vencimento Bruto", net: "Valor Líquido", taxFormTitle: "DECLARAÇÃO DE IMPOSTOS", letterTitle: "CORRESPONDÊNCIA CONFIDENCIAL", kycTitle: "VERIFICAÇÃO DE IDENTIDADE", kycBody: "Em anexo encontra-se o documento oficial para verificação.", salaryIban: "Conta Ordenado (IBAN)", taxIban: "Conta de Reembolso (IBAN)" },
-      JPN: { currency: "￥", invoiceTitle: "請求書 (インボイス)", vendorHeader: "販売者 (適格請求書発行事業者)", clientHeader: "購入者", invNo: "請求書番号", invDate: "発行日", dueDate: "お支払期限", desc: "品名", qty: "数量", unitPrice: "単価", total: "金額", subtotal: "小計", vat: "消費税 (10%)", totalPayable: "合計金額", payTerms: "お支払い期限までにお振込みください。", taxLabel: "適格請求書発行事業者登録番号", ibanLabel: "振込先 (金融機関・口座番号)", bankTitle: "取引明細書", accHolder: "口座名義人", openBal: "期首残高", closeBal: "期末残高", payslipTitle: "給与明細書", gross: "総支給額", net: "差引支給額", taxFormTitle: "確定申告書", letterTitle: "機密文書", kycTitle: "本人確認書類提出", kycBody: "コンプライアンスおよび本人確認のための公的証明書を添付いたします。", salaryIban: "給与振込口座", taxIban: "還付金受取口座" },
-      CHN: { currency: "¥", invoiceTitle: "增值税普通发票", vendorHeader: "销售方", clientHeader: "购买方", invNo: "发票号码", invDate: "开票日期", dueDate: "到期日", desc: "项目名称", qty: "数量", unitPrice: "单价", total: "金额", subtotal: "合计", vat: "税额", totalPayable: "价税合计", payTerms: "请于30日内结清款项。", taxLabel: "纳税人识别号 / 居民身份证", ibanLabel: "开户行及账号", bankTitle: "银行对账单", accHolder: "账户名", openBal: "期初余额", closeBal: "期末余额", payslipTitle: "工资单", gross: "应发工资", net: "实发工资", taxFormTitle: "纳税申报表", letterTitle: "机密函件", kycTitle: "身份验证文件", kycBody: "附件为合规审查所需的官方身份证明文件。", salaryIban: "工资代发账户", taxIban: "退税账户" },
       USA: { currency: "$", invoiceTitle: "INVOICE", vendorHeader: "VENDOR", clientHeader: "CLIENT", invNo: "Invoice Number", invDate: "Invoice Date", dueDate: "Due Date", desc: "Description", qty: "Quantity", unitPrice: "Unit Price", total: "Total", subtotal: "Subtotal", vat: "Sales Tax (8.25%)", totalPayable: "Total Due", payTerms: "Payment due within 30 days of invoice.", taxLabel: "Social Security Number (SSN) / EIN", ibanLabel: "Routing / Account", bankTitle: "BANK STATEMENT", accHolder: "Account Holder", openBal: "Starting Balance", closeBal: "Ending Balance", payslipTitle: "PAYSTUB / SALARY STATEMENT", gross: "Gross Pay", net: "Net Pay", taxFormTitle: "FEDERAL TAX RETURN", letterTitle: "CONFIDENTIAL CORRESPONDENCE", kycTitle: "IDENTITY VERIFICATION FORM (KYC)", kycBody: "Please find attached the official identification document for compliance verification.", salaryIban: "Direct Deposit Routing (ACH)", taxIban: "Tax Refund Routing" }
     };
 
@@ -556,49 +559,22 @@
       NLD: ["DE BRUIJN, EMMA LISANNE", "VAN DIJK, DAAN BERNARD", "BAKKER, SOPHIE MARIE"],
       DEU: ["MÜLLER, MAXIMILIAN", "SCHMIDT, HANNAH LENA", "SCHNEIDER, LUKAS PAUL"],
       FRA: ["DUBOIS, CAMILLE SOPHIE", "MARTIN, LOUIS ANTOINE", "BERNARD, LÉA MARIE"],
-      ESP: ["GARCÍA MARTÍNEZ, ALEJANDRO", "RODRÍGUEZ LÓPEZ, LUCÍA", "SÁNCHEZ GÓMEZ, MATEO"],
-      POL: ["KOWALSKI, JANUSZ PIOTR", "NOWAK, ANNA MARIA", "WIŚNIEWSKI, TOMASZ"],
-      ITA: ["ROSSI, EMMA MARIA", "RUSSO, MATTEO LUCA", "FERRARI, GIULIA ELENA"],
-      PRT: ["SILVA, JOÃO PEDRO", "SANTOS, MARIA INÊS", "FERREIRA, TIAGO JOSÉ"],
-      JPN: ["SATO, TARO (佐藤 太郎)", "SUZUKI, HANAKO (鈴木 花子)", "TAKAHASHI, KEN (高橋 健)"],
-      CHN: ["ZHANG, WEI (张 伟)", "WANG, FANG (王 芳)", "LI, NA (李 娜)"],
       USA: ["SPECIMEN, EMMA LISANNE", "SMITH, ALEXANDER JAMES", "JOHNSON, OLIVIA ROSE"]
     };
 
     const LOCALIZED_LABELS = {
       NLD: { passport: "PASPOORT", dl: "RIJBEWIJS", id: "IDENTITEITSKAART", surname: "1. NAAM:", given: "2. VOORNAMEN:", dob: "3. GEBOORTEDATUM:", nat: "NATIONALITEIT: Nederlandse" },
-      DEU: { passport: "REISEPASS", dl: "FÜHRERSCHEIN", id: "PERSONALAUSWEIS", surname: "1. NAME:", given: "2. VORNAMEN:", dob: "3. GEBURTSDATUM:", nat: "STAATSANGEHÖRIGKEIT: Deutsch" },
-      FRA: { passport: "PASSEPORT", dl: "PERMIS DE CONDUIRE", id: "CARTE D'IDENTITÉ", surname: "1. NOM:", given: "2. PRÉNOMS:", dob: "3. DATE DE NAISS.:", nat: "NATIONALITÉ: Française" },
-      ESP: { passport: "PASAPORTE", dl: "PERMISO DE CONDUCCIÓN", id: "DOCUMENTO NACIONAL DE IDENTIDAD", surname: "1. APELLIDOS:", given: "2. NOMBRE:", dob: "3. FECHA DE NAC.:", nat: "NACIONALIDAD: Española" },
-      POL: { passport: "PASZPORT", dl: "PRAWO JAZDY", id: "DOWÓD OSOBISTY", surname: "1. NAZWISKO:", given: "2. IMIĘ:", dob: "3. DATA URODZENIA:", nat: "OBYWATELSTWO: Polskie" },
-      ITA: { passport: "PASSAPORTO", dl: "PATENTE DI GUIDA", id: "CARTA D'IDENTITÀ", surname: "1. COGNOME:", given: "2. NOME:", dob: "3. DATA DI NASCITA:", nat: "CITTADINANZA: Italiana" },
-      PRT: { passport: "PASSAPORTE", dl: "CARTA DE CONDUÇÃO", id: "CARTÃO DE CIDADÃO", surname: "1. APELIDO:", given: "2. NOME:", dob: "3. DATA DE NASC.:", nat: "NACIONALIDADE: Portuguesa" },
-      JPN: { passport: "RYOKAN (護照)", dl: "UNTEN MENKYO SHO", id: "MY NUMBER CARD", surname: "氏名:", given: "名:", dob: "生年月日:", nat: "国籍: 日本" },
-      CHN: { passport: "HUZHAO (护照)", dl: "JIASHIZHENG", id: "RESIDENT IDENTITY CARD", surname: "姓:", given: "名:", dob: "出生日期:", nat: "国籍: 中国" },
       USA: { passport: "PASSPORT", dl: "DRIVER LICENSE", id: "NATIONAL IDENTIFICATION CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: USA" }
     };
 
     const REGIONAL_CARD_BRANDS = {
       NLD: ["MAESTRO", "VISA", "MASTERCARD"],
-      DEU: ["MAESTRO", "MASTERCARD", "VISA"],
-      FRA: ["CB", "VISA", "MASTERCARD"],
-      ESP: ["VISA", "MASTERCARD"],
-      POL: ["VISA", "MASTERCARD"],
-      ITA: ["VISA", "MASTERCARD"],
-      JPN: ["JCB", "VISA", "MASTERCARD", "AMEX"],
-      CHN: ["UNIONPAY", "VISA", "MASTERCARD"],
       USA: ["VISA", "MASTERCARD", "AMEX", "DISCOVER"]
     };
 
     function getFallbackDictionaryKey(isoCode) {
       if (TAB4_DICTIONARIES[isoCode]) return isoCode;
-      const f = {
-        AND:"ESP", ARG:"ESP", BOL:"ESP", CHL:"ESP", COL:"ESP", CRI:"ESP", CUB:"ESP", DOM:"ESP", ECU:"ESP", SLV:"ESP", GTM:"ESP", HND:"ESP", MEX:"ESP", NIC:"ESP", PAN:"ESP", PRY:"ESP", PER:"ESP", URY:"ESP", VEN:"ESP",
-        AGO:"PRT", BRA:"PRT", CPV:"PRT", MOZ:"PRT", STP:"PRT",
-        BEL:"FRA", BEN:"FRA", BFA:"FRA", BDI:"FRA", CMR:"FRA", CAF:"FRA", TCD:"FRA", COG:"FRA", COD:"FRA", CIV:"FRA", DJI:"FRA", GAB:"FRA", GIN:"FRA", HTI:"FRA", MDG:"FRA", MLI:"FRA", MCO:"FRA", NER:"FRA", RWA:"FRA", SEN:"FRA", TGO:"FRA",
-        AUT:"DEU", LIE:"DEU", CHE:"DEU"
-      };
-      return f[isoCode] || 'USA';
+      return 'USA';
     }
 
     let ocrNameIndex = {};
@@ -619,20 +595,16 @@
 
     const ALL_195_ISO_CODES = ["AFG","ALB","DZA","AND","AGO","ATG","ARG","ARM","AUS","AUT","AZE","BHS","BHR","BGD","BRB","BLR","BEL","BLZ","BEN","BTN","BOL","BIH","BWA","BRA","BRN","BGR","BFA","BDI","CPV","KHM","CMR","CAN","CAF","TCD","CHL","CHN","COL","COM","COG","COD","CRI","CIV","HRV","CUB","CYP","CZE","DNK","DJI","DMA","DOM","ECU","EGY","SLV","GNQ","ERI","EST","SWZ","ETH","FJI","FIN","FRA","GAB","GMB","GEO","DEU","GHA","GRC","GRD","GTM","GIN","GNB","GUY","HTI","HND","HUN","ISL","IND","IDN","IRN","IRQ","IRL","ISR","ITA","JAM","JPN","JOR","KAZ","KEN","KIR","PRK","KOR","KWT","KGZ","LAO","LVA","LBN","LSO","LBR","LBY","LIE","LTU","LUX","MDG","MWI","MYS","MDV","MLI","MLT","MHL","MRT","MUS","MEX","FSM","MDA","MCO","MNG","MNE","MAR","MOZ","MMR","NAM","NRU","NPL","NLD","NZL","NIC","NER","NGA","MKD","NOR","OMN","PAK","PLW","PSE","PAN","PNG","PRY","PER","PHL","POL","PRT","QAT","ROU","RUS","RWA","KNA","LCA","VCT","WSM","SMR","STP","SAU","SEN","SRB","SYC","SLE","SGP","SVK","SVN","SLB","SOM","ZAF","SSD","ESP","LKA","SDN","SUR","SWE","CHE","SYR","TWN","TJK","TZA","THA","TLS","TGO","TON","TTO","TUN","TUR","TKM","TUV","UGA","UKR","ARE","GBR","USA","URY","UZB","VUT","VAT","VEN","VNM","YEM","ZMB","ZWE"];
     
-    const COUNTRY_NAMES_MAP = { AFG:"Afghanistan", ALB:"Albania", DZA:"Algeria", AUT:"Austria", BEL:"Belgium", BRA:"Brazil", CAN:"Canada", CHN:"China", FRA:"France", DEU:"Germany", IND:"India", ITA:"Italy", JPN:"Japan", NLD:"Netherlands", POL:"Poland", ESP:"Spain", SWE:"Sweden", CHE:"Switzerland", GBR:"United Kingdom", USA:"United States" };
+    const COUNTRY_NAMES_MAP = { AFG:"Afghanistan", DEU:"Germany", FRA:"France", NLD:"Netherlands", USA:"United States" };
 
     const COUNTRY_DEFINITIONS = ALL_195_ISO_CODES.map(code => {
       const found = UN_COUNTRIES_SEED.find(item => item.code === code);
       const name = COUNTRY_NAMES_MAP[code] || code;
       if (found) return { ...found, country: name };
-      return {
-        code: code,
-        country: name,
-        formats: { taxNumber: `${code}-99999999`, passport: `${code.substring(0,2)}9999999`, driverLicense: `DL-${code}-999999` }
-      };
+      return { code: code, country: name, formats: { taxNumber: `${code}-99999999`, passport: `${code.substring(0,2)}9999999`, driverLicense: `DL-${code}-999999` } };
     });
 
-    // MASTER LIST OF 6 AI ENGINES WITH LATEST MODELS & ENDPOINTS
+    // --- TAB 3 AI ENGINES: RESTORED API ENDPOINTS FOR RELIABILITY ---
     const AI_ENGINES = {
       openai: { name: "OpenAI ChatGPT (GPT-4o)", webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
       anthropic: { name: "Anthropic Claude (Claude 3.5 Sonnet)", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet" },
@@ -659,7 +631,7 @@
     function onAiEngineChange() {
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
       const welcome = document.getElementById('aiWelcomeMsg');
-      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Model: ${engine.model}] [Routing: ${trafficType.toUpperCase()}]. Target: ${targetUrl}`;
+      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Model: ${engine.model}]. Target: ${targetUrl}`;
       log(`Switched AI Engine target to ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
     }
 
@@ -813,9 +785,7 @@
 
       ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, 400, 260);
       ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 0.5;
-      for (let i = 0; i < 260; i += 8) {
-        ctx.beginPath(); ctx.moveTo(0, i); ctx.bezierCurveTo(100, i + 10, 200, i - 10, 400, i); ctx.stroke();
-      }
+      for (let i = 0; i < 260; i += 8) { ctx.beginPath(); ctx.moveTo(0, i); ctx.bezierCurveTo(100, i + 10, 200, i - 10, 400, i); ctx.stroke(); }
 
       ctx.fillStyle = '#0284c7'; ctx.fillRect(0, 0, 400, 40);
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif';
@@ -862,12 +832,6 @@
       ctx.fillText(labels.dob || "DOB: 25.12.1984", 120, 95);
       ctx.fillText(`${dlVal}`, 120, 120);
       ctx.fillText(`${taxVal}`, 120, 145);
-
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 200, 400, 60);
-      ctx.fillStyle = '#000000';
-      for (let x = 15; x < 385; x += Math.floor(Math.random() * 5 + 2)) {
-        ctx.fillRect(x, 210, Math.floor(Math.random() * 3 + 1), 40);
-      }
     }
 
     function renderIdCanvas(countryName, countryCode, taxVal, idTitle) {
@@ -892,12 +856,7 @@
       ctx.fillText(`${labels.surname} ${holderName}`, 120, 75);
       ctx.fillText(labels.dob || "DOB: 25.12.1984", 120, 95);
       ctx.fillText(labels.nat || 'NATIONALITY', 120, 120);
-      ctx.fillText(`ID / ${taxVal}`, 120, 145);
-
-      ctx.fillStyle = '#0f766e'; ctx.fillRect(0, 190, 400, 70);
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px monospace';
-      ctx.fillText(`I<${countryCode}SPECIMEN<<${holderName.replace(/[^A-Z]/g, '<')}<<<<<<<<`, 10, 215);
-      ctx.fillText(`ID999999999${countryCode}8412254F2810010<<<<<<<<<<01`, 10, 240);
+      ctx.fillText(`ID / ${taxVal.split(':')[1] || taxVal}`, 120, 145);
     }
 
     function renderCcCanvas(countryCode, cardVal) {
@@ -955,7 +914,6 @@
         const dict = TAB4_DICTIONARIES[dKey] || TAB4_DICTIONARIES.USA;
         const name = getActiveSpecimenName(code);
         
-        // Decoupled independent data generation for Tab 4
         const taxVal = getValidTaxIdForCountry(code);
         const ibanVal = generateValidIBANOrRouting(code);
 
@@ -963,26 +921,30 @@
 
         if (activeTab4DocType === 'invoice') {
           html = `
-            <div style="border-bottom: 2px solid #06b6d4; padding-bottom: 12px; margin-bottom: 20px; display:flex; justify-content:space-between;">
-              <div>
-                <h1 style="font-size:22px; color:#0f172a; margin:0;">${dict.invoiceTitle}</h1>
-                <p style="color:#64748b; margin:0;">Ref: INV-${Math.floor(Math.random()*89999+10000)}</p>
-              </div>
-              <div style="text-align:right;">
-                <p style="margin:0; font-weight:bold;">${dict.vendorHeader}: CYBER EGRESS B.V.</p>
-                <p style="margin:0;">${taxVal}</p>
-              </div>
-            </div>
-            <div style="margin-bottom:20px; display:flex; justify-content:space-between;">
-              <div>
-                <p style="margin:0; font-weight:bold;">${dict.clientHeader}:</p>
-                <p style="margin:0;">${name}</p>
-              </div>
-              <div style="text-align:right;">
-                <p style="margin:0;">${dict.invDate}: ${new Date().toLocaleDateString()}</p>
-                <p style="margin:0;">${dict.dueDate}: 30 Days Net</p>
-              </div>
-            </div>
+            <table style="width:100%; border-bottom: 2px solid #06b6d4; margin-bottom: 20px;">
+              <tr>
+                <td style="vertical-align:top; width:50%;">
+                  <h1 style="font-size:22px; color:#0f172a; margin:0;">${dict.invoiceTitle}</h1>
+                  <p style="color:#64748b; margin:0;">Ref: INV-${Math.floor(Math.random()*89999+10000)}</p>
+                </td>
+                <td style="vertical-align:top; width:50%; text-align:right;">
+                  <p style="margin:0; font-weight:bold;">${dict.vendorHeader}: CYBER EGRESS B.V.</p>
+                  <p style="margin:0;">${taxVal}</p>
+                </td>
+              </tr>
+            </table>
+            <table style="width:100%; margin-bottom:20px;">
+              <tr>
+                <td style="vertical-align:top; width:50%;">
+                  <p style="margin:0; font-weight:bold;">${dict.clientHeader}:</p>
+                  <p style="margin:0;">${name}</p>
+                </td>
+                <td style="vertical-align:top; width:50%; text-align:right;">
+                  <p style="margin:0;">${dict.invDate}: ${new Date().toLocaleDateString()}</p>
+                  <p style="margin:0;">${dict.dueDate}: 30 Days Net</p>
+                </td>
+              </tr>
+            </table>
             <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
               <thead>
                 <tr style="background:#f1f5f9; text-align:left;">
@@ -1006,9 +968,6 @@
               <p style="margin:0;">${dict.vat}: ${dict.currency} 262.50</p>
               <h3 style="margin:5px 0 0 0; color:#0f172a;">${dict.totalPayable}: ${dict.currency} 1,512.50</h3>
             </div>
-            <p style="font-size:10px; color:#64748b; border-top:1px solid #e2e8f0; padding-top:10px;">
-              ${dict.payTerms} | ${dict.ibanLabel}: ${ibanVal}
-            </p>
           `;
         } else if (activeTab4DocType === 'bank_stmt') {
           html = `
@@ -1017,10 +976,12 @@
               <p style="color:#64748b; margin:0;">${dict.accHolder}: ${name}</p>
               <p style="color:#64748b; margin:0;">${dict.ibanLabel}: ${ibanVal}</p>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; background:#f8fafc; padding:10px; border-radius:4px;">
-              <div>${dict.openBal}: <strong>${dict.currency} 4,820.50</strong></div>
-              <div>${dict.closeBal}: <strong>${dict.currency} 6,333.00</strong></div>
-            </div>
+            <table style="width:100%; margin-bottom:20px; background:#f8fafc; border-collapse:collapse;">
+              <tr>
+                <td style="padding:10px; width:50%;">${dict.openBal}: <strong>${dict.currency} 4,820.50</strong></td>
+                <td style="padding:10px; width:50%; text-align:right;">${dict.closeBal}: <strong>${dict.currency} 6,333.00</strong></td>
+              </tr>
+            </table>
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr style="background:#f1f5f9; text-align:left;">
@@ -1035,11 +996,6 @@
                   <td style="padding:8px; border-bottom:1px solid #e2e8f0;">Salary Transfer Corp B.V.</td>
                   <td style="padding:8px; border-bottom:1px solid #e2e8f0; color:#10b981;">+${dict.currency} 2,452.50</td>
                 </tr>
-                <tr>
-                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">03/10/2026</td>
-                  <td style="padding:8px; border-bottom:1px solid #e2e8f0;">Egress Hardware Purchase</td>
-                  <td style="padding:8px; border-bottom:1px solid #e2e8f0; color:#ef4444;">-${dict.currency} 940.00</td>
-                </tr>
               </tbody>
             </table>
           `;
@@ -1049,10 +1005,16 @@
               <h1 style="font-size:20px; color:#0f172a; margin:0;">${dict.payslipTitle}</h1>
               <p style="color:#64748b; margin:0;">Period: October 2026</p>
             </div>
-            <div style="margin-bottom:20px; display:flex; justify-content:space-between;">
-              <div><p style="margin:0; font-weight:bold;">Employee:</p><p style="margin:0;">${name}</p><p style="margin:0;">${taxVal}</p></div>
-              <div style="text-align:right;"><p style="margin:0; font-weight:bold;">${dict.salaryIban}:</p><p style="margin:0;">${ibanVal}</p></div>
-            </div>
+            <table style="width:100%; margin-bottom:20px;">
+              <tr>
+                <td style="vertical-align:top; width:50%;">
+                  <p style="margin:0; font-weight:bold;">Employee:</p><p style="margin:0;">${name}</p><p style="margin:0;">${taxVal}</p>
+                </td>
+                <td style="vertical-align:top; width:50%; text-align:right;">
+                  <p style="margin:0; font-weight:bold;">${dict.salaryIban}:</p><p style="margin:0;">${ibanVal}</p>
+                </td>
+              </tr>
+            </table>
             <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
               <tr><td style="padding:8px; border-bottom:1px solid #e2e8f0;">${dict.gross}</td><td style="padding:8px; border-bottom:1px solid #e2e8f0; text-align:right;">${dict.currency} 3,500.00</td></tr>
               <tr><td style="padding:8px; border-bottom:1px solid #e2e8f0; color:#ef4444;">Taxes & Deductions</td><td style="padding:8px; border-bottom:1px solid #e2e8f0; text-align:right; color:#ef4444;">-${dict.currency} 1,047.50</td></tr>
@@ -1084,11 +1046,7 @@
             <p>Dear ${name},</p>
             <p>This document contains confidential security benchmark testing records generated specifically for compliance validation.</p>
             <p><strong>RECORDS ATTACHED:</strong></p>
-            <ul>
-              <li>${taxVal}</li>
-              <li>${dict.ibanLabel}: ${ibanVal}</li>
-            </ul>
-            <p style="margin-top:30px;">Sincerely,<br/><strong>Network DLP Egress Bench</strong></p>
+            <ul><li>${taxVal}</li><li>${dict.ibanLabel}: ${ibanVal}</li></ul>
           `;
         } else if (activeTab4DocType.includes('kyc')) {
           let imgSrc = '';
@@ -1131,12 +1089,113 @@
         log(`Initiating OCR specimen transfer: ${filename} (${(blob.size / 1024).toFixed(1)} KB)...`);
         try {
           const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
-          if (response.ok) log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
-        } catch (err) { log(`TRAFFIC BLOCKED: OCR Document specimen intercepted by DLP!`, true); }
+          if (response.ok) {
+            log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
+          } else {
+            triggerAutomaticBlockPage(true, filename);
+            log(`TRAFFIC BLOCKED: OCR Document specimen intercepted by DLP proxy (HTTP ${response.status})!`, true);
+          }
+        } catch (err) { 
+          triggerAutomaticBlockPage(true, filename);
+          log(`TRAFFIC BLOCKED: OCR Document specimen dropped by DLP firewall!`, true); 
+        }
       }, 'image/png');
     }
 
-    // --- TAB 4 EXPORT PIPELINE ---
+    // --- AUTOMATIC BLOCK PAGE ENGINE (RAW PALO ALTO PAN-OS VARIABLE TAGS) ---
+    function triggerAutomaticBlockPage(isFilePayload, payloadName, customReason) {
+      const blockSection = document.getElementById('blockPageSection');
+      const blockContent = document.getElementById('blockPageContent');
+      if (!blockSection || !blockContent) return;
+
+      let html = '';
+
+      if (isFilePayload) {
+        html = `
+          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
+              <span style="font-size:24px;">📁</span>
+              <div>
+                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">File Transfer Blocked</h2>
+                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Next-Generation Firewall</p>
+              </div>
+            </div>
+            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">Access blocked because access to the file is blocked by security policy.</p>
+            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">File Name:</td><td style="padding:8px; color:#2d3748; font-family:monospace; font-weight:bold;">&lt;file-name&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">URL / Target:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">&lt;url&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">File Blocking Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;file-blocking-profile&gt;</td></tr>
+              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;action&gt;</td></tr>
+            </table>
+          </div>
+        `;
+      } else {
+        html = `
+          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
+              <span style="font-size:24px;">🚫</span>
+              <div>
+                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">Data Filtering Violation</h2>
+                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Enterprise Security Gateway</p>
+              </div>
+            </div>
+            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">Content was matched against a data filtering profile and blocked because sensitive information was detected.</p>
+            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">URL / Host:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">&lt;url&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Application:</td><td style="padding:8px; color:#2d3748;">&lt;appname&gt;</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Data Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;data-profile&gt;</td></tr>
+              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">&lt;action&gt;</td></tr>
+            </table>
+          </div>
+        `;
+      }
+
+      blockContent.innerHTML = html;
+      blockSection.style.display = 'block';
+      blockSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeBlockPageViewer() {
+      const section = document.getElementById('blockPageSection');
+      if (section) section.style.display = 'none';
+    }
+
+    function onIframeLoad() {
+      try {
+        const iframe = document.getElementById('egressTargetIframe');
+        if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
+          const bodyHtml = iframe.contentDocument.body.innerHTML;
+          if (bodyHtml && bodyHtml.trim().length > 0) {
+            triggerAutomaticBlockPage(true, "native_form_upload.bin");
+            log(`CAPTURER: Intercepted response payload from target iframe.`);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // --- RESET TEST BENCH FUNCTION ---
+    function resetTestBench() {
+      const payloadBox = document.getElementById('payload');
+      if (payloadBox) payloadBox.value = '';
+      updateByteCount();
+
+      const aiInput = document.getElementById('aiPromptInput');
+      if (aiInput) aiInput.value = '';
+
+      const fileInput = document.getElementById('generalFileInput');
+      if (fileInput) fileInput.value = '';
+
+      closeBlockPageViewer();
+
+      const logBox = document.getElementById('logBox');
+      if (logBox) logBox.innerHTML = '[Awaiting network request execution...]';
+
+      updateTab1CountryData();
+      renderTab4Document();
+      log('🔄 Test bench, input fields, block page viewer, and inspection logs have been reset.');
+    }
+
+    // --- TAB 4 EXPORT PIPELINE WITH TRUE DOCX GENERATOR ---
     function transformPayload(text, encoding) {
       if (encoding === 'base64') return btoa(unescape(encodeURIComponent(text)));
       if (encoding === 'url') return encodeURIComponent(text);
@@ -1163,7 +1222,6 @@
         let text = stage.innerText;
         if (fmt === 'json') text = JSON.stringify({ document_type: activeTab4DocType, jurisdiction: code, extracted_text: text }, null, 2);
         if (fmt === 'csv') text = `type,jurisdiction,content\n"${activeTab4DocType}","${code}","${text.replace(/"/g, '""')}"`;
-        
         text = transformPayload(text, encoding);
         finalBlob = new Blob([text], { type: 'text/plain;charset=utf-8' });
         filename += `.${fmt}`;
@@ -1184,11 +1242,10 @@
         finalBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         filename += '.png';
       }
-      else if (fmt === 'docx') {
-        const html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><\/head><body>" + stage.innerHTML + "<\/body><\/html>";
-        const transformed = transformPayload(html, encoding);
-        finalBlob = new Blob([transformed], { type: 'application/vnd.ms-word' });
-        filename += '.doc';
+      else if (fmt === 'docx' && window.htmlDocx) {
+        const htmlStr = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${stage.innerHTML}</body></html>`;
+        finalBlob = htmlDocx.asBlob(htmlStr);
+        filename += '.docx';
       }
 
       if (archive !== 'none' && window.JSZip && finalBlob) {
@@ -1196,7 +1253,6 @@
         zip.file(filename, finalBlob);
         finalBlob = await zip.generateAsync({ type: "blob" });
         filename += (archive === 'zip_enc') ? '_encrypted.zip' : '.zip';
-        if (archive === 'zip_enc') log(`Note: Applying simulated encrypted ZIP header for '${filename}'`);
       }
 
       if (returnBlob) return { blob: finalBlob, filename };
@@ -1211,37 +1267,53 @@
     }
 
     async function exportAllBundle() {
-      if (!window.JSZip) { log('JSZip not loaded.', true); return; }
+      if (!window.JSZip) return;
       log('Compiling Export ALL Bundle...');
       const zip = new JSZip();
-      
       const formats = ['pdf', 'png', 'txt', 'json', 'csv', 'docx'];
       for (let fmt of formats) {
         const res = await exportTab4Document(fmt, true);
         if (res && res.blob) zip.file(res.filename, res.blob);
       }
-      
       const bundleBlob = await zip.generateAsync({ type: "blob" });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(bundleBlob);
       a.download = `DLP_Benchmark_Bundle_${document.getElementById('tab4CountrySelect').value}.zip`;
       a.click();
-      log(`Downloaded complete document bundle: ${a.download}`);
+    }
+
+    async function transmitTab4OutboundDirect(fmt) {
+      const formatSelect = document.getElementById('tab4TransmitFormat');
+      if (formatSelect) formatSelect.value = fmt;
+      await transmitTab4Outbound();
     }
 
     async function transmitTab4Outbound() {
-      const stage = document.getElementById('a4PreviewStage');
-      if (!stage) return;
-      const text = stage.innerText;
-      log(`Transmitting localized document payload outbound (${getByteSize(text)} bytes)...`);
+      const formatSelect = document.getElementById('tab4TransmitFormat');
+      const fmt = formatSelect ? formatSelect.value : 'txt';
+      
+      log(`Compiling ${fmt.toUpperCase()} document payload for outbound network transmission...`);
+      const exportData = await exportTab4Document(fmt, true);
+      if (!exportData || !exportData.blob) return;
+      
+      const { blob, filename } = exportData;
+      log(`Transmitting dynamic document payload outbound (${(blob.size / 1024).toFixed(1)} KB)...`);
+      
+      const formData = new FormData();
+      formData.append('dlp_document_payload', blob, filename);
+
       try {
-        const response = await fetch('https://httpbin.org/post', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ dlp_document_payload: text })
-        });
-        if (response.ok) log(`TRAFFIC PASSED: Document payload transmitted across network (200 OK).`);
-      } catch (err) { log(`TRAFFIC BLOCKED: Outbound document blocked by DLP firewall!`, true); }
+        const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
+        if (response.ok) {
+          log(`TRAFFIC PASSED: Document payload (${filename}) transmitted across network (200 OK).`);
+        } else {
+          triggerAutomaticBlockPage(true, filename);
+          log(`TRAFFIC BLOCKED: Outbound document rejected by proxy (HTTP ${response.status})!`, true);
+        }
+      } catch (err) { 
+        triggerAutomaticBlockPage(true, filename);
+        log(`TRAFFIC BLOCKED: Outbound document blocked by network firewall!`, true); 
+      }
     }
 
     function log(msg, isError = false) {
@@ -1288,10 +1360,15 @@
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ dlp_test_payload: val })
         });
-        if (response.ok) log(`TRAFFIC PASSED: Outbound HTTP POST reached external destination (200 OK). Proxy allowed payload.`);
-        else log(`TRAFFIC ALTERED: Response code ${response.status}`, true);
+        if (response.ok) {
+          log(`TRAFFIC PASSED: Outbound HTTP POST reached external destination (200 OK). Proxy allowed payload.`);
+        } else {
+          triggerAutomaticBlockPage(false, null, "Synthetic Data / PII String");
+          log(`TRAFFIC BLOCKED: Outbound request rejected by inline proxy (HTTP ${response.status})!`, true);
+        }
       } catch (err) {
-        log(`TRAFFIC BLOCKED: Connection dropped/reset by network DLP layer!`, true);
+        triggerAutomaticBlockPage(false, null, "Synthetic Data / PII String");
+        log(`TRAFFIC BLOCKED: Connection dropped or reset by network firewall/DLP layer!`, true);
       }
     }
 
@@ -1307,24 +1384,20 @@
       if (mode === 'native-form') {
         const form = document.getElementById('nativeEgressForm');
         form.innerHTML = '';
-        
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.name = 'document_file';
-        
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
         fileInput.files = dataTransfer.files;
-        
         form.appendChild(fileInput);
         form.submit();
-
         log(`WIRE EGRESS DISPATCHED: Native multipart/form-data packet dispatched over network card via iframe target to https://httpbin.org/post. Proxy inspected raw socket payload.`);
         return;
       }
 
       if (mode === 'chunked') {
-        const chunkSize = 1024 * 64; // 64KB blocks
+        const chunkSize = 1024 * 64; 
         let offset = 0;
         let chunkIndex = 0;
         while (offset < file.size) {
@@ -1335,11 +1408,13 @@
           try {
             const resp = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
             if (resp.status === 403 || resp.status === 401) {
-              log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${resp.status})! Network SWG dropped chunk ${chunkIndex + 1}.`, true);
+              triggerAutomaticBlockPage(true, `${file.name}.part${chunkIndex}`);
+              log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${resp.status})! Network gateway dropped chunk ${chunkIndex + 1}.`, true);
               return;
             }
             log(`Chunk ${chunkIndex + 1} transmitted (${chunk.size} bytes). Status: ${resp.status}`);
           } catch (e) {
+            triggerAutomaticBlockPage(true, `${file.name}.part${chunkIndex}`);
             log(`Chunk ${chunkIndex + 1} intercepted/dropped by DLP network reset!`, true);
             return;
           }
@@ -1354,12 +1429,9 @@
       formData.append('document_file', file);
 
       try {
-        const response = await fetch('https://httpbin.org/post', { 
-          method: 'POST', 
-          body: formData 
-        });
-        
+        const response = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
         if (response.status === 403 || response.status === 401) {
+          triggerAutomaticBlockPage(true, file.name);
           log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${response.status})! Network proxy rejected the file upload.`, true);
         } else if (response.ok) {
           log(`FILE TRAFFIC PASSED: Standard multipart upload permitted (200 OK).`);
@@ -1367,15 +1439,17 @@
           log(`FILE TRAFFIC ALTERED: Response code ${response.status}`, true);
         }
       } catch (err) {
+        triggerAutomaticBlockPage(true, file.name);
         log(`FILE TRAFFIC INTERCEPTED / DROPPED: File upload packet was dropped or reset by network DLP layer! (${err.message})`, true);
       }
     }
 
-    function appendChatMessage(sender, text, isUser = false) {
+    // --- TAB 3 SHADOW AI HANDLERS: RESTORED FETCH + API OPTION + SANITIZER ---
+    function appendChatMessage(sender, text, msgClass = 'msg-ai') {
       const chatBox = document.getElementById('chatBox');
       if (!chatBox) return;
       const div = document.createElement('div');
-      div.className = `chat-msg ${isUser ? 'msg-user' : 'msg-ai'}`;
+      div.className = `chat-msg ${msgClass}`;
       div.innerText = `${sender}: ${text}`;
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
@@ -1385,62 +1459,74 @@
       const input = document.getElementById('aiPromptInput');
       const promptText = input.value.trim();
       if (!promptText) { log('Error: AI prompt field is empty.', true); return; }
+      
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
-      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, true);
+      const isWeb = trafficType === 'web_endpoint';
+      
+      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] ${promptText}`, 'msg-user');
       input.value = '';
-      log(`Transmitting AI prompt outbound (${trafficType.toUpperCase()} mode) to target: ${targetUrl}...`);
+      log(`Transmitting AI prompt outbound to target: ${targetUrl}...`);
+      
       try {
-        const isWebEndpoint = (trafficType === 'web_endpoint');
         const fetchOptions = {
-          method: 'POST', mode: isWebEndpoint ? 'no-cors' : 'cors',
-          headers: { 'Content-Type': isWebEndpoint ? 'application/x-www-form-urlencoded' : 'application/json' },
-          body: isWebEndpoint ? new URLSearchParams({ f_req: promptText, prompt: promptText, query: promptText }) : JSON.stringify({ engine: engine.name, traffic_type: trafficType, simulated_endpoint: targetUrl, model: engine.model, prompt: promptText })
+          method: 'POST', 
+          mode: isWeb ? 'no-cors' : 'cors',
+          headers: isWeb ? { 'Content-Type': 'application/x-www-form-urlencoded' } : { 'Content-Type': 'application/json' },
+          body: isWeb ? new URLSearchParams({ dlp_test_payload: promptText }) : JSON.stringify({ prompt: promptText })
         };
+        
         const response = await fetch(targetUrl, fetchOptions);
-        if (isWebEndpoint) {
-          log(`AI DIRECT TRAFFIC DISPATCHED: Opaque HTTP POST packet transmitted over network card to ${targetUrl}. Firewall / SWG inspected wire payload.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Direct TCP/TLS packet dispatched to ${targetUrl}. Inline SWG/DLP inspected the outbound wire traffic.`);
-        } else if (response.ok) {
-          log(`AI TRAFFIC PASSED: Prompt payload delivered to ${engine.name} target (${targetUrl}). Status: ${response.status}`);
-          appendChatMessage(`🤖 ${engine.name}`, `Prompt transmitted to ${targetUrl}. Outbound packet permitted.`);
+        
+        if (isWeb) {
+          // Opaque response means browser sent it and didn't get a TCP reset.
+          log(`🚨 EXFILTRATION SUCCESSFUL: Payload dispatched over wire to ${targetUrl}`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked over Web Interface to ${engine.name}.\n\nThe inline DLP firewall ALLOWED the TCP connection. Payload was transmitted across the firewall to the external domain.`, 'msg-ai-passed');
         } else {
-          log(`AI TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Connection established.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Packet reached target domain (${targetUrl}). Response code: ${response.status}.`);
+          // API Response (Sanitized to hide ugly JSON token errors)
+          if (response.status === 401 || response.status === 400 || response.status === 403 || response.ok) {
+            log(`🚨 EXFILTRATION SUCCESSFUL: Payload reached API infrastructure (HTTP ${response.status}).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. Data successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
+          } else {
+            appendChatMessage(`🤖 ${engine.name}`, `Status HTTP ${response.status}`, 'msg-ai-passed');
+          }
         }
       } catch (err) {
-        log(`AI TRAFFIC INTERCEPTED / BLOCKED: Outbound request to ${targetUrl} was dropped or reset by network DLP/CORS rules!`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [Connection Intercepted: Outbound prompt packet to ${targetUrl} was dropped or blocked by network DLP/firewall layer.]`);
+        // TCP Drop / Palo Alto Proxy Intercept
+        log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG layer.`, true);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nNetwork connection to ${targetUrl} was forcibly reset or intercepted by the inline security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
+        triggerAutomaticBlockPage(false, null, `GenAI Prompt to ${engine.name}`);
       }
     }
 
     async function sendAiFileAttachment() {
       const input = document.getElementById('aiFileInput');
       if (!input.files || input.files.length === 0) { log('Error: Select a file to upload to AI first.', true); return; }
+      
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
+      const isWeb = trafficType === 'web_endpoint';
       const file = input.files[0];
       const formData = new FormData();
-      formData.append('ai_engine', engine.name);
-      formData.append('traffic_type', trafficType);
-      formData.append('simulated_endpoint', targetUrl);
       formData.append('ai_document_attachment', file);
-      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()}) File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]`, true);
-      log(`Transmitting AI file attachment outbound (${trafficType.toUpperCase()} mode) to ${targetUrl}...`);
+      
+      appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] Uploading File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'msg-user');
+      log(`Transmitting AI file attachment outbound to ${targetUrl}...`);
+      
       try {
-        const isWebEndpoint = (trafficType === 'web_endpoint');
-        const response = await fetch(targetUrl, { method: 'POST', mode: isWebEndpoint ? 'no-cors' : 'cors', body: formData });
-        if (isWebEndpoint) {
-          log(`AI DIRECT FILE UPLOAD DISPATCHED: Multipart attachment packet transmitted over network card to ${targetUrl}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `Direct multipart file upload transmitted to ${targetUrl}.`);
-        } else if (response.ok) {
-          log(`AI FILE TRAFFIC PASSED: File upload permitted to ${targetUrl}.`);
-          appendChatMessage(`🤖 ${engine.name}`, `File ${file.name} uploaded to ${targetUrl}.`);
+        const response = await fetch(targetUrl, { method: 'POST', mode: isWeb ? 'no-cors' : 'cors', body: formData });
+        
+        if (isWeb) {
+          log(`🚨 EXFILTRATION SUCCESSFUL: File attachment '${file.name}' reached external AI infrastructure.`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Attachment Leaked:\nFile '${file.name}' (${(file.size / 1024).toFixed(1)} KB) transmitted over wire to ${engine.name}. Outbound packet permitted by inline firewall.`, 'msg-ai-passed');
         } else {
-          log(`AI FILE TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Connection established.`);
-          appendChatMessage(`🤖 ${engine.name}`, `File packet reached ${targetUrl} (Status ${response.status}).`);
+          if (response.status === 401 || response.status === 400 || response.status === 403 || response.ok) {
+            log(`🚨 EXFILTRATION SUCCESSFUL: File reached API infrastructure (HTTP ${response.status}).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. File successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
+          }
         }
       } catch (err) {
-        log(`AI FILE TRAFFIC BLOCKED: Multipart attachment request to ${targetUrl} intercepted or reset by inline DLP proxy!`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP.]`);
+        log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
+        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' to ${targetUrl} was reset or intercepted by inline security rules.`, 'msg-ai-blocked');
+        triggerAutomaticBlockPage(true, file.name);
       }
     }
 
