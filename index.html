@@ -328,20 +328,20 @@
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX (DIRECT SIMPLE-REQUEST POST WIRE DISPATCH) -->
+    <!-- TAB 3: SHADOW AI SANDBOX (OPTIMIZED HARDCODED ENGINE ROUTING + CORS-FIRST VALIDATION) -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox</h2>
-        <p>Tests live payload exfiltration to GenAI domains. Employs simple-request POST dispatches (`application/x-www-form-urlencoded` and `multipart/form-data`) to bypass CORS preflight checks and slam sensitive data directly onto the wire for Palo Alto inspection.</p>
+        <p>Tests live payload exfiltration to GenAI engines using optimal, hard-coded egress interfaces per engine. Employs a CORS-First Strategy to accurately detect Palo Alto firewall blocks without false positive exfiltration reporting.</p>
         <div class="selector-bar">
           <label for="aiEngineSelect" style="font-size:0.85rem; font-weight:bold; color:#fff;">Target AI Engine:</label>
           <select id="aiEngineSelect" onchange="onAiEngineChange()"></select>
         </div>
         <div class="selector-bar" style="margin-bottom:15px;">
           <label style="font-size:0.85rem; font-weight:bold; color:#fff;">Egress Target Interface:</label>
-          <select id="aiTrafficTypeSelect" onchange="onAiEngineChange()">
-            <option value="api_endpoint">⚡ Direct Service API (Highest DLP Trigger Reliability)</option>
+          <select id="aiTrafficTypeSelect" onchange="onManualInterfaceChange()">
             <option value="web_endpoint">🌐 Web UI Interface (Direct Browser Domain POST)</option>
+            <option value="api_endpoint">⚡ Direct Service API (Highest DLP Trigger Reliability)</option>
           </select>
         </div>
         <div class="chat-container" id="chatBox"><div class="chat-msg msg-ai" id="aiWelcomeMsg">🤖 GenAI Sandbox initialized.</div></div>
@@ -472,7 +472,7 @@
   </div>
 
   <script>
-    // --- DEVTOOLS AND PAGE PROTECTION COMPLETELY REMOVED ---
+    // --- DEVTOOLS AND PAGE PROTECTION UNLOCKED ---
     function mountProtectedAttribution() {
       const container = document.getElementById('jv-protection-root');
       if (!container) return;
@@ -665,14 +665,50 @@
       return { code: code, country: name, formats: { taxNumber: `${code}-99999999`, passport: `${code.substring(0,2)}9999999`, driverLicense: `DL-${code}-999999` } };
     });
 
-    // --- TAB 3 AI ENGINES: DIRECT SIMPLE-REQUEST WIRE TARGETS ---
+    // --- TAB 3 AI ENGINES: HARDCODED PREFERRED EGRESS MODES ---
     const AI_ENGINES = {
-      openai: { name: "OpenAI ChatGPT (GPT-4o)", webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", apiEndpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o" },
-      anthropic: { name: "Anthropic Claude (Claude 3.5 Sonnet)", webEndpoint: "https://claude.ai/chat", apiEndpoint: "https://api.anthropic.com/v1/messages", model: "claude-3-5-sonnet" },
-      gemini: { name: "Google Gemini (Gemini 1.5 Pro)", webEndpoint: "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?hl=nl&rt=c", apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", model: "gemini-1.5-pro" },
-      perplexity: { name: "Perplexity AI (Sonar Reasoning)", webEndpoint: "https://www.perplexity.ai/search", apiEndpoint: "https://api.perplexity.ai/chat/completions", model: "sonar-reasoning" },
-      copilot: { name: "Microsoft Copilot (GPT-4 Turbo)", webEndpoint: "https://copilot.microsoft.com/turing/conversation/create", apiEndpoint: "https://models.inference.ai.azure.com/chat/completions", model: "gpt-4o" },
-      meta: { name: "Meta AI / Groq (Llama 3.3 70B)", webEndpoint: "https://www.meta.ai/api/graphql/", apiEndpoint: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile" }
+      openai: { 
+        name: "OpenAI ChatGPT (GPT-4o)", 
+        webEndpoint: "https://chatgpt.com/unauth-mweb/conversation/updates?lightweight_authenticated=0", 
+        apiEndpoint: "https://api.openai.com/v1/chat/completions", 
+        model: "gpt-4o",
+        preferredMode: "web_endpoint"
+      },
+      copilot: { 
+        name: "Microsoft Copilot (bing-ai)", 
+        webEndpoint: "https://copilot.microsoft.com/turing/conversation/create", 
+        apiEndpoint: "https://models.inference.ai.azure.com/chat/completions", 
+        model: "gpt-4o",
+        preferredMode: "web_endpoint"
+      },
+      anthropic: { 
+        name: "Anthropic Claude (Claude 3.5 Sonnet)", 
+        webEndpoint: "https://claude.ai/chat", 
+        apiEndpoint: "https://api.anthropic.com/v1/messages", 
+        model: "claude-3-5-sonnet",
+        preferredMode: "api_endpoint"
+      },
+      gemini: { 
+        name: "Google Gemini (Gemini 1.5 Pro)", 
+        webEndpoint: "https://gemini.google.com/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate?hl=nl&rt=c", 
+        apiEndpoint: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", 
+        model: "gemini-1.5-pro",
+        preferredMode: "api_endpoint"
+      },
+      perplexity: { 
+        name: "Perplexity AI (Sonar Reasoning)", 
+        webEndpoint: "https://www.perplexity.ai/search", 
+        apiEndpoint: "https://api.perplexity.ai/chat/completions", 
+        model: "sonar-reasoning",
+        preferredMode: "api_endpoint"
+      },
+      meta: { 
+        name: "Meta AI / Groq (Llama 3.3 70B)", 
+        webEndpoint: "https://www.meta.ai/api/graphql/", 
+        apiEndpoint: "https://api.groq.com/openai/v1/chat/completions", 
+        model: "llama-3.3-70b-versatile",
+        preferredMode: "api_endpoint"
+      }
     };
 
     function populateAiSelect() {
@@ -690,10 +726,23 @@
     }
 
     function onAiEngineChange() {
+      const engineKey = document.getElementById('aiEngineSelect').value;
+      const engine = AI_ENGINES[engineKey] || AI_ENGINES.openai;
+      const trafficSelect = document.getElementById('aiTrafficTypeSelect');
+      if (trafficSelect && engine.preferredMode) {
+        trafficSelect.value = engine.preferredMode;
+      }
+      const { trafficType, targetUrl } = getActiveAiEndpoint();
+      const welcome = document.getElementById('aiWelcomeMsg');
+      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Model: ${engine.model}] [Auto-Interface: ${trafficType.toUpperCase()}]. Target: ${targetUrl}`;
+      log(`Switched AI Engine target to ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
+    }
+
+    function onManualInterfaceChange() {
       const { engine, trafficType, targetUrl } = getActiveAiEndpoint();
       const welcome = document.getElementById('aiWelcomeMsg');
-      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Model: ${engine.model}]. Target: ${targetUrl}`;
-      log(`Switched AI Engine target to ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
+      if (welcome) welcome.innerText = `🤖 Sandbox active for ${engine.name} [Model: ${engine.model}] [Manual Interface: ${trafficType.toUpperCase()}]. Target: ${targetUrl}`;
+      log(`Manual interface set for ${engine.name} (${trafficType.toUpperCase()}: ${targetUrl}).`);
     }
 
     function generateLuhnForBrand(brand) {
@@ -1505,7 +1554,7 @@
       }
     }
 
-    // --- TAB 3 SHADOW AI HANDLERS: SIMPLE-REQUEST WIRE DISPATCH ---
+    // --- TAB 3 SHADOW AI HANDLERS: CORS-FIRST STRATEGY & DISPATCH VALIDATION ---
     function appendChatMessage(sender, text, msgClass = 'msg-ai') {
       const chatBox = document.getElementById('chatBox');
       if (!chatBox) return;
@@ -1528,34 +1577,72 @@
       input.value = '';
       log(`Transmitting AI prompt outbound to target: ${targetUrl}...`);
       
-      try {
-        // Use CORS Simple Requests (x-www-form-urlencoded) to slam payloads directly onto the wire without OPTIONS preflights
-        const fetchOptions = {
-          method: 'POST', 
-          mode: isWeb ? 'no-cors' : 'cors',
-          headers: isWeb ? { 'Content-Type': 'application/x-www-form-urlencoded' } : { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText, query: promptText })
-        };
-        
-        const response = await fetch(targetUrl, fetchOptions);
-        
-        if (isWeb) {
-          log(`🚨 EXFILTRATION SUCCESSFUL: Payload dispatched over wire to ${targetUrl}`, true);
-          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked over Web Interface to ${engine.name}.\n\nThe inline DLP firewall ALLOWED the TCP connection. Payload was transmitted across the network to the external domain.`, 'msg-ai-passed');
-        } else {
-          // API Endpoint handling with sanitized output
-          if (response.status === 401 || response.status === 400 || response.status === 403 || response.ok) {
+      if (isWeb) {
+        // CORS-First Strategy for Web UI mode to detect Palo Alto Firewall blocks accurately
+        try {
+          // STEP 1: Attempt standard CORS dispatch first so Palo Alto HTTP 403 blocks or TCP drops are caught directly
+          const corsOptions = {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText, query: promptText })
+          };
+          const resp = await fetch(targetUrl, corsOptions);
+          
+          if (resp.status === 403) {
+            // Explicit Palo Alto Gateway HTTP 403 Block Page Response
+            log(`🛡️ AI TRAFFIC BLOCKED BY DLP/SWG: Intercepted by proxy (HTTP 403).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nOutbound request containing sensitive data was intercepted and blocked by inline security policies (HTTP 403).`, 'msg-ai-blocked');
+            return;
+          }
+          
+          // Request reached server and received explicit HTTP response from remote host
+          log(`🚨 EXFILTRATION SUCCESSFUL: Payload reached ${engine.name} across firewall (HTTP ${resp.status}).`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked over Web Interface to ${engine.name}.\n\nInline DLP firewall ALLOWED the TCP connection. Payload transmitted across firewall to external domain (HTTP ${resp.status}).`, 'msg-ai-passed');
+        } catch (corsErr) {
+          // STEP 2: Standard CORS attempt threw a network error. Test with 'no-cors' to distinguish Firewall TCP Drop vs Browser CORS Header Restrictions
+          try {
+            const noCorsOptions = {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText, query: promptText })
+            };
+            await fetch(targetUrl, noCorsOptions);
+            
+            // If 'no-cors' succeeds, the TCP socket opened and payload escaped across network card!
+            log(`🚨 EXFILTRATION SUCCESSFUL: Payload dispatched over wire to ${targetUrl}`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked over Web Interface to ${engine.name}.\n\nInline DLP firewall ALLOWED the TCP socket connection. Payload was transmitted across network card to external domain.`, 'msg-ai-passed');
+          } catch (noCorsErr) {
+            // 'no-cors' ALSO threw TypeError -> The Palo Alto Firewall forcibly reset or dropped the TCP connection!
+            log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG firewall.`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nNetwork TCP connection to ${targetUrl} was forcibly reset or dropped by inline security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
+          }
+        }
+      } else {
+        // Direct API Endpoint Mode
+        try {
+          const apiOptions = {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+          };
+          const response = await fetch(targetUrl, apiOptions);
+          
+          if (response.status === 403) {
+            log(`🛡️ AI TRAFFIC BLOCKED BY DLP/SWG: Intercepted by proxy (HTTP 403).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nOutbound API prompt was blocked by inline DLP security policies (HTTP 403).`, 'msg-ai-blocked');
+          } else if (response.status === 401 || response.status === 400 || response.ok) {
             log(`🚨 EXFILTRATION SUCCESSFUL: Payload reached API infrastructure (HTTP ${response.status}).`, true);
             appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. Data successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
           } else {
             appendChatMessage(`🤖 ${engine.name}`, `Server response status: HTTP ${response.status}`, 'msg-ai-passed');
           }
+        } catch (err) {
+          log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG layer.`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nNetwork connection to ${targetUrl} was forcibly reset or intercepted by the inline security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
         }
-      } catch (err) {
-        // TCP Reset or Socket Drop by Palo Alto NGFW
-        log(`🛡️ AI TRAFFIC INTERCEPTED: Connection dropped or reset by network DLP/SWG layer.`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nNetwork connection to ${targetUrl} was forcibly reset or intercepted by the inline security gateway. Outbound exfiltration prevented.`, 'msg-ai-blocked');
-        // Standard chat notification only — standalone block page intentionally omitted for Tab 3
       }
     }
 
@@ -1572,21 +1659,42 @@
       appendChatMessage('User', `[${engine.name} (${trafficType.toUpperCase()})] Uploading File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'msg-user');
       log(`Transmitting AI file attachment outbound to ${targetUrl}...`);
       
-      try {
-        const response = await fetch(targetUrl, { method: 'POST', mode: isWeb ? 'no-cors' : 'cors', body: formData });
-        
-        if (isWeb) {
+      if (isWeb) {
+        try {
+          const resp = await fetch(targetUrl, { method: 'POST', mode: 'cors', body: formData });
+          if (resp.status === 403) {
+            log(`🛡️ AI FILE UPLOAD BLOCKED BY DLP: Intercepted by proxy (HTTP 403).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' was intercepted and blocked by inline security policies (HTTP 403).`, 'msg-ai-blocked');
+            return;
+          }
           log(`🚨 EXFILTRATION SUCCESSFUL: File attachment '${file.name}' reached external AI infrastructure.`, true);
           appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Attachment Leaked:\nFile '${file.name}' (${(file.size / 1024).toFixed(1)} KB) transmitted over wire to ${engine.name}. Outbound packet permitted by inline firewall.`, 'msg-ai-passed');
-        } else {
-          if (response.status === 401 || response.status === 400 || response.status === 403 || response.ok) {
-            log(`🚨 EXFILTRATION SUCCESSFUL: File reached API infrastructure (HTTP ${response.status}).`, true);
-            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. File successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
+        } catch (corsErr) {
+          try {
+            await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+            log(`🚨 EXFILTRATION SUCCESSFUL: File attachment '${file.name}' reached external AI infrastructure.`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Attachment Leaked:\nFile '${file.name}' (${(file.size / 1024).toFixed(1)} KB) transmitted over wire to ${engine.name}. Outbound packet permitted by inline firewall.`, 'msg-ai-passed');
+          } catch (noCorsErr) {
+            log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' to ${targetUrl} was reset or intercepted by inline security rules.`, 'msg-ai-blocked');
           }
         }
-      } catch (err) {
-        log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
-        appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' to ${targetUrl} was reset or intercepted by inline security rules.`, 'msg-ai-blocked');
+      } else {
+        try {
+          const response = await fetch(targetUrl, { method: 'POST', mode: 'cors', body: formData });
+          if (response.status === 403) {
+            log(`🛡️ AI FILE UPLOAD BLOCKED BY DLP: Intercepted by proxy (HTTP 403).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound API file upload for '${file.name}' was blocked by inline DLP security policies (HTTP 403).`, 'msg-ai-blocked');
+          } else if (response.status === 401 || response.status === 400 || response.ok) {
+            log(`🚨 EXFILTRATION SUCCESSFUL: File reached API infrastructure (HTTP ${response.status}).`, true);
+            appendChatMessage(`🤖 ${engine.name}`, `🚨 [EXFILTRATION SUCCESSFUL] - File Leaked to API.\n\nThe inline DLP firewall ALLOWED the traffic. File successfully reached external API infrastructure (Server returned HTTP ${response.status}).`, 'msg-ai-passed');
+          } else {
+            appendChatMessage(`🤖 ${engine.name}`, `Server response status: HTTP ${response.status}`, 'msg-ai-passed');
+          }
+        } catch (err) {
+          log(`🛡️ AI FILE UPLOAD INTERCEPTED: Connection dropped or reset by network DLP layer.`, true);
+          appendChatMessage(`🤖 ${engine.name}`, `⚠️ [FILE UPLOAD BLOCKED BY DLP/SWG FIREWALL]\nOutbound request for '${file.name}' to ${targetUrl} was reset or intercepted by inline security rules.`, 'msg-ai-blocked');
+        }
       }
     }
 
