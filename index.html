@@ -1577,7 +1577,7 @@
       );
     }
 
-    // 1. Updated logAiSuccess to render green text (isError = false)
+    // Updated logAiSuccess to render green text (isError = false)
     function logAiSuccess(engineName, targetUrl, detail) {
       log(`🚨 EXFILTRATION SUCCESSFUL [${engineName}]: Payload reached target (${detail}).`, false);
       appendChatMessage(
@@ -1690,42 +1690,30 @@
     }
 
     // -------------------------------------------------------------------------
-    // 3. ANTHROPIC CLAUDE HANDLERS (Direct API Target)
+    // 3. ANTHROPIC CLAUDE HANDLERS (Direct API Target - Simple Request no-cors)
     // -------------------------------------------------------------------------
-    // Updated Claude Prompt Handler to evaluate HTTP status codes (401 vs 503)
     async function handleClaudePrompt(engine, targetUrl, promptText) {
       try {
-        const resp = await fetch(targetUrl, {
+        await fetch(targetUrl, {
           method: 'POST',
+          mode: 'no-cors',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
         });
-
-        if (resp.status === 403 || resp.status === 503) {
-          logAiBlock(engine.name, targetUrl, `Proxy intercepted request (HTTP ${resp.status})`);
-        } else if (resp.status === 401 || resp.status === 400 || resp.ok) {
-          logAiSuccess(engine.name, targetUrl, `Anthropic API reached (HTTP ${resp.status})`);
-        } else {
-          logAiSuccess(engine.name, targetUrl, `Anthropic API reached (HTTP ${resp.status})`);
-        }
+        logAiSuccess(engine.name, targetUrl, 'Payload reached Anthropic API infrastructure');
       } catch (err) {
-        logAiBlock(engine.name, targetUrl, 'Anthropic API socket reset or firewall block');
+        logAiBlock(engine.name, targetUrl, 'Anthropic API socket reset or dropped by DLP firewall');
       }
     }
 
-    // Updated Claude File Handler to evaluate HTTP status codes (401 vs 503)
     async function handleClaudeFile(engine, targetUrl, file) {
       const formData = new FormData();
       formData.append('file', file);
       try {
-        const resp = await fetch(targetUrl, { method: 'POST', body: formData });
-        if (resp.status === 403 || resp.status === 503) {
-          logAiBlock(engine.name, targetUrl, `Proxy intercepted file upload (HTTP ${resp.status})`);
-        } else {
-          logAiSuccess(engine.name, targetUrl, `Anthropic API reached (HTTP ${resp.status})`);
-        }
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' reached Anthropic API infrastructure`);
       } catch (err) {
-        logAiBlock(engine.name, targetUrl, 'Anthropic file transfer reset by firewall');
+        logAiBlock(engine.name, targetUrl, `Anthropic file upload connection reset by DLP firewall`);
       }
     }
 
