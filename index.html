@@ -198,16 +198,6 @@
     .msg-ai-passed { align-self: flex-start; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--accent-green); color: #a7f3d0; }
 
     .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
-
-    .block-page-wrapper {
-      background: #e5e7eb;
-      color: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 30px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      text-align: center;
-    }
   </style>
 </head>
 <body>
@@ -365,7 +355,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: SHADOW AI SANDBOX (REAL RESPONSE & EXFILTRATION PROOF FLOW) -->
+    <!-- TAB 3: SHADOW AI SANDBOX (LIVE EXFILTRATION PROOF FLOW) -->
     <div id="tab-ai" class="tab-content">
       <div class="section">
         <h2>🤖 Shadow AI Prompt Sandbox</h2>
@@ -478,7 +468,7 @@
       </div>
     </div>
 
-    <!-- Live Intercepted DLP Block Page Display Container -->
+    <!-- Live Intercepted Gateway Block Page Container (Palo Alto PAN-OS Response Viewer) -->
     <div class="section" id="blockPageSection" style="display:none; border-color: var(--danger);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h2 style="color:var(--danger); border:none; margin:0;">🛡️ Intercepted Gateway Block Page Viewer</h2>
@@ -1277,29 +1267,63 @@
       }, 'image/png');
     }
 
-    // --- AUTOMATIC BLOCK PAGE ENGINE ---
+    // --- AUTOMATIC BLOCK PAGE ENGINE (PALO ALTO PAN-OS / PRISMA ACCESS RESPONSE TEMPLATES) ---
     function triggerAutomaticBlockPage(isFilePayload, payloadName, customReason) {
       const blockSection = document.getElementById('blockPageSection');
       const blockContent = document.getElementById('blockPageContent');
       if (!blockSection || !blockContent) return;
 
-      let titleHtml = isFilePayload ? 'File Blocked' : 'Data Payload Blocked';
-      let bodyText = isFilePayload 
-        ? 'The file you are trying to download or upload has been blocked in accordance with company policy. Please contact your system administrator if you believe this is an error.'
-        : 'The outbound text or data payload has been blocked in accordance with company policy. Please contact your system administrator if you believe this is an error.';
-      let detailHtml = isFilePayload 
-        ? `<strong>File name:</strong> ${payloadName}`
-        : `<strong>Reason:</strong> Non-file payload exfiltration attempt (${customReason || 'sensitive PII string'}) detected and intercepted.`;
+      let html = '';
 
-      blockContent.innerHTML = `
-        <div class="block-page-wrapper">
-          <h2 style="font-size:24px; font-weight:normal; margin-bottom:20px; color:#000;">${titleHtml}</h2>
-          <div style="background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:20px; text-align:left; max-width:550px; margin:0 auto; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
-            <p style="margin-bottom:15px; color:#374151; line-height:1.5;">${bodyText}</p>
-            <p style="margin:0; color:#111827; font-size:13px;">${detailHtml}</p>
+      if (isFilePayload) {
+        // Palo Alto Networks File Blocking Response Page Template
+        const fileName = payloadName || 'sensitive_document.bin';
+        html = `
+          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
+              <span style="font-size:24px;">📁</span>
+              <div>
+                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">File Transfer Blocked</h2>
+                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Next-Generation Firewall</p>
+              </div>
+            </div>
+            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">
+              Access blocked because access to the file is blocked by security policy.
+            </p>
+            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">File Name:</td><td style="padding:8px; color:#2d3748; font-family:monospace; font-weight:bold;">${fileName}</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">URL / Target:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">https://httpbin.org/post</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">File Blocking Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">Block-Sensitive-Docs-EDLP</td></tr>
+              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">Reset-Both / Block (HTTP 403)</td></tr>
+            </table>
           </div>
-        </div>
-      `;
+        `;
+      } else {
+        // Palo Alto Networks Data Filtering Block Page Template (Inline Non-File Payload)
+        const reason = customReason || 'Synthetic PII / Data Pattern';
+        html = `
+          <div style="background:#f4f5f7; color:#172b4d; border:1px solid #dfe1e6; border-radius:6px; padding:30px; font-family:Arial, sans-serif; text-align:left; max-width:650px; margin:0 auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="display:flex; align-items:center; gap:12px; border-bottom:2px solid #e02424; padding-bottom:12px; margin-bottom:20px;">
+              <span style="font-size:24px;">🚫</span>
+              <div>
+                <h2 style="font-size:18px; color:#e02424; margin:0; font-weight:bold;">Data Filtering Violation</h2>
+                <p style="font-size:12px; color:#5e6c84; margin:0;">Palo Alto Networks Enterprise Security Gateway</p>
+              </div>
+            </div>
+            <p style="font-size:13px; color:#333333; margin-bottom:15px; line-height:1.5;">
+              Content was matched against a data filtering profile and blocked because sensitive information was detected.
+            </p>
+            <table style="width:100%; font-size:12px; border-collapse:collapse; background:#ffffff; border:1px solid #e2e8f0;">
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568; width:30%;">URL / Host:</td><td style="padding:8px; color:#2d3748; font-family:monospace;">https://httpbin.org/post</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Application:</td><td style="padding:8px; color:#2d3748;">web-posting / data-exfiltration</td></tr>
+              <tr style="border-bottom:1px solid #edf2f7;"><td style="padding:8px; font-weight:bold; color:#4a5568;">Data Profile:</td><td style="padding:8px; color:#e02424; font-weight:bold;">DLP-Strict-PII-Prevention (${reason})</td></tr>
+              <tr><td style="padding:8px; font-weight:bold; color:#4a5568;">Action:</td><td style="padding:8px; color:#e02424; font-weight:bold;">Blocked (HTTP 403)</td></tr>
+            </table>
+          </div>
+        `;
+      }
+
+      blockContent.innerHTML = html;
       blockSection.style.display = 'block';
       blockSection.scrollIntoView({ behavior: 'smooth' });
     }
@@ -1647,7 +1671,6 @@
         const response = await fetch(targetUrl, fetchOptions);
         
         if (response.ok || isWebEndpoint || response.status === 401 || response.status === 400) {
-          // Exfiltration Successful: Network allowed the request through!
           let resText = "";
           try {
             const rawBody = await response.text();
