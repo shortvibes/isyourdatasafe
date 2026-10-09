@@ -157,6 +157,39 @@
     .doc-type-btn:hover { border-color: var(--accent-cyan); }
     .doc-type-btn.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); }
 
+    /* Nested Sidebar Sub-Tabs Styling */
+    .sidebar-subtabs {
+      display: flex;
+      gap: 4px;
+      background: #020617;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .subtab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .subtab-btn:hover { color: #fff; }
+    .subtab-btn.active {
+      background: #1e293b;
+      color: var(--accent-cyan);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .subtab-panel { display: none; }
+    .subtab-panel.active { display: block; }
+
     .chat-container { background: #020617; border: 1px solid var(--border); border-radius: 6px; height: 240px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
     .chat-msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; }
     .msg-user { align-self: flex-end; background: #1e1b4b; border: 1px solid #4338ca; color: #818cf8; }
@@ -386,31 +419,54 @@
               </select>
             </div>
             
+            <!-- STEP 5 & 6: NESTED SUB-TABS FOR SEPARATING LOCAL EXPORT & NETWORK EGRESS -->
             <div>
-              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:6px;">5. LOCAL FILE EXPORT</label>
-              <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
-                <button class="btn btn-sm" onclick="exportTab4Document('pdf')">📄 PDF</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('png')">🖼️ PNG</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('txt')">📝 TXT</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('json')">📊 JSON</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('csv')">📈 CSV</button>
-                <button class="btn btn-sm" onclick="exportTab4Document('docx')">💼 DOCX</button>
-              </div>
-              <button class="btn btn-sm" style="width:100%; margin-bottom:12px; background:#f59e0b; color:#000;" onclick="exportAllBundle()">📦 Export ALL (ZIP Bundle)</button>
+              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:6px;">5. DISPATCH ACTION ENGINE</label>
               
-              <label style="font-size:0.8rem; font-weight:bold; color:#fff; display:block; margin-bottom:6px;">6. NETWORK EGRESS TRANSMISSION</label>
-              <div style="display:flex; gap:6px;">
-                <select id="tab4TransmitFormat" style="flex:1;">
-                  <option value="docx">💼 DOCX</option>
-                  <option value="pdf">📄 PDF</option>
-                  <option value="png">🖼️ PNG</option>
-                  <option value="txt">📝 TXT</option>
-                  <option value="json">📊 JSON</option>
-                  <option value="csv">📈 CSV</option>
-                </select>
-                <button class="btn btn-purple" style="flex:2;" onclick="transmitTab4Outbound()">⚡ Transmit Outbound</button>
+              <div class="sidebar-subtabs">
+                <button class="subtab-btn active" id="btnSubtabLocal" onclick="switchSidebarSubtab('local')">💾 Local Export</button>
+                <button class="subtab-btn" id="btnSubtabNetwork" onclick="switchSidebarSubtab('network')">⚡ Network Egress</button>
+              </div>
+
+              <!-- SUBTAB PANEL 1: LOCAL EXPORT -->
+              <div id="subtab-panel-local" class="subtab-panel active" style="background:#020617; border:1px solid var(--border); border-radius:6px; padding:12px;">
+                <p style="font-size:0.75rem; color:var(--muted); margin-bottom:8px;">Generate and download compiled file directly to client endpoint:</p>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
+                  <button class="btn btn-sm" onclick="exportTab4Document('pdf')">📄 PDF</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('png')">🖼️ PNG</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('txt')">📝 TXT</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('json')">📊 JSON</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('csv')">📈 CSV</button>
+                  <button class="btn btn-sm" onclick="exportTab4Document('docx')">💼 DOCX</button>
+                </div>
+                <button class="btn btn-sm" style="width:100%; background:#f59e0b; color:#000;" onclick="exportAllBundle()">📦 Export ALL (ZIP Bundle)</button>
+              </div>
+
+              <!-- SUBTAB PANEL 2: NETWORK EGRESS -->
+              <div id="subtab-panel-network" class="subtab-panel" style="background:#020617; border:1px solid var(--purple); border-radius:6px; padding:12px;">
+                <p style="font-size:0.75rem; color:#a5b4fc; margin-bottom:8px;">Fires real HTTP POST packet over wire to test inline DLP/SWG proxy:</p>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-bottom:8px;">
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('docx')">⚡ DOCX</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('pdf')">⚡ PDF</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('png')">⚡ PNG</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('txt')">⚡ TXT</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('json')">⚡ JSON</button>
+                  <button class="btn btn-sm" style="border-color:var(--purple); color:#fff;" onclick="transmitTab4OutboundDirect('csv')">⚡ CSV</button>
+                </div>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                  <select id="tab4TransmitFormat" style="flex:1;">
+                    <option value="docx">💼 DOCX</option>
+                    <option value="pdf">📄 PDF</option>
+                    <option value="png">🖼️ PNG</option>
+                    <option value="txt">📝 TXT</option>
+                    <option value="json">📊 JSON</option>
+                    <option value="csv">📈 CSV</option>
+                  </select>
+                  <button class="btn btn-purple" style="flex:1.5;" onclick="transmitTab4Outbound()">⚡ Transmit</button>
+                </div>
               </div>
             </div>
+
           </div>
           <div class="tab4-stage">
             <div class="a4-preview" id="a4PreviewStage"></div>
@@ -476,12 +532,28 @@
     });
     observer.observe(document.body, { childList: true, subtree: true, attributes: true });
 
-    // --- TAB SWITCHING ---
+    // --- MAIN TAB SWITCHING ---
     function switchTab(evt, tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       evt.currentTarget.classList.add('active');
       document.getElementById(tabId).classList.add('active');
+    }
+
+    // --- TAB 4 SIDEBAR SUB-TAB SWITCHING ---
+    function switchSidebarSubtab(type) {
+      document.getElementById('btnSubtabLocal').classList.remove('active');
+      document.getElementById('btnSubtabNetwork').classList.remove('active');
+      document.getElementById('subtab-panel-local').classList.remove('active');
+      document.getElementById('subtab-panel-network').classList.remove('active');
+
+      if (type === 'local') {
+        document.getElementById('btnSubtabLocal').classList.add('active');
+        document.getElementById('subtab-panel-local').classList.add('active');
+      } else {
+        document.getElementById('btnSubtabNetwork').classList.add('active');
+        document.getElementById('subtab-panel-network').classList.add('active');
+      }
     }
 
     // --- MATHEMATICAL CHECKSUM ENGINES ---
@@ -621,7 +693,7 @@
       ITA: { passport: "PASSAPORTO", dl: "PATENTE DI GUIDA", id: "CARTA D'IDENTITÀ", surname: "1. COGNOME:", given: "2. NOME:", dob: "3. DATA DI NASCITA:", nat: "CITTADINANZA: Italiana" },
       PRT: { passport: "PASSAPORTE", dl: "CARTA DE CONDUÇÃO", id: "CARTÃO DE CIDADÃO", surname: "1. APELIDO:", given: "2. NOME:", dob: "3. DATA DE NASC.:", nat: "NACIONALIDADE: Portuguesa" },
       JPN: { passport: "RYOKAN (護照)", dl: "UNTEN MENKYO SHO", id: "MY NUMBER CARD", surname: "氏名:", given: "名:", dob: "生年月日:", nat: "国籍: 日本" },
-      CHN: { passport: "HUZHAO (護照)", dl: "JIASHIZHENG", id: "RESIDENT IDENTITY CARD", surname: "姓:", given: "名:", dob: "出生日期:", nat: "国籍: 中国" },
+      CHN: { passport: "HUZHAO (护照)", dl: "JIASHIZHENG", id: "RESIDENT IDENTITY CARD", surname: "姓:", given: "名:", dob: "出生日期:", nat: "国籍: 中国" },
       USA: { passport: "PASSPORT", dl: "DRIVER LICENSE", id: "NATIONAL IDENTIFICATION CARD", surname: "SURNAME:", given: "GIVEN NAMES:", dob: "DATE OF BIRTH:", nat: "NATIONALITY: USA" }
     };
 
@@ -978,7 +1050,7 @@
       ctx.fillText(holderName.toUpperCase(), 30, 210);
     }
 
-    // --- TAB 4 DECOUPLED INDEPENDENT LOCALIZED RENDERER (USING MS WORD COMPATIBLE TABLES) ---
+    // --- TAB 4 DECOUPLED INDEPENDENT LOCALIZED RENDERER ---
     function setTab4DocType(type, evt) {
       activeTab4DocType = type;
       document.querySelectorAll('.doc-type-btn').forEach(btn => btn.classList.remove('active'));
@@ -1362,6 +1434,12 @@
       a.download = `DLP_Benchmark_Bundle_${document.getElementById('tab4CountrySelect').value}.zip`;
       a.click();
       log(`Downloaded complete document bundle: ${a.download}`);
+    }
+
+    async function transmitTab4OutboundDirect(fmt) {
+      const formatSelect = document.getElementById('tab4TransmitFormat');
+      if (formatSelect) formatSelect.value = fmt;
+      await transmitTab4Outbound();
     }
 
     async function transmitTab4Outbound() {
