@@ -165,15 +165,13 @@
     .log-box { background: #020617; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.8rem; color: var(--accent-green); min-height: 110px; max-height: 250px; overflow-y: auto; }
 
     .block-page-wrapper {
-      background: #ffffff;
+      background: #e5e7eb;
       color: #0f172a;
-      border: 2px solid var(--danger);
-      border-radius: 6px;
-      padding: 15px;
-      max-height: 350px;
-      overflow-y: auto;
-      font-family: sans-serif;
-      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 30px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-align: center;
     }
   </style>
 </head>
@@ -414,8 +412,8 @@
         <h2 style="color:var(--danger); border:none; margin:0;">🛡️ Intercepted DLP Block Page Viewer</h2>
         <button class="btn btn-sm" onclick="closeBlockPageViewer()">Close Block Page</button>
       </div>
-      <p style="color:#ef4444; font-size:0.8rem;">An outbound request triggered a block response from an inline network proxy gateway. Below is the captured block page payload:</p>
-      <div class="block-page-wrapper" id="blockPageContent"></div>
+      <p style="color:#ef4444; font-size:0.8rem; margin-bottom:12px;">An outbound request triggered a block response from an inline network proxy gateway. Below is the captured block page payload:</p>
+      <div id="blockPageContent"></div>
     </div>
 
     <!-- Persistent Egress Inspector Log -->
@@ -1181,23 +1179,41 @@
           if (response.ok) {
             log(`TRAFFIC PASSED: OCR Document specimen permitted across network (200 OK).`);
           } else {
-            const html = await response.text();
-            displayCapturedBlockPage(html);
+            triggerAutomaticBlockPage(true, filename);
             log(`TRAFFIC BLOCKED: OCR Document specimen intercepted by DLP proxy (HTTP ${response.status})!`, true);
           }
-        } catch (err) { log(`TRAFFIC BLOCKED: OCR Document specimen dropped by DLP firewall!`, true); }
+        } catch (err) { 
+          triggerAutomaticBlockPage(true, filename);
+          log(`TRAFFIC BLOCKED: OCR Document specimen dropped by DLP firewall!`, true); 
+        }
       }, 'image/png');
     }
 
-    // --- BLOCK PAGE CAPTURE ENGINE ---
-    function displayCapturedBlockPage(content) {
-      const section = document.getElementById('blockPageSection');
-      const wrapper = document.getElementById('blockPageContent');
-      if (section && wrapper) {
-        wrapper.innerHTML = content;
-        section.style.display = 'block';
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
+    // --- AUTOMATIC BLOCK PAGE ENGINE ---
+    function triggerAutomaticBlockPage(isBlobFile, fileNameOrType, customReason) {
+      const blockSection = document.getElementById('blockPageSection');
+      const blockContent = document.getElementById('blockPageContent');
+      if (!blockSection || !blockContent) return;
+
+      let titleHtml = isBlobFile ? 'File Blocked' : 'Data Payload Blocked';
+      let bodyText = isBlobFile 
+        ? 'The file you are trying to download or upload has been blocked in accordance with company policy. Please contact your system administrator if you believe this is an error.'
+        : 'The outbound text or data payload has been blocked in accordance with company policy. Please contact your system administrator if you believe this is an error.';
+      let detailHtml = isBlobFile 
+        ? `<strong>File name:</strong> ${fileNameOrType}`
+        : `<strong>Reason:</strong> Non-file payload exfiltration attempt (${customReason || 'sensitive PII string'}) detected and intercepted.`;
+
+      blockContent.innerHTML = `
+        <div class="block-page-wrapper">
+          <h2 style="font-size:24px; font-weight:normal; margin-bottom:20px; color:#000;">${titleHtml}</h2>
+          <div style="background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:20px; text-align:left; max-width:550px; margin:0 auto; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+            <p style="margin-bottom:15px; color:#374151; line-height:1.5;">${bodyText}</p>
+            <p style="margin:0; color:#111827; font-size:13px;">${detailHtml}</p>
+          </div>
+        </div>
+      `;
+      blockSection.style.display = 'block';
+      blockSection.scrollIntoView({ behavior: 'smooth' });
     }
 
     function closeBlockPageViewer() {
@@ -1211,38 +1227,32 @@
         if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
           const bodyHtml = iframe.contentDocument.body.innerHTML;
           if (bodyHtml && bodyHtml.trim().length > 0) {
-            displayCapturedBlockPage(bodyHtml);
+            triggerAutomaticBlockPage(true, "native_form_upload.bin");
             log(`CAPTURER: Intercepted response payload from target iframe.`);
           }
         }
       } catch (e) {
-        // Cross-origin iframe restriction when request passes out of domain
+        // Direct browser cross-origin frame restriction on wire post
       }
     }
 
     // --- RESET TEST BENCH FUNCTION ---
     function resetTestBench() {
-      // 1. Clear payload box
       const payloadBox = document.getElementById('payload');
       if (payloadBox) payloadBox.value = '';
       updateByteCount();
 
-      // 2. Clear AI prompt input
       const aiInput = document.getElementById('aiPromptInput');
       if (aiInput) aiInput.value = '';
 
-      // 3. Clear file input
       const fileInput = document.getElementById('generalFileInput');
       if (fileInput) fileInput.value = '';
 
-      // 4. Hide Block Page Viewer
       closeBlockPageViewer();
 
-      // 5. Reset Log Box
       const logBox = document.getElementById('logBox');
       if (logBox) logBox.innerHTML = '[Awaiting network request execution...]';
 
-      // 6. Regenerate synthetic PII numbers
       updateTab1CountryData();
       renderTab4Document();
 
@@ -1356,11 +1366,13 @@
         if (response.ok) {
           log(`TRAFFIC PASSED: Document payload transmitted across network (200 OK).`);
         } else {
-          const html = await response.text();
-          displayCapturedBlockPage(html);
+          triggerAutomaticBlockPage(false, null, "Pll Document Egress");
           log(`TRAFFIC BLOCKED: Outbound document rejected by proxy (HTTP ${response.status})!`, true);
         }
-      } catch (err) { log(`TRAFFIC BLOCKED: Outbound document blocked by DLP firewall!`, true); }
+      } catch (err) { 
+        triggerAutomaticBlockPage(false, null, "PII Document Egress");
+        log(`TRAFFIC BLOCKED: Outbound document blocked by DLP firewall!`, true); 
+      }
     }
 
     function log(msg, isError = false) {
@@ -1410,11 +1422,11 @@
         if (response.ok) {
           log(`TRAFFIC PASSED: Outbound HTTP POST reached external destination (200 OK). Proxy allowed payload.`);
         } else {
-          const html = await response.text();
-          displayCapturedBlockPage(html);
+          triggerAutomaticBlockPage(false, null, "Synthetic PII String");
           log(`TRAFFIC BLOCKED: Outbound request rejected by inline proxy (HTTP ${response.status})!`, true);
         }
       } catch (err) {
+        triggerAutomaticBlockPage(false, null, "Synthetic PII String");
         log(`TRAFFIC BLOCKED: Connection dropped or reset by network firewall/DLP layer!`, true);
       }
     }
@@ -1459,13 +1471,13 @@
           try {
             const resp = await fetch('https://httpbin.org/post', { method: 'POST', body: formData });
             if (resp.status === 403 || resp.status === 401) {
-              const html = await resp.text();
-              displayCapturedBlockPage(html);
+              triggerAutomaticBlockPage(true, `${file.name}.part${chunkIndex}`);
               log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${resp.status})! Network gateway dropped chunk ${chunkIndex + 1}.`, true);
               return;
             }
             log(`Chunk ${chunkIndex + 1} transmitted (${chunk.size} bytes). Status: ${resp.status}`);
           } catch (e) {
+            triggerAutomaticBlockPage(true, `${file.name}.part${chunkIndex}`);
             log(`Chunk ${chunkIndex + 1} intercepted/dropped by DLP network reset!`, true);
             return;
           }
@@ -1486,8 +1498,7 @@
         });
         
         if (response.status === 403 || response.status === 401) {
-          const html = await response.text();
-          displayCapturedBlockPage(html);
+          triggerAutomaticBlockPage(true, file.name);
           log(`⚠️ DLP BLOCK PAGE DETECTED (HTTP ${response.status})! Network proxy rejected the file upload.`, true);
         } else if (response.ok) {
           log(`FILE TRAFFIC PASSED: Standard multipart upload permitted (200 OK).`);
@@ -1495,6 +1506,7 @@
           log(`FILE TRAFFIC ALTERED: Response code ${response.status}`, true);
         }
       } catch (err) {
+        triggerAutomaticBlockPage(true, file.name);
         log(`FILE TRAFFIC INTERCEPTED / DROPPED: File upload packet was dropped or reset by network DLP layer! (${err.message})`, true);
       }
     }
@@ -1532,12 +1544,12 @@
           log(`AI TRAFFIC PASSED: Prompt payload delivered to ${engine.name} target (${targetUrl}). Status: ${response.status}`);
           appendChatMessage(`🤖 ${engine.name}`, `Prompt transmitted to ${targetUrl}. Outbound packet permitted.`);
         } else {
-          const html = await response.text();
-          displayCapturedBlockPage(html);
+          triggerAutomaticBlockPage(false, null, `GenAI Prompt to ${engine.name}`);
           log(`AI TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Block page captured.`);
           appendChatMessage(`🤖 ${engine.name}`, `Packet reached target domain (${targetUrl}). Response code: ${response.status}.`);
         }
       } catch (err) {
+        triggerAutomaticBlockPage(false, null, `GenAI Prompt to ${engine.name}`);
         log(`AI TRAFFIC INTERCEPTED / BLOCKED: Outbound request to ${targetUrl} was dropped or reset by network firewall/DLP rules!`, true);
         appendChatMessage(`🤖 ${engine.name}`, `⚠️ [Connection Intercepted: Outbound prompt packet to ${targetUrl} was dropped or blocked by network security layer.]`);
       }
@@ -1565,12 +1577,12 @@
           log(`AI FILE TRAFFIC PASSED: File upload permitted to ${targetUrl}.`);
           appendChatMessage(`🤖 ${engine.name}`, `File ${file.name} uploaded to ${targetUrl}.`);
         } else {
-          const html = await response.text();
-          displayCapturedBlockPage(html);
+          triggerAutomaticBlockPage(true, file.name);
           log(`AI FILE TRAFFIC RESPONSE: HTTP ${response.status} from target (${targetUrl}). Block page captured.`);
           appendChatMessage(`🤖 ${engine.name}`, `File packet reached ${targetUrl} (Status ${response.status}).`);
         }
       } catch (err) {
+        triggerAutomaticBlockPage(true, file.name);
         log(`AI FILE TRAFFIC BLOCKED: Multipart attachment request to ${targetUrl} intercepted or reset by inline DLP proxy!`, true);
         appendChatMessage(`🤖 ${engine.name}`, `⚠️ [File Upload to ${targetUrl} Intercepted by Network Layer DLP.]`);
       }
