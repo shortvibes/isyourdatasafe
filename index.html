@@ -1555,7 +1555,7 @@
     }
 
     // =========================================================================
-    // TAB 3: SHADOW AI SANDBOX - NATIVE IFRAME FORM DISPATCH ENGINE
+    // TAB 3: SHADOW AI SANDBOX - ENGINE-SPECIFIC MODULAR EGRESS SUITE
     // =========================================================================
 
     function appendChatMessage(sender, text, msgClass = 'msg-ai') {
@@ -1584,49 +1584,6 @@
         `🚨 [EXFILTRATION SUCCESSFUL] - Data Leaked to ${engineName}\nTarget: ${targetUrl}\nDetail: ${detail}\nThe inline DLP firewall ALLOWED the connection across the network card.`,
         'msg-ai-passed'
       );
-    }
-
-    // --- GENERIC NATIVE FORM DISPATCH HELPERS (CORS-FREE WIRE TRANSMISSION) ---
-    function dispatchAiFormPrompt(engine, targetUrl, promptText) {
-      const form = document.getElementById('nativeEgressForm');
-      form.action = targetUrl;
-      form.method = 'POST';
-      form.enctype = 'application/x-www-form-urlencoded';
-      form.innerHTML = '';
-
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'prompt';
-      input.value = promptText;
-      form.appendChild(input);
-
-      const payloadInput = document.createElement('input');
-      payloadInput.type = 'hidden';
-      payloadInput.name = 'dlp_test_payload';
-      payloadInput.value = promptText;
-      form.appendChild(payloadInput);
-
-      form.submit();
-      logAiSuccess(engine.name, targetUrl, 'Packet dispatched over network card via native form interface');
-    }
-
-    function dispatchAiFormFile(engine, targetUrl, file) {
-      const form = document.getElementById('nativeEgressForm');
-      form.action = targetUrl;
-      form.method = 'POST';
-      form.enctype = 'multipart/form-data';
-      form.innerHTML = '';
-
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.name = 'file';
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      fileInput.files = dataTransfer.files;
-      form.appendChild(fileInput);
-
-      form.submit();
-      logAiSuccess(engine.name, targetUrl, `File '${file.name}' dispatched over network card via native form interface`);
     }
 
     // --- MAIN ROUTERS ---
@@ -1676,69 +1633,199 @@
     }
 
     // -------------------------------------------------------------------------
-    // 1. OPENAI CHATGPT HANDLERS
+    // 1. OPENAI CHATGPT HANDLERS (Web UI Target)
     // -------------------------------------------------------------------------
     async function handleOpenAiPrompt(engine, targetUrl, promptText) {
-      dispatchAiFormPrompt(engine, targetUrl, promptText);
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Opaque TCP Stream Transmitted');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'TCP connection reset/dropped by firewall');
+      }
     }
 
     async function handleOpenAiFile(engine, targetUrl, file) {
-      dispatchAiFormFile(engine, targetUrl, file);
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' uploaded via Web UI stream`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, `File upload connection reset by firewall`);
+      }
     }
 
     // -------------------------------------------------------------------------
-    // 2. MICROSOFT COPILOT HANDLERS
+    // 2. MICROSOFT COPILOT HANDLERS (Web UI Target / bing-ai)
     // -------------------------------------------------------------------------
     async function handleCopilotPrompt(engine, targetUrl, promptText) {
-      dispatchAiFormPrompt(engine, targetUrl, promptText);
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Copilot Web Stream Transmitted');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Copilot connection reset by firewall');
+      }
     }
 
     async function handleCopilotFile(engine, targetUrl, file) {
-      dispatchAiFormFile(engine, targetUrl, file);
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' passed to Copilot Web Endpoint`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, `Copilot file transfer dropped by firewall`);
+      }
     }
 
     // -------------------------------------------------------------------------
-    // 3. ANTHROPIC CLAUDE HANDLERS
+    // 3. ANTHROPIC CLAUDE HANDLERS (Direct API Target)
     // -------------------------------------------------------------------------
     async function handleClaudePrompt(engine, targetUrl, promptText) {
-      dispatchAiFormPrompt(engine, targetUrl, promptText);
+      try {
+        const resp = await fetch(targetUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+
+        if (resp.status === 503 || resp.status === 403) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted request (HTTP ${resp.status})`);
+        } else if (resp.status === 401 || resp.status === 400 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Anthropic API reached (HTTP ${resp.status})`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Anthropic API reached (HTTP ${resp.status})`);
+        }
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Anthropic API socket reset or firewall block');
+      }
     }
 
     async function handleClaudeFile(engine, targetUrl, file) {
-      dispatchAiFormFile(engine, targetUrl, file);
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const resp = await fetch(targetUrl, { method: 'POST', body: formData });
+        if (resp.status === 503 || resp.status === 403) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted file upload (HTTP ${resp.status})`);
+        } else if (resp.status === 401 || resp.status === 400 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Anthropic API reached (HTTP ${resp.status})`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Anthropic API reached (HTTP ${resp.status})`);
+        }
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Anthropic file transfer reset by firewall');
+      }
     }
 
     // -------------------------------------------------------------------------
-    // 4. GOOGLE GEMINI HANDLERS
+    // 4. GOOGLE GEMINI HANDLERS (Direct API Target - Structured JSON Payload)
     // -------------------------------------------------------------------------
     async function handleGeminiPrompt(engine, targetUrl, promptText) {
-      dispatchAiFormPrompt(engine, targetUrl, promptText);
+      try {
+        const resp = await fetch(targetUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: promptText }]
+            }]
+          })
+        });
+
+        if (resp.status === 400 || resp.status === 401 || resp.status === 403 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
+        } else if (resp.status === 503) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted request (HTTP ${resp.status})`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
+        }
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'TCP connection dropped/reset by DLP firewall');
+      }
     }
 
     async function handleGeminiFile(engine, targetUrl, file) {
-      dispatchAiFormFile(engine, targetUrl, file);
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const resp = await fetch(targetUrl, { method: 'POST', body: formData });
+        if (resp.status === 400 || resp.status === 401 || resp.status === 403 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
+        } else if (resp.status === 503) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted request (HTTP ${resp.status})`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Google API reached (HTTP ${resp.status})`);
+        }
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Google API file upload connection reset');
+      }
     }
 
     // -------------------------------------------------------------------------
-    // 5. PERPLEXITY AI HANDLERS
+    // 5. PERPLEXITY AI HANDLERS (Direct API Target)
     // -------------------------------------------------------------------------
     async function handlePerplexityPrompt(engine, targetUrl, promptText) {
-      dispatchAiFormPrompt(engine, targetUrl, promptText);
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Payload reached Perplexity API');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Perplexity API connection reset by firewall');
+      }
     }
 
     async function handlePerplexityFile(engine, targetUrl, file) {
-      dispatchAiFormFile(engine, targetUrl, file);
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' reached Perplexity API`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Perplexity file transfer reset by firewall');
+      }
     }
 
     // -------------------------------------------------------------------------
-    // 6. META AI / GROQ HANDLERS
+    // 6. META AI / GROQ HANDLERS (Direct API Target)
     // -------------------------------------------------------------------------
     async function handleMetaPrompt(engine, targetUrl, promptText) {
-      dispatchAiFormPrompt(engine, targetUrl, promptText);
+      try {
+        await fetch(targetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
+        });
+        logAiSuccess(engine.name, targetUrl, 'Payload reached Meta/Groq API infrastructure');
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Meta/Groq API socket reset or HTTP 503 block');
+      }
     }
 
     async function handleMetaFile(engine, targetUrl, file) {
-      dispatchAiFormFile(engine, targetUrl, file);
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
+        logAiSuccess(engine.name, targetUrl, `File '${file.name}' reached Meta/Groq API`);
+      } catch (err) {
+        logAiBlock(engine.name, targetUrl, 'Meta/Groq file transfer reset by firewall');
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
