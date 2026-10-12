@@ -1754,19 +1754,25 @@
     }
 
     // -------------------------------------------------------------------------
-    // 5. PERPLEXITY AI HANDLERS (Direct API Target)
+    // 5. PERPLEXITY AI HANDLERS (Direct API Target - Explicit Status Evaluation)
     // -------------------------------------------------------------------------
     async function handlePerplexityPrompt(engine, targetUrl, promptText) {
       try {
-        await fetch(targetUrl, {
+        const resp = await fetch(targetUrl, {
           method: 'POST',
-          mode: 'no-cors',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ dlp_test_payload: promptText, prompt: promptText })
         });
-        logAiSuccess(engine.name, targetUrl, 'Payload reached Perplexity API');
+
+        if (resp.status === 503 || resp.status === 403) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted request (HTTP ${resp.status})`);
+        } else if (resp.status === 401 || resp.status === 400 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Perplexity API reached (HTTP ${resp.status})`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Perplexity API reached (HTTP ${resp.status})`);
+        }
       } catch (err) {
-        logAiBlock(engine.name, targetUrl, 'Perplexity API connection reset by firewall');
+        logAiBlock(engine.name, targetUrl, 'Perplexity API connection reset or firewall block');
       }
     }
 
@@ -1774,8 +1780,14 @@
       const formData = new FormData();
       formData.append('file', file);
       try {
-        await fetch(targetUrl, { method: 'POST', mode: 'no-cors', body: formData });
-        logAiSuccess(engine.name, targetUrl, `File '${file.name}' reached Perplexity API`);
+        const resp = await fetch(targetUrl, { method: 'POST', body: formData });
+        if (resp.status === 503 || resp.status === 403) {
+          logAiBlock(engine.name, targetUrl, `Proxy intercepted file upload (HTTP ${resp.status})`);
+        } else if (resp.status === 401 || resp.status === 400 || resp.ok) {
+          logAiSuccess(engine.name, targetUrl, `Perplexity API reached (HTTP ${resp.status})`);
+        } else {
+          logAiSuccess(engine.name, targetUrl, `Perplexity API reached (HTTP ${resp.status})`);
+        }
       } catch (err) {
         logAiBlock(engine.name, targetUrl, 'Perplexity file transfer reset by firewall');
       }
