@@ -1556,6 +1556,7 @@
         `⚠️ [TRAFFIC BLOCKED BY DLP/SWG FIREWALL]\nTarget: ${targetUrl}\nReason: ${reason}\nOutbound exfiltration prevented by inline security policy.`,
         'msg-ai-blocked'
       );
+      triggerAutomaticBlockPage(false, null, `Shadow AI Exfiltration Attempt (${engineName}): ${reason}`);
     }
 
     function logAiSuccess(engineName, targetUrl, detail) {
@@ -1754,7 +1755,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // 5. PERPLEXITY AI HANDLERS (Direct API Target - Explicit Status Evaluation)
+    // 5. PERPLEXITY AI HANDLERS (Direct API Target)
     // -------------------------------------------------------------------------
     async function handlePerplexityPrompt(engine, targetUrl, promptText) {
       try {
